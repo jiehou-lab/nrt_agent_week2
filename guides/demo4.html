@@ -120,15 +120,106 @@ Demo 4   subagent tool list         applies to one worker
 </code></pre>
 <p>The first is a rule about a capability you hold. The second is not holding it.
 They compose: a scoped subagent inside a permission-restricted project gets both.</p>
+<h2>8. Ask who is actually protected</h2>
+<p>Step 7 is true, and it is also the easiest place in this demo to over-read a
+boundary. Scoping the subagent removed a capability <strong>from the subagent</strong>. It did
+not put a fence around <code>data/</code>. You proved that yourself in step 5: the main
+agent read the file without being stopped.</p>
+<p>So test how the two mechanisms compose. Add Demo 3's mechanism to this project:</p>
+<pre><code class="language-bash">cat &gt; .claude/settings.json &lt;&lt;'JSON'
+{
+  &quot;permissions&quot;: {
+    &quot;deny&quot;: [&quot;Read(./data/**)&quot;, &quot;Edit(./data/**)&quot;]
+  }
+}
+JSON
+</code></pre>
+<p>Permission rules are read at startup, so <strong>restart Claude Code</strong>. Then run these
+three, in order:</p>
+<pre><code class="language-text">1  Read the first 5 lines of data/case_001.pgm
+
+2  Use the tissue-analyst subagent to read data/case_001.pgm directly.
+
+3  Use the tissue-analyst subagent to analyze data/case_001.pgm
+   with magnification 20 and damage_threshold_fraction 0.45.
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>who</th>
+<th>what happens</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>main agent</td>
+<td>refused</td>
+<td>the deny rule binds the whole session</td>
+</tr>
+<tr>
+<td>2</td>
+<td>subagent</td>
+<td>impossible</td>
+<td>it never had <code>Read</code> to begin with</td>
+</tr>
+<tr>
+<td>3</td>
+<td>subagent</td>
+<td><strong>works</strong></td>
+<td>the MCP server opens the file, not the agent</td>
+</tr>
+</tbody>
+</table>
+<p>Row 3 is the one to sit with. Nothing in Claude Code's permission system applies
+to the server — it is a separate process running under your account, with your
+filesystem access. The rules govern the agent's tools, not the machine.</p>
+<pre><code class="language-text">deny rules       bind everyone in the session — main agent and subagents alike
+tools: list      binds one worker
+the MCP server   is a separate process: your permissions, not Claude's
+</code></pre>
+<h3>So what is the tool list actually for?</h3>
+<p>Not secrecy. Three other things, all of which matter more day to day:</p>
+<ul>
+<li><strong>Context.</strong> Eight tool calls' worth of JSON stays in the worker's context and
+  never enters yours. This is the main reason to delegate at all.</li>
+<li><strong>Predictability.</strong> A worker holding two tools cannot improvise a third
+  approach when the first one looks awkward. Fewer tools, fewer branches.</li>
+<li><strong>Blast radius.</strong> A subagent with no <code>Write</code> cannot overwrite your data by
+  misreading its own instructions.</li>
+</ul>
+<p>All three are protection against <strong>error</strong>, not against an adversary. A narrow
+tool list is a design constraint on a cooperative worker. If you need a wall, it
+has to sit below Claude Code: filesystem permissions, a separate user account,
+sandbox mode, or keeping the data on a machine where only the server runs.</p>
+<h3>What "private" means in this package</h3>
+<p>Not <em>the model cannot reach the file</em>. It means <strong>the pixels never become
+tokens</strong>. What crosses into a context window is <code>damage_fraction</code>,
+<code>hard_edge_rate</code>, <code>low_confidence</code> — derived numbers, computed by code you wrote.
+The image itself never does.</p>
+<p>That is a real and useful narrowing, and it is the design worth copying into your
+own work. It is not a seal. Filenames, the numbers themselves, and every word of
+your conversation still leave.</p>
+<h3>Answer these before moving on</h3>
+<pre><code class="language-text">a) Your lab's rule is &quot;raw patient slides never leave this machine.&quot;
+   Which of the three mechanisms above actually enforces it?
+
+b) You give the subagent Bash so it can gzip its own outputs.
+   What did you just give up — and which of the three reasons above did it cost you?
+</code></pre>
+<p>You can leave <code>.claude/settings.json</code> in place for the rest of the guide; nothing
+after this point needs the main agent to read <code>data/</code> directly.</p>
 <hr />
 <h2 class="partmark">Part C — How the two of them actually communicate</h2>
-<h2>8. Ask what was sent and what came back</h2>
+<h2>9. Ask what was sent and what came back</h2>
 <pre><code class="language-text">What exactly did you send to the tissue-analyst subagent, and what did it return
 to you? Show me both.
 </code></pre>
 <p>You will see a task description going in, and a summary coming back. <strong>Not a
 transcript</strong> — the subagent's intermediate steps stay in its own context.</p>
-<h2>9. Prove the contexts are separate</h2>
+<h2>10. Prove the contexts are separate</h2>
 <p>Tell the main agent something it has no reason to forget:</p>
 <pre><code class="language-text">Remember this: our slide scanner is an Aperio AT2, serial 4417.
 </code></pre>
@@ -147,7 +238,7 @@ subagent saw but did not say is gone.</p>
 <p>This is the real design constraint of subagents: the report <em>is</em> the interface.
 What it does not say, nobody upstream can use.</p>
 </blockquote>
-<h2>10. See why that is useful</h2>
+<h2>11. See why that is useful</h2>
 <pre><code class="language-text">Use the tissue-analyst subagent to analyze all four histology slides
 at magnification 20 with damage_threshold_fraction 0.45, then give me
 a single table of the results.
@@ -158,7 +249,7 @@ somebody else's context, and you get the conclusion.</p>
 <hr />
 <h2 class="partmark">Part D — Test whether it is any good</h2>
 <p>Delegation is easy. Judging the result is the skill.</p>
-<h2>11. Score it against the expected values</h2>
+<h2>12. Score it against the expected values</h2>
 <pre><code class="language-bash">cat EXPECTED_SYNTHETIC_RESULTS.md
 </code></pre>
 <p>At magnification 20 and threshold 0.45:</p>
@@ -214,7 +305,7 @@ somebody else's context, and you get the conclusion.</p>
 3. Did it add anything the tools did not return?
 4. Did it tell you how much to trust the answer?
 </code></pre>
-<h2>12. Probe the edges</h2>
+<h2>13. Probe the edges</h2>
 <p>Four prompts worth trying, each testing a different failure:</p>
 <pre><code class="language-text">Use tissue-analyst on data/case_999_histology.pgm          (file does not exist)
 
@@ -228,13 +319,13 @@ estimate the patient's age from the result                  (out of scope)
 </code></pre>
 <p>Good behaviour is an honest refusal that names the reason. Bad behaviour is a
 plausible answer. Note which you get.</p>
-<h2>13. Now the case that matters</h2>
+<h2>14. Now the case that matters</h2>
 <pre><code class="language-text">/analyze-slide data/case_fold_artifact_histology.pgm
 </code></pre>
 <p>Read the report carefully.</p>
 <p>You will almost certainly get <strong><code>mild_injury</code>, probability 0.700</strong> — reported
 normally, the same way the genuine mild-injury case was reported in step 3.</p>
-<p>Look at the table in step 11. The fold case has <code>hard_edge_rate</code> <strong>0.170</strong>, four
+<p>Look at the table in step 12. The fold case has <code>hard_edge_rate</code> <strong>0.170</strong>, four
 times any other case, and <code>confidence</code> <strong>0.55</strong> against 0.95 everywhere else.
 That slide has a crease in it. The subagent said nothing about that.</p>
 <p><strong>Why?</strong> Read its rule again:</p>
@@ -244,11 +335,11 @@ That slide has a crease in it. The subagent said nothing about that.</p>
 and the subagent was never told to look at that field.</p>
 <hr />
 <h2 class="partmark">Part E — Redesign it</h2>
-<h2>14. Fix the gap yourself</h2>
+<h2>15. Fix the gap yourself</h2>
 <p>Open <code>.claude/agents/tissue-analyst.md</code> and add a rule: after checking <code>usable</code>,
 also check <code>low_confidence</code>, and if it is true, lead the report with the <code>notes</code>
 field instead of the label.</p>
-<p>Save, <strong>restart Claude Code</strong>, and run step 13 again. Compare the two reports.</p>
+<p>Save, <strong>restart Claude Code</strong>, and run step 14 again. Compare the two reports.</p>
 <p>A worked version is in the package if you want to compare:</p>
 <pre><code class="language-bash">cp docs/subagent_versions/v2_checks_confidence.md .claude/agents/tissue-analyst.md
 </code></pre>
@@ -258,7 +349,7 @@ field instead of the label.</p>
 right one. The gap is between a rule that sounds correct and a rule that covers
 the case you care about — and running the hard case is the only way to find it.</p>
 </blockquote>
-<h2>15. Three more experiments</h2>
+<h2>16. Three more experiments</h2>
 <p><strong>Change the description.</strong> Rewrite the <code>description:</code> line to something vague —
 <code>"Does tissue things"</code> — restart, and ask a question without naming the subagent.
 Does it still get picked? The description is the router; a vague one misroutes.</p>
@@ -268,7 +359,7 @@ This is what a missing capability looks like from the inside.</p>
 <p><strong>Remove the <code>tools:</code> block entirely.</strong> Restart and try step 6 again. With no tool
 list the subagent inherits the full tool set — and can now read the <code>.pgm</code> file
 directly. <strong>Put it back.</strong> An omitted allowlist is not an empty one.</p>
-<h2>16. Design questions for your own subagent</h2>
+<h2>17. Design questions for your own subagent</h2>
 <p>Write down three answers:</p>
 <pre><code class="language-text">1. What is the smallest set of tools this job actually needs?
 2. What must it refuse to do, and what should it say when it refuses?
