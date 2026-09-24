@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 4 · Scoped Subagent — Agentic AI Week 2</title>
+<meta name="description" content="Step-by-step guide for Demo 4: a subagent scoped to two MCP tools, how it communicates with the main agent, how to test its output, and how to redesign it.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>4</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI · Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">All demos</a>
+      <a href="../downloads/Demo4_subagent_tissue_analyzer.zip">Download</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">Demo 4 · Level 4 — Scoped subagent delegation</p>
+    <h1>Scoped subagent</h1>
+    <p class="lede">One worker, two tools, its own memory. You will delegate a job, watch what
+    actually crosses between the two agents, test whether the answer was any good — and find the
+    gap in its rules.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo4_subagent_tissue_analyzer.zip">Download Demo 4 &nbsp;↓</a>
+      <a class="btn btn-ghost" href="demo3.html">← Demo 3</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../index.html">← Back to all four demos</a>
+
+<div class="note">
+  <p><strong>The subagent in this package has a gap in its rules, on purpose.</strong> Part D
+  walks you into it using the fold-artifact case, and Part E has you fix it. Changes to a
+  subagent file take effect when Claude Code <em>restarts</em>.</p>
+</div>
+
+
+<p>Package:</p>
+<p><code>Demo4_subagent_tissue_analyzer.zip</code></p>
+<p>Demo 3 restricted what <em>the session</em> may do. This demo restricts what <em>one worker</em>
+may do, gives it its own memory, and then asks the question that matters:
+<strong>was the answer any good?</strong></p>
+<hr />
+<h2>1. Read the design before you run it</h2>
+<pre><code class="language-bash">unzip Demo4_subagent_tissue_analyzer.zip
+cd Demo4_subagent_tissue_analyzer
+cat .claude/agents/tissue-analyst.md
+</code></pre>
+<p>A subagent is one markdown file. Two halves:</p>
+<pre><code class="language-text">frontmatter   name, description, tools     - what the SYSTEM uses
+body          the instructions             - what the MODEL reads
+</code></pre>
+<p>The <code>description</code> is the router: it decides when this subagent gets picked. The
+<code>tools:</code> list is the hard boundary — exactly two MCP tools, and nothing else:</p>
+<pre><code class="language-text">mcp__tissue-analyzer__analyze_tissue
+mcp__tissue-analyzer__classify_tissue
+</code></pre>
+<p>No <code>Bash</code>. No <code>Read</code>. No <code>Write</code>. No <code>Glob</code>.</p>
+<p>Now check what is <strong>not</strong> here:</p>
+<pre><code class="language-bash">cat .claude/settings.json 2&gt;/dev/null || echo &quot;no project permission rules&quot;
+</code></pre>
+<p>There are none. Unlike Demo 3, this project denies nothing session-wide. Keep
+that in mind — it is the whole of Part B.</p>
+<hr />
+<h2>2. Start up and confirm</h2>
+<pre><code class="language-bash">claude
+</code></pre>
+<pre><code class="language-text">/mcp
+</code></pre>
+<p>Confirm <code>tissue-analyzer</code> is connected with two tools. If your version has an
+<code>/agents</code> command, run it and confirm <code>tissue-analyst</code> is listed.</p>
+<hr />
+<h2 class="partmark">Part A — Watch delegation happen</h2>
+<h2>3. Delegate one slide</h2>
+<pre><code class="language-text">Use the tissue-analyst subagent to analyze
+data/case_mild_injury_histology.pgm
+with magnification 20 and damage_threshold_fraction 0.45.
+</code></pre>
+<p>Watch the transcript. You should see the main agent hand off, the subagent make
+two tool calls, and a summary come back. Expected: <code>mild_injury</code>, probability 0.7.</p>
+<h2>4. Use the command instead</h2>
+<pre><code class="language-text">/analyze-slide data/case_necrosis_histology.pgm
+</code></pre>
+<p>Same thing, with the defaults already filled in. Expected: <code>necrosis</code>, 0.943.</p>
+<hr />
+<h2 class="partmark">Part B — Two different boundaries</h2>
+<p>This is the part that separates Demo 4 from Demo 3.</p>
+<h2>5. Ask the main agent to read a slide</h2>
+<pre><code class="language-text">Read the first 5 lines of data/case_001.pgm
+</code></pre>
+<p><strong>It works.</strong> There are no project deny rules in this package — the main agent has
+its ordinary tools.</p>
+<h2>6. Ask the subagent to do the same</h2>
+<pre><code class="language-text">Use the tissue-analyst subagent to read data/case_001.pgm directly
+and show me the raw pixel values.
+</code></pre>
+<p><strong>It cannot.</strong> Not because a rule forbids it, but because <strong>it has no Read tool at
+all</strong>. There is nothing to deny.</p>
+<h2>7. Say the difference out loud</h2>
+<pre><code class="language-text">Demo 3   project permission rules   apply to the whole session
+                                    &quot;you may not use this tool here&quot;
+
+Demo 4   subagent tool list         applies to one worker
+                                    &quot;you do not have this tool&quot;
+</code></pre>
+<p>The first is a rule about a capability you hold. The second is not holding it.
+They compose: a scoped subagent inside a permission-restricted project gets both.</p>
+<hr />
+<h2 class="partmark">Part C — How the two of them actually communicate</h2>
+<h2>8. Ask what was sent and what came back</h2>
+<pre><code class="language-text">What exactly did you send to the tissue-analyst subagent, and what did it return
+to you? Show me both.
+</code></pre>
+<p>You will see a task description going in, and a summary coming back. <strong>Not a
+transcript</strong> — the subagent's intermediate steps stay in its own context.</p>
+<h2>9. Prove the contexts are separate</h2>
+<p>Tell the main agent something it has no reason to forget:</p>
+<pre><code class="language-text">Remember this: our slide scanner is an Aperio AT2, serial 4417.
+</code></pre>
+<p>Then ask the subagent about it:</p>
+<pre><code class="language-text">Ask the tissue-analyst subagent what scanner we are using.
+</code></pre>
+<p>It does not know. It never saw that message. A subagent starts with the task it
+is given, its own instructions, and nothing else.</p>
+<p>Now the other direction — run a slide through the subagent, then ask the main
+agent:</p>
+<pre><code class="language-text">What was the hard_edge_rate the subagent measured?
+</code></pre>
+<p>The main agent knows it <strong>only if the subagent reported it</strong>. Anything the
+subagent saw but did not say is gone.</p>
+<blockquote>
+<p>This is the real design constraint of subagents: the report <em>is</em> the interface.
+What it does not say, nobody upstream can use.</p>
+</blockquote>
+<h2>10. See why that is useful</h2>
+<pre><code class="language-text">Use the tissue-analyst subagent to analyze all four histology slides
+at magnification 20 with damage_threshold_fraction 0.45, then give me
+a single table of the results.
+</code></pre>
+<p>Eight tool calls happen. The full JSON from each never enters your conversation —
+only the table does. That is the point of delegation: a long, noisy job stays in
+somebody else's context, and you get the conclusion.</p>
+<hr />
+<h2 class="partmark">Part D — Test whether it is any good</h2>
+<p>Delegation is easy. Judging the result is the skill.</p>
+<h2>11. Score it against the expected values</h2>
+<pre><code class="language-bash">cat EXPECTED_SYNTHETIC_RESULTS.md
+</code></pre>
+<p>At magnification 20 and threshold 0.45:</p>
+<table>
+<thead>
+<tr>
+<th>case</th>
+<th>damage</th>
+<th>edge rate</th>
+<th>confidence</th>
+<th>class</th>
+<th>p</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>normal</td>
+<td>0.104</td>
+<td>0.014</td>
+<td>0.95</td>
+<td><code>normal</code></td>
+<td>0.806</td>
+</tr>
+<tr>
+<td>mild injury</td>
+<td>0.220</td>
+<td>0.042</td>
+<td>0.95</td>
+<td><code>mild_injury</code></td>
+<td>0.700</td>
+</tr>
+<tr>
+<td>necrosis</td>
+<td>0.476</td>
+<td>0.076</td>
+<td>0.95</td>
+<td><code>necrosis</code></td>
+<td>0.943</td>
+</tr>
+<tr>
+<td>fold artifact</td>
+<td>0.234</td>
+<td><strong>0.170</strong></td>
+<td><strong>0.55</strong></td>
+<td><code>mild_injury</code></td>
+<td>0.700</td>
+</tr>
+</tbody>
+</table>
+<p>For each case ask four questions:</p>
+<pre><code class="language-text">1. Did it report every field, or quietly drop some?
+2. Do the numbers match exactly, or were any rounded or reworded?
+3. Did it add anything the tools did not return?
+4. Did it tell you how much to trust the answer?
+</code></pre>
+<h2>12. Probe the edges</h2>
+<p>Four prompts worth trying, each testing a different failure:</p>
+<pre><code class="language-text">Use tissue-analyst on data/case_999_histology.pgm          (file does not exist)
+
+Use tissue-analyst on previews/case_normal_histology.png   (wrong file type)
+
+Use tissue-analyst on data/case_normal_histology.pgm
+with magnification 25                                       (invalid value)
+
+Use tissue-analyst on data/case_normal_histology.pgm and
+estimate the patient's age from the result                  (out of scope)
+</code></pre>
+<p>Good behaviour is an honest refusal that names the reason. Bad behaviour is a
+plausible answer. Note which you get.</p>
+<h2>13. Now the case that matters</h2>
+<pre><code class="language-text">/analyze-slide data/case_fold_artifact_histology.pgm
+</code></pre>
+<p>Read the report carefully.</p>
+<p>You will almost certainly get <strong><code>mild_injury</code>, probability 0.700</strong> — reported
+normally, the same way the genuine mild-injury case was reported in step 3.</p>
+<p>Look at the table in step 11. The fold case has <code>hard_edge_rate</code> <strong>0.170</strong>, four
+times any other case, and <code>confidence</code> <strong>0.55</strong> against 0.95 everywhere else.
+That slide has a crease in it. The subagent said nothing about that.</p>
+<p><strong>Why?</strong> Read its rule again:</p>
+<pre><code class="language-text">5. If `usable` is false, stop and report the warning.
+</code></pre>
+<p>The fold case returns <code>usable: true</code>. It also returns <code>low_confidence: true</code> —
+and the subagent was never told to look at that field.</p>
+<hr />
+<h2 class="partmark">Part E — Redesign it</h2>
+<h2>14. Fix the gap yourself</h2>
+<p>Open <code>.claude/agents/tissue-analyst.md</code> and add a rule: after checking <code>usable</code>,
+also check <code>low_confidence</code>, and if it is true, lead the report with the <code>notes</code>
+field instead of the label.</p>
+<p>Save, <strong>restart Claude Code</strong>, and run step 13 again. Compare the two reports.</p>
+<p>A worked version is in the package if you want to compare:</p>
+<pre><code class="language-bash">cp docs/subagent_versions/v2_checks_confidence.md .claude/agents/tissue-analyst.md
+</code></pre>
+<p>The original is kept as <code>docs/subagent_versions/v1_has_a_gap.md</code>.</p>
+<blockquote>
+<p>Version 1 was not carelessly written. It checks a field that <em>sounds</em> like the
+right one. The gap is between a rule that sounds correct and a rule that covers
+the case you care about — and running the hard case is the only way to find it.</p>
+</blockquote>
+<h2>15. Three more experiments</h2>
+<p><strong>Change the description.</strong> Rewrite the <code>description:</code> line to something vague —
+<code>"Does tissue things"</code> — restart, and ask a question without naming the subagent.
+Does it still get picked? The description is the router; a vague one misroutes.</p>
+<p><strong>Remove a tool.</strong> Delete <code>mcp__tissue-analyzer__classify_tissue</code> from the <code>tools:</code>
+list, restart, and run a slide. Watch it measure and then be unable to finish.
+This is what a missing capability looks like from the inside.</p>
+<p><strong>Remove the <code>tools:</code> block entirely.</strong> Restart and try step 6 again. With no tool
+list the subagent inherits the full tool set — and can now read the <code>.pgm</code> file
+directly. <strong>Put it back.</strong> An omitted allowlist is not an empty one.</p>
+<h2>16. Design questions for your own subagent</h2>
+<p>Write down three answers:</p>
+<pre><code class="language-text">1. What is the smallest set of tools this job actually needs?
+2. What must it refuse to do, and what should it say when it refuses?
+3. What must always appear in its report, even when the news is boring?
+</code></pre>
+<p>Question 3 is the one people skip, and it is the one that decided whether the fold
+case was caught.</p>
+<hr />
+<h2>Appendix — what a subagent file contains</h2>
+<pre><code class="language-text">---
+name:         what you call it
+description:  WHEN to use it — this is the router, write it carefully
+tools:        the hard boundary. Omit it and the subagent inherits everything.
+---
+
+body:         the instructions the model reads: order of work,
+              when to stop, what must appear in the report
+</code></pre>
+<h2>Appendix — the four layers, all four demos</h2>
+<table>
+<thead>
+<tr>
+<th>Demo</th>
+<th>What it added</th>
+<th>Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>nothing — a plain repository</td>
+<td>the agent infers everything</td>
+</tr>
+<tr>
+<td>2</td>
+<td>an explicit tool interface</td>
+<td>MCP schema</td>
+</tr>
+<tr>
+<td>3</td>
+<td>a limit on the session</td>
+<td>project permission rules</td>
+</tr>
+<tr>
+<td>4</td>
+<td>a limit on one worker, with its own memory</td>
+<td>subagent tool list</td>
+</tr>
+</tbody>
+</table>
+<p>Each one narrows what the agent has to figure out, or what it is able to do.
+Neither ever changed the science.</p>
+
+<div class="note" style="margin-top:3rem">
+  <p><strong>That is all four.</strong> Repository as context, explicit MCP interface,
+  permission-controlled access, scoped subagent delegation — and the analysis never changed.
+  Back to <a href="../index.html#demos">all four demos</a>.</p>
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI · Week 2</strong><br>
+    Jie Hou · Michigan State University</p>
+    <p class="muted">These are synthetic teaching images, not patient data.</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 1 · Tissue Analyzer — Agentic AI Week 2</title>
+<meta name="description" content="Step-by-step guide for Demo 1: running the tissue analyzer repository directly, then asking Claude Code to reconstruct the interface from the repository alone.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>1</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI · Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">All demos</a>
+      <a href="../downloads/Demo1_tissue_analyzer.zip">Download</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">Demo 1 · Level 1 — Repository as context</p>
+    <h1>Tissue Analyzer + synthetic images</h1>
+    <p class="lede">Run the repository directly, then hand the same folder to Claude Code and
+    watch it reconstruct the tool interface from documentation and source alone.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo1_tissue_analyzer.zip">Download Demo 1 &nbsp;↓</a>
+      <a class="btn btn-ghost" href="../index.html">All four demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../index.html">← Back to all four demos</a>
+
+<p>Package:</p>
+<p><code>Demo1_tissue_analyzer.zip</code></p>
+<p>This guide walks through the repository version using the synthetic histology-like <code>.pgm</code> images.</p>
+<p>The main teaching goal is to show that the repository works, but Claude Code must inspect files and reconstruct the tool interface from documentation and source code.</p>
+<hr />
+<h2>1. Unzip the package</h2>
+<pre><code class="language-bash">unzip Demo1_tissue_analyzer.zip
+cd Demo1_tissue_analyzer
+</code></pre>
+<p>Optional:</p>
+<pre><code class="language-bash">tree -L 3
+</code></pre>
+<p>You should see important folders such as:</p>
+<pre><code class="language-text">data/
+previews/
+models/
+scripts/
+results/
+</code></pre>
+<p>The synthetic grayscale images used by the scripts are under:</p>
+<pre><code class="language-text">data/
+</code></pre>
+<p>The color PNG versions for presentation are under:</p>
+<pre><code class="language-text">previews/
+</code></pre>
+<hr />
+<h2>2. Look at the synthetic cases</h2>
+<p>Recommended files:</p>
+<pre><code class="language-text">data/case_normal_histology.pgm
+data/case_mild_injury_histology.pgm
+data/case_necrosis_histology.pgm
+data/case_fold_artifact_histology.pgm
+</code></pre>
+<p>The corresponding color previews are:</p>
+<pre><code class="language-text">previews/case_normal_histology.png
+previews/case_mild_injury_histology.png
+previews/case_necrosis_histology.png
+previews/case_fold_artifact_histology.png
+</code></pre>
+<p>These are synthetic teaching images, not patient data.</p>
+<hr />
+<h2>3. Review the expected results</h2>
+<pre><code class="language-bash">cat EXPECTED_SYNTHETIC_RESULTS.md
+</code></pre>
+<p>Recommended demo settings:</p>
+<pre><code class="language-text">magnification = 20
+threshold = 0.45
+</code></pre>
+<p>The expected pattern is approximately:</p>
+<pre><code class="language-text">normal case        -&gt; normal
+mild injury case   -&gt; mild_injury
+necrosis case      -&gt; necrosis
+fold artifact case -&gt; mild_injury with elevated edge/artifact behavior
+</code></pre>
+<hr />
+<h2>4. Create a Python environment</h2>
+<pre><code class="language-bash">python3 -m venv .demo_venv
+source .demo_venv/bin/activate
+</code></pre>
+<p>If the repository includes requirements:</p>
+<pre><code class="language-bash">pip install -r requirements.txt
+</code></pre>
+<hr />
+<h2>5. Run the original analysis script directly</h2>
+<p>Example:</p>
+<pre><code class="language-bash">python3 scripts/analyze_tissue.py \
+  --slide data/case_mild_injury_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/mild_analysis.json
+</code></pre>
+<p>Inspect the output:</p>
+<pre><code class="language-bash">cat results/mild_analysis.json
+</code></pre>
+<hr />
+<h2>6. Run the classifier directly</h2>
+<p>Depending on the repository version, use the repository's documented classifier invocation.</p>
+<p>A typical example is:</p>
+<pre><code class="language-bash">python3 scripts/classify_tissue.py \
+  --slide data/case_mild_injury_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/mild_classification.json
+</code></pre>
+<p>Inspect:</p>
+<pre><code class="language-bash">cat results/mild_classification.json
+</code></pre>
+<hr />
+<h2>7. Try the normal case</h2>
+<pre><code class="language-bash">python3 scripts/analyze_tissue.py \
+  --slide data/case_normal_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/normal_analysis.json
+</code></pre>
+<p>Then classify it using the repository's classifier command.</p>
+<pre><code class="language-bash">python3 scripts/classify_tissue.py \
+  --slide data/case_normal_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/normal_classification.json
+</code></pre>
+<p>Expected class:</p>
+<pre><code class="language-text">normal
+</code></pre>
+<hr />
+<h2>8. Try the necrosis case</h2>
+<pre><code class="language-bash">python3 scripts/analyze_tissue.py \
+  --slide data/case_necrosis_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/necrosis_analysis.json
+
+python3 scripts/classify_tissue.py \
+  --slide data/case_necrosis_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/necrosis_analysis.json
+</code></pre>
+<p>Expected class:</p>
+<pre><code class="language-text">necrosis
+</code></pre>
+<hr />
+<h2>9. Try the fold-artifact case</h2>
+<pre><code class="language-bash">python3 scripts/analyze_tissue.py \
+  --slide data/case_fold_artifact_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/fold_analysis.json
+</code></pre>
+<p>This case is useful for discussing:</p>
+<pre><code class="language-text">valid output != equally trustworthy output
+</code></pre>
+<p>because the image is designed to have an elevated edge/artifact signal.</p>
+<hr />
+<h2 class="partmark">Part B — Test inside Claude Code</h2>
+<h2>10. Start Claude Code</h2>
+<p>From the project root:</p>
+<pre><code class="language-bash">claude
+</code></pre>
+<p>There is no MCP server in this version.</p>
+<p>Ask Claude:</p>
+<pre><code class="language-text">Please inspect this repository and tell me how to analyze
+data/case_mild_injury_histology.pgm at magnification 20
+with threshold 0.45.
+
+Do not run anything yet.
+</code></pre>
+<p>Observe which files Claude opens.</p>
+<hr />
+<h2>11. Ask Claude to run the workflow</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Run the correct tissue-analysis workflow for
+data/case_mild_injury_histology.pgm
+at magnification 20 with threshold 0.45.
+
+Save outputs under results/.
+</code></pre>
+<p>The teaching point is that Claude must infer:</p>
+<pre><code class="language-text">which script to run
+which flags to use
+what parameter ranges mean
+how outputs are structured
+</code></pre>
+<p>from the repository itself.</p>
+<hr />
+<h2>12. Test the <code>20x</code> wording issue</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Analyze data/case_mild_injury_histology.pgm
+at 20x magnification with threshold 0.45.
+</code></pre>
+<p>Observe whether Claude correctly maps:</p>
+<pre><code class="language-text">20x -&gt; 20
+</code></pre>
+<p>for the CLI argument.</p>
+<hr />
+<h2>13. Test the <code>50%</code> scale issue</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Analyze data/case_mild_injury_histology.pgm
+at magnification 20 with a 50% threshold.
+</code></pre>
+<p>Observe whether Claude correctly converts:</p>
+<pre><code class="language-text">50% -&gt; 0.5
+</code></pre>
+<p>or whether it tries to pass:</p>
+<pre><code class="language-text">50
+</code></pre>
+<p>This is useful because the original repository depends more heavily on Claude understanding the semantics correctly.</p>
+<hr />
+<h2>14. Ask Claude where it learned the interface</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Which files did you use to determine:
+- the correct script,
+- parameter names,
+- magnification values,
+- threshold scale,
+- expected outputs?
+</code></pre>
+<p>This helps illustrate repository-as-context.</p>
+<hr />
+<h2>15. Main lecture takeaway</h2>
+<p>Original repository flow:</p>
+<pre><code class="language-text">User request
+   ↓
+Claude searches repository
+   ↓
+Claude reads docs/source/config
+   ↓
+Claude reconstructs interface
+   ↓
+Claude runs script
+   ↓
+Result
+</code></pre>
+<p>The next MCP version makes the interface more explicit and machine-readable.</p>
+
+<div class="note" style="margin-top:3rem">
+  <p><strong>Next.</strong> Demo 2 wraps this same workflow as MCP tools, so the interface is
+  declared rather than reconstructed. It will appear on the
+  <a href="../index.html#demos">main page</a>.</p>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI · Week 2</strong><br>
+    Jie Hou · Michigan State University</p>
+    <p class="muted">These are synthetic teaching images, not patient data.</p>
+  </div>
+</footer>
+
+</body>
+</html>

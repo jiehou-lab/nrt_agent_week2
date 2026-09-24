@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 2 · MCP Tissue Analyzer — Agentic AI Week 2</title>
+<meta name="description" content="Step-by-step guide for Demo 2: the same tissue analysis exposed through MCP, with a declared schema that rejects invalid arguments before anything runs.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>2</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI · Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">All demos</a>
+      <a href="../downloads/Demo2_MCP_Tissue_Analyzer.zip">Download</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">Demo 2 · Level 2 — Explicit MCP interface</p>
+    <h1>MCP Tissue Analyzer</h1>
+    <p class="lede">The same slides, the same model, the same numbers — but the tool interface is
+    now declared rather than reconstructed, and invalid arguments are refused before anything runs.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo2_MCP_Tissue_Analyzer.zip">Download Demo 2 &nbsp;↓</a>
+      <a class="btn btn-ghost" href="demo1.html">← Demo 1</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../index.html">← Back to all four demos</a>
+
+<div class="note">
+  <p><strong>If <code>python3 server.py</code> looks like it has frozen, it is working.</strong>
+  An stdio MCP server sits waiting for messages on standard input — a blinking cursor and no
+  output is exactly right. Press <code>Ctrl C</code> to stop it. You never need to start it by
+  hand; Claude Code launches it for you.</p>
+</div>
+
+
+<p>Package:</p>
+<p><code>Demo2_MCP_Tissue_Analyzer.zip</code></p>
+<p>This guide uses the same synthetic histology-like images, but now the tool is exposed through MCP.</p>
+<p>The main teaching goal is to show that the scientific workflow remains similar while the tool interface becomes explicit and machine-readable.</p>
+<hr />
+<h2>1. Unzip the package</h2>
+<pre><code class="language-bash">unzip Demo2_MCP_Tissue_Analyzer.zip
+cd Demo2_MCP_Tissue_Analyzer
+</code></pre>
+<p>Inspect:</p>
+<pre><code class="language-bash">tree -a -L 3
+</code></pre>
+<p>Important files include:</p>
+<pre><code class="language-text">server.py
+.mcp.json
+tools/
+data/
+previews/
+results/
+EXPECTED_SYNTHETIC_RESULTS.md
+</code></pre>
+<hr />
+<h2>2. Review the synthetic images</h2>
+<p>Grayscale images used by the tool:</p>
+<pre><code class="language-text">data/case_normal_histology.pgm
+data/case_mild_injury_histology.pgm
+data/case_necrosis_histology.pgm
+data/case_fold_artifact_histology.pgm
+</code></pre>
+<p>Color previews:</p>
+<pre><code class="language-text">previews/
+</code></pre>
+<p>These are synthetic teaching images only.</p>
+<hr />
+<h2>3. Review expected outputs</h2>
+<pre><code class="language-bash">cat docs/EXPECTED_SYNTHETIC_RESULTS.md
+</code></pre>
+<p>Recommended parameters:</p>
+<pre><code class="language-text">magnification = 20
+damage_threshold_fraction = 0.45
+</code></pre>
+<p>Expected pattern:</p>
+<pre><code class="language-text">normal -&gt; normal
+mild injury -&gt; mild_injury
+necrosis -&gt; necrosis
+fold artifact -&gt; plausible class + elevated artifact/edge behavior
+</code></pre>
+<hr />
+<h2 class="partmark">Part A — Test the MCP-adapted tools directly</h2>
+<h2>4. Run the MCP-adapted analysis script</h2>
+<p>Example:</p>
+<pre><code class="language-bash">python3 tools/analyze_tissue.py \
+  --slide data/case_mild_injury_histology.pgm \
+  --magnification 20 \
+  --damage-threshold-fraction 0.45 \
+  --out results/mild_mcp_analysis.json
+</code></pre>
+<p>Inspect:</p>
+<pre><code class="language-bash">cat results/mild_mcp_analysis.json
+</code></pre>
+<hr />
+<h2>5. Run the classifier</h2>
+<p>The MCP classifier expects the saved analysis JSON as its input.</p>
+<pre><code class="language-bash">python3 tools/classify_tissue.py \
+  --features results/mild_mcp_analysis.json \
+  --out results/mild_mcp_classification.json
+</code></pre>
+<p>Inspect:</p>
+<pre><code class="language-bash">cat results/mild_mcp_classification.json
+</code></pre>
+<hr />
+<h2>6. Demonstrate stronger validation</h2>
+<p>Try an invalid threshold:</p>
+<pre><code class="language-bash">python3 tools/analyze_tissue.py \
+  --slide data/case_mild_injury_histology.pgm \
+  --magnification 20 \
+  --damage-threshold-fraction 50
+</code></pre>
+<p>This version should reject the invalid scale instead of silently treating <code>50</code> as a valid fraction.</p>
+<hr />
+<h2>7. Inspect the MCP configuration</h2>
+<pre><code class="language-bash">cat .mcp.json
+</code></pre>
+<p>The project should register a local MCP server called:</p>
+<pre><code class="language-text">tissue-analyzer
+</code></pre>
+<hr />
+<h2>8. Inspect the MCP server</h2>
+<pre><code class="language-bash">less server.py
+</code></pre>
+<p>Look for the tool definitions:</p>
+<pre><code class="language-text">analyze_tissue
+classify_tissue
+</code></pre>
+<p>The MCP layer makes explicit things such as:</p>
+<pre><code class="language-text">magnification ∈ {10, 20, 40}
+damage_threshold_fraction ∈ [0, 1]
+</code></pre>
+<hr />
+<h2>8A. Practice Claude Code MCP management commands</h2>
+<p>Before starting the interactive Claude Code session, try the MCP-management commands from a normal terminal.</p>
+<h3>List configured MCP servers</h3>
+<pre><code class="language-bash">claude mcp list
+</code></pre>
+<p>For this demo, look for:</p>
+<pre><code class="language-text">tissue-analyzer
+</code></pre>
+<p>This command is useful for checking both whether the server is configured and whether Claude Code can connect to it.</p>
+<p>Typical states conceptually mean:</p>
+<pre><code class="language-text">Connected             -&gt; configuration exists and Claude Code can connect
+Needs authentication  -&gt; configuration exists but login is required
+Failed to connect     -&gt; configuration exists but the server could not start/connect
+</code></pre>
+<h3>Inspect one MCP server</h3>
+<pre><code class="language-bash">claude mcp get tissue-analyzer
+</code></pre>
+<p>Use this to inspect details for one server, including how Claude Code starts it.</p>
+<p>For this project, the server process should be equivalent to:</p>
+<pre><code class="language-text">python3 server.py
+</code></pre>
+<p>This command is especially useful when diagnosing the wrong Python interpreter, wrong command, wrong scope, or server startup failure.</p>
+<h3>Understand scopes</h3>
+<p>Claude Code MCP configuration can use different scopes:</p>
+<pre><code class="language-text">local
+  available only to you for the current project
+
+project
+  stored in the project's .mcp.json
+  can be shared with the repository
+
+user
+  available to you across projects
+</code></pre>
+<p>For this classroom demo, <code>project</code> scope is useful because students can see the <code>.mcp.json</code> file directly.</p>
+<h3>Add this local stdio MCP server manually</h3>
+<p>The package already contains <code>.mcp.json</code>, so normally you do not need to add it again. As practice, the equivalent command is:</p>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- python3 server.py
+</code></pre>
+<p>The <code>--</code> separates Claude Code options from the command used to start the MCP server.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">name       = tissue-analyzer
+scope      = project
+transport  = stdio
+command    = python3 server.py
+</code></pre>
+<p>After adding it, verify:</p>
+<pre><code class="language-bash">claude mcp list
+claude mcp get tissue-analyzer
+</code></pre>
+<h3>Make the Python environment explicit</h3>
+<p>If you created a virtual environment:</p>
+<pre><code class="language-bash">python3 -m venv .demo_venv
+source .demo_venv/bin/activate
+</code></pre>
+<p>you can register the MCP server with the exact interpreter:</p>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- .demo_venv/bin/python3 server.py
+</code></pre>
+<p>This avoids ambiguity about which Python starts the MCP server.</p>
+<p>You can also check:</p>
+<pre><code class="language-bash">which python3
+python3 --version
+</code></pre>
+<h3>Remove an MCP server registration</h3>
+<pre><code class="language-bash">claude mcp remove tissue-analyzer --scope project
+</code></pre>
+<p>Then verify:</p>
+<pre><code class="language-bash">claude mcp list
+</code></pre>
+<p>Removing the registration does <strong>not</strong> delete <code>server.py</code>, the analysis tools, models, or data. It only removes the Claude Code configuration that tells Claude how to connect to the MCP server.</p>
+<p>Restore it with:</p>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- python3 server.py
+</code></pre>
+<h3>Reset a previously rejected project MCP decision</h3>
+<p>If a valid <code>.mcp.json</code> exists but Claude Code still does not load the project MCP server, you can reset stored project MCP approval choices:</p>
+<pre><code class="language-bash">claude mcp reset-project-choices
+</code></pre>
+<p>Then restart Claude Code from the project root.</p>
+<h3>Terminal MCP commands vs. <code>/mcp</code></h3>
+<p>From a normal terminal:</p>
+<pre><code class="language-bash">claude mcp list
+claude mcp get tissue-analyzer
+claude mcp add ...
+claude mcp remove ...
+</code></pre>
+<p>These commands inspect or modify MCP configuration.</p>
+<p>Inside an active Claude Code session:</p>
+<pre><code class="language-text">/mcp
+</code></pre>
+<p>opens the interactive MCP status/management panel.</p>
+<p>A useful mental model is:</p>
+<pre><code class="language-text">Terminal CLI
+    configure and inspect MCP servers
+
+Claude Code /mcp
+    inspect/manage MCP servers in the current session
+</code></pre>
+<h3>Suggested five-minute practice sequence</h3>
+<pre><code class="language-bash">claude mcp list
+claude mcp get tissue-analyzer
+</code></pre>
+<p>If it is already configured, do not add a duplicate.</p>
+<p>For practice, you can remove and restore it:</p>
+<pre><code class="language-bash">claude mcp remove tissue-analyzer --scope project
+claude mcp list
+</code></pre>
+<p>Restore:</p>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- python3 server.py
+</code></pre>
+<p>Verify again:</p>
+<pre><code class="language-bash">claude mcp list
+claude mcp get tissue-analyzer
+</code></pre>
+<p>Then start Claude Code:</p>
+<pre><code class="language-bash">claude
+</code></pre>
+<p>and inside Claude Code run:</p>
+<pre><code class="language-text">/mcp
+</code></pre>
+<p>This demonstrates the lifecycle:</p>
+<pre><code class="language-text">configure -&gt; inspect -&gt; remove -&gt; restore -&gt; connect -&gt; use tools
+</code></pre>
+<hr />
+<h2 class="partmark">Part B — Test inside Claude Code</h2>
+<h2>9. Start Claude Code from the project root</h2>
+<pre><code class="language-bash">claude
+</code></pre>
+<p>Inside Claude Code:</p>
+<pre><code class="language-text">/mcp
+</code></pre>
+<p>Confirm that:</p>
+<pre><code class="language-text">tissue-analyzer
+</code></pre>
+<p>is connected.</p>
+<p>Approve the project MCP server if Claude asks for trust/permission.</p>
+<hr />
+<h2>10. Ask Claude to list available MCP tools</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">List the tools available from the tissue-analyzer MCP server
+and summarize their input schemas.
+</code></pre>
+<p>You should see:</p>
+<pre><code class="language-text">analyze_tissue
+classify_tissue
+</code></pre>
+<hr />
+<h2>11. Call <code>analyze_tissue</code> through MCP</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Use the tissue-analyzer MCP tool analyze_tissue.
+
+Use:
+slide = data/case_mild_injury_histology.pgm
+magnification = 20
+damage_threshold_fraction = 0.45
+out = results/mild_claude_mcp_analysis.json
+
+Return the structured tool result.
+</code></pre>
+<p>Then verify in another terminal if desired:</p>
+<pre><code class="language-bash">cat results/mild_claude_mcp_analysis.json
+</code></pre>
+<hr />
+<h2>12. Chain the classifier</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Now call the tissue-analyzer MCP tool classify_tissue.
+
+Use:
+features = results/mild_claude_mcp_analysis.json
+out = results/mild_claude_mcp_classification.json
+
+Return the structured result.
+</code></pre>
+<p>Expected class:</p>
+<pre><code class="language-text">mild_injury
+</code></pre>
+<hr />
+<h2>13. Try the normal case</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Use analyze_tissue on:
+
+slide = data/case_normal_histology.pgm
+magnification = 20
+damage_threshold_fraction = 0.45
+out = results/normal_mcp_analysis.json
+</code></pre>
+<p>Then classify the resulting JSON.</p>
+<p>Expected class:</p>
+<pre><code class="language-text">normal
+</code></pre>
+<hr />
+<h2>14. Try the necrosis case</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Use analyze_tissue on:
+
+slide = data/case_necrosis_histology.pgm
+magnification = 20
+damage_threshold_fraction = 0.45
+out = results/necrosis_mcp_analysis.json
+</code></pre>
+<p>Then classify.</p>
+<p>Expected class:</p>
+<pre><code class="language-text">necrosis
+</code></pre>
+<hr />
+<h2>15. Try the fold-artifact case</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Use analyze_tissue on:
+
+slide = data/case_fold_artifact_histology.pgm
+magnification = 20
+damage_threshold_fraction = 0.45
+out = results/fold_mcp_analysis.json
+</code></pre>
+<p>Then classify the result.</p>
+<p>Use this case to discuss:</p>
+<pre><code class="language-text">structured valid result
+does not automatically mean
+high scientific confidence
+</code></pre>
+<p>because artifact-related features can affect usability/confidence.</p>
+<hr />
+<h2 class="partmark">Part C — Demonstrate MCP validation</h2>
+<h2>16. Try an invalid threshold through MCP</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Call analyze_tissue with:
+
+slide = data/case_mild_injury_histology.pgm
+magnification = 20
+damage_threshold_fraction = 50
+</code></pre>
+<p>The MCP layer should reject the invalid range before normal execution.</p>
+<hr />
+<h2>17. Try invalid magnification</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Call analyze_tissue with:
+
+slide = data/case_mild_injury_histology.pgm
+magnification = 25
+damage_threshold_fraction = 0.45
+</code></pre>
+<p>The interface should reject the unsupported magnification.</p>
+<hr />
+<h2>18. Compare natural language with the formal schema</h2>
+<p>Prompt:</p>
+<pre><code class="language-text">Analyze data/case_mild_injury_histology.pgm
+at 20x magnification with a 50% damage threshold.
+Use the MCP tool.
+</code></pre>
+<p>Claude should convert the natural language into:</p>
+<pre><code class="language-text">magnification = 20
+damage_threshold_fraction = 0.5
+</code></pre>
+<p>before calling the tool.</p>
+<p>This is the key contrast with the repository-only version.</p>
+<hr />
+<h2>19. Main lecture comparison</h2>
+<h3>Original repository</h3>
+<pre><code class="language-text">Claude searches files
+→ infers script
+→ infers parameter names
+→ infers valid values
+→ generates command
+</code></pre>
+<h3>MCP version</h3>
+<pre><code class="language-text">Claude discovers tool
+→ reads formal schema
+→ provides structured arguments
+→ invalid values can be rejected
+→ structured result returned
+</code></pre>
+<hr />
+<h2>20. Main takeaway</h2>
+<blockquote>
+<p>The MCP layer does not replace the tissue-analysis workflow.</p>
+</blockquote>
+<p>It makes the capability easier for an agent to discover and call reliably.</p>
+<p>The same scientific computation is now accessed through a clearer contract.</p>
+<hr />
+<h2 class="partmark">Appendix — Claude Code MCP Command Reference</h2>
+<p>The following table summarizes the MCP-related commands used in this demo.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Where to run it</th>
+<th>What it does</th>
+<th>Example for this demo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>claude mcp list</code></td>
+<td>Normal terminal</td>
+<td>Lists MCP servers Claude Code knows about and shows their connection/status information.</td>
+<td><code>claude mcp list</code></td>
+</tr>
+<tr>
+<td><code>claude mcp get &lt;name&gt;</code></td>
+<td>Normal terminal</td>
+<td>Shows the configuration/details for one MCP server. Useful for checking command, scope, transport, and troubleshooting.</td>
+<td><code>claude mcp get tissue-analyzer</code></td>
+</tr>
+<tr>
+<td><code>claude mcp add ...</code></td>
+<td>Normal terminal</td>
+<td>Registers a new MCP server with Claude Code.</td>
+<td><code>claude mcp add --scope project --transport stdio tissue-analyzer -- python3 server.py</code></td>
+</tr>
+<tr>
+<td><code>claude mcp remove &lt;name&gt; --scope &lt;scope&gt;</code></td>
+<td>Normal terminal</td>
+<td>Removes an MCP server registration from the specified scope. It does not delete the actual server code.</td>
+<td><code>claude mcp remove tissue-analyzer --scope project</code></td>
+</tr>
+<tr>
+<td><code>claude mcp reset-project-choices</code></td>
+<td>Normal terminal</td>
+<td>Resets stored trust/approval choices for project MCP servers so Claude Code can ask again. Useful if you previously selected “Do not trust.”</td>
+<td><code>claude mcp reset-project-choices</code></td>
+</tr>
+<tr>
+<td><code>claude mcp list</code> after add/remove</td>
+<td>Normal terminal</td>
+<td>Confirms whether the MCP server is currently registered and whether Claude can connect to it.</td>
+<td><code>claude mcp list</code></td>
+</tr>
+<tr>
+<td><code>claude</code></td>
+<td>Normal terminal</td>
+<td>Starts Claude Code in the current project directory. Start it from the directory containing <code>.mcp.json</code>.</td>
+<td><code>claude</code></td>
+</tr>
+<tr>
+<td><code>/mcp</code></td>
+<td>Inside Claude Code</td>
+<td>Opens the interactive MCP status/management panel for the current session.</td>
+<td><code>/mcp</code></td>
+</tr>
+<tr>
+<td><code>which python3</code></td>
+<td>Normal terminal</td>
+<td>Shows which Python interpreter will be used when <code>python3</code> is invoked from the current shell. Useful before starting an stdio MCP server.</td>
+<td><code>which python3</code></td>
+</tr>
+<tr>
+<td><code>python3 --version</code></td>
+<td>Normal terminal</td>
+<td>Confirms the Python version associated with the active interpreter.</td>
+<td><code>python3 --version</code></td>
+</tr>
+<tr>
+<td><code>source .demo_venv/bin/activate</code></td>
+<td>Normal terminal</td>
+<td>Activates the project virtual environment before running Claude Code or registering the MCP server.</td>
+<td><code>source .demo_venv/bin/activate</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Common MCP add patterns</h2>
+<h3>Project-scoped stdio server</h3>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- python3 server.py
+</code></pre>
+<h3>Project-scoped stdio server using an explicit virtual environment</h3>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- .demo_venv/bin/python3 server.py
+</code></pre>
+<p>The explicit interpreter version is often better for a classroom demo because it removes ambiguity about which Python environment starts the MCP server.</p>
+<h2>MCP scope reminder</h2>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Meaning</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local</code></td>
+<td>Available only to you for the current project</td>
+<td>Personal project-specific setup</td>
+</tr>
+<tr>
+<td><code>project</code></td>
+<td>Stored with the project, typically through <code>.mcp.json</code></td>
+<td>Shared classroom/repository configuration</td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td>Available to you across projects</td>
+<td>Personal globally useful MCP servers</td>
+</tr>
+</tbody>
+</table>
+<p>For this demo, <code>project</code> scope is the clearest choice because students can inspect the <code>.mcp.json</code> file directly.</p>
+<h2>Useful troubleshooting sequence</h2>
+<p>If <code>tissue-analyzer</code> does not appear inside <code>/mcp</code>, try:</p>
+<pre><code class="language-bash">which python3
+python3 --version
+
+claude mcp list
+claude mcp get tissue-analyzer
+</code></pre>
+<p>If you previously rejected the project MCP server:</p>
+<pre><code class="language-bash">claude mcp reset-project-choices
+</code></pre>
+<p>Then restart:</p>
+<pre><code class="language-bash">claude
+</code></pre>
+<p>and inside Claude Code run:</p>
+<pre><code class="language-text">/mcp
+</code></pre>
+<p>If the server is still missing, re-register it:</p>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- python3 server.py
+</code></pre>
+<p>Then confirm:</p>
+<pre><code class="language-bash">claude mcp list
+</code></pre>
+<p>A compact mental model is:</p>
+<pre><code class="language-text">claude mcp add/remove/get/list
+    -&gt; configure or inspect MCP from the terminal
+
+/mcp
+    -&gt; inspect/manage MCP inside the active Claude Code session
+</code></pre>
+
+<div class="note" style="margin-top:3rem">
+  <p><strong>Next.</strong> Demo 3 keeps this MCP server as the approved route and closes the
+  direct ones — denying <code>Read(data/**)</code>, editing and general <code>Bash</code>. It will
+  appear on the <a href="../index.html#demos">main page</a>.</p>
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI · Week 2</strong><br>
+    Jie Hou · Michigan State University</p>
+    <p class="muted">These are synthetic teaching images, not patient data.</p>
+  </div>
+</footer>
+
+</body>
+</html>

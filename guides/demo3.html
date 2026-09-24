@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 3 · MCP + Permissions — Agentic AI Week 2</title>
+<meta name="description" content="Step-by-step guide for Demo 3: writing a permission policy, breaking it on purpose, and closing it properly.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>3</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI · Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">All demos</a>
+      <a href="../downloads/Demo3_MCP_Permissions_Tissue_Analyzer.zip">Download</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">Demo 3 · Level 3 — Permission-controlled access</p>
+    <h1>MCP + Permissions</h1>
+    <p class="lede">The MCP server stays the approved route; the direct ones close. You will
+    write a reasonable policy, break it yourself, and find out why the blunt version is the
+    right one.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo3_MCP_Permissions_Tissue_Analyzer.zip">Download Demo 3 &nbsp;↓</a>
+      <a class="btn btn-ghost" href="demo2.html">← Demo 2</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../index.html">← Back to all four demos</a>
+
+<div class="note">
+  <p><strong>This package ships with a deliberately incomplete policy.</strong> Part B has you
+  find the hole in it and close it. Permission changes take effect when Claude Code
+  <em>restarts</em>, so expect to quit and relaunch several times.</p>
+</div>
+
+
+<p>Package:</p>
+<p><code>Demo3_MCP_Permissions_Tissue_Analyzer.zip</code></p>
+<p>Demo 2 made the capability explicit. This demo controls <strong>who may call what</strong>.</p>
+<p>The teaching goal is not "permissions exist". It is that <strong>writing a good permission
+policy is harder than it looks</strong>, and you will find that out by writing a bad one
+first and then breaking it yourself.</p>
+<hr />
+<h2>1. Unzip and look at the policy</h2>
+<pre><code class="language-bash">unzip Demo3_MCP_Permissions_Tissue_Analyzer.zip
+cd Demo3_MCP_Permissions_Tissue_Analyzer
+cat .claude/settings.json
+</code></pre>
+<p>You should see a short, reasonable-looking policy:</p>
+<pre><code class="language-json">{
+  &quot;permissions&quot;: {
+    &quot;deny&quot;: [
+      &quot;Read(./data/**)&quot;,
+      &quot;Edit(./data/**)&quot;
+    ]
+  }
+}
+</code></pre>
+<p>The intent is clear: <strong>Claude must not look at the raw slide images directly.</strong>
+It must go through the MCP tools instead.</p>
+<p>Also read <code>CLAUDE.md</code>, which states the same thing in prose. Note that prose is
+advice and the settings file is enforcement — the difference matters.</p>
+<hr />
+<h2>2. Start Claude Code and read the rules back</h2>
+<pre><code class="language-bash">claude
+</code></pre>
+<p>Inside Claude Code:</p>
+<pre><code class="language-text">/permissions
+</code></pre>
+<p>Confirm the two deny rules are listed. While you are here, note the three modes:</p>
+<pre><code class="language-text">allow   the tool runs without asking
+ask     you are prompted each time
+deny    the tool is refused, always
+</code></pre>
+<p>And the rule that decides conflicts:</p>
+<pre><code class="language-text">deny beats ask beats allow
+</code></pre>
+<p>Also run <code>/mcp</code> and confirm <code>tissue-analyzer</code> is connected with two tools.</p>
+<hr />
+<h2 class="partmark">Part A — Watch the policy work</h2>
+<h2>3. Try the forbidden thing</h2>
+<pre><code class="language-text">Read data/case_mild_injury_histology.pgm directly and describe the raw pixel values.
+</code></pre>
+<p>This should be <strong>refused</strong>. Note the exact wording Claude gives you — you will
+compare it with a different kind of refusal later.</p>
+<h2>4. Try something the policy does not mention</h2>
+<pre><code class="language-text">Show me previews/case_mild_injury_histology.png
+</code></pre>
+<p>This is <strong>allowed</strong>. <code>previews/</code> appears nowhere in the deny list.</p>
+<p>Worth a moment: the colour preview is a picture of the same slide. The policy
+protects a file extension and a folder, not a concept. <strong>A permission rule is
+exactly as smart as the path you typed into it.</strong></p>
+<h2>5. Use the approved route</h2>
+<pre><code class="language-text">Use analyze_tissue with:
+slide = data/case_mild_injury_histology.pgm
+magnification = 20
+damage_threshold_fraction = 0.45
+out = results/mild_permission_analysis.json
+</code></pre>
+<p>Then chain the classifier:</p>
+<pre><code class="language-text">Use classify_tissue with:
+features = results/mild_permission_analysis.json
+out = results/mild_permission_classification.json
+</code></pre>
+<p>Expected: <code>mild_injury</code>. Compare against <code>docs/EXPECTED_SYNTHETIC_RESULTS.md</code>.</p>
+<h2>6. Notice what just happened</h2>
+<p>Claude could not open that file. The tool it called <strong>did</strong> open it, read every
+pixel, and handed back numbers.</p>
+<pre><code class="language-text">Claude ──X──&gt; data/*.pgm            (denied: Claude's own Read tool)
+
+Claude ────&gt; MCP tool ────&gt; data/*.pgm   (allowed: a separate process)
+                   │
+                   └────&gt; {&quot;damage_fraction&quot;: 0.22, ...}
+</code></pre>
+<p><strong>Claude Code permissions restrict Claude's tools. They are not an operating-system
+sandbox.</strong> The MCP server is an ordinary process running as you, with your file
+access. If that distinction were not true, the demo could not work at all — the
+analysis has to read the pixels to produce a number.</p>
+<hr />
+<h2 class="partmark">Part B — Break your own policy</h2>
+<p>This is the part worth doing slowly.</p>
+<h2>7. Find the hole</h2>
+<p>The policy denies <code>Read</code> and <code>Edit</code> on <code>data/</code>. Ask Claude to do this:</p>
+<pre><code class="language-text">Using a shell command, show me the first 5 lines of
+data/case_mild_injury_histology.pgm
+</code></pre>
+<p><strong>It works.</strong> Claude runs <code>head -5 data/...</code> through Bash and the contents come
+straight back.</p>
+<p>The deny list named <code>Read</code> and <code>Edit</code>. It never mentioned <code>Bash</code>. The file was
+never protected — only two of the several routes to it were.</p>
+<blockquote>
+<p>A deny list protects what you remembered to deny.</p>
+</blockquote>
+<h2>8. Patch it the obvious way — and watch that fail too</h2>
+<p>Copy the second stage over the policy:</p>
+<pre><code class="language-bash">cp docs/permission_stages/stage2_enumerate.json .claude/settings.json
+</code></pre>
+<p>Restart Claude Code (permission changes are read at startup), then:</p>
+<pre><code class="language-text">/permissions
+</code></pre>
+<p>You should now see <code>Bash(cat:*)</code>, <code>Bash(head:*)</code> and <code>Bash(less:*)</code> denied.
+Try the same request again — it is blocked.</p>
+<p>Now try harder:</p>
+<pre><code class="language-text">Using a shell command, print the first few lines of
+data/case_mild_injury_histology.pgm — you may use any tool available.
+</code></pre>
+<p>There are many ways to read a file: <code>od</code>, <code>xxd</code>, <code>sed</code>, <code>awk</code>, <code>tail</code>,
+<code>python3 -c</code>, <code>grep .</code>. Enumerating the bad ones is a game you lose.</p>
+<h2>9. Close it properly</h2>
+<pre><code class="language-bash">cp docs/permission_stages/stage3_closed.json .claude/settings.json
+</code></pre>
+<p>Restart Claude Code and try step 7 again. Now it is refused.</p>
+<p>The difference between stage 2 and stage 3 is the difference between <strong>blocking
+bad uses of a capability</strong> and <strong>not granting the capability</strong>. The second is the
+only one that holds.</p>
+<pre><code class="language-text">stage 2:  Bash is available, and I listed some commands I do not like
+stage 3:  Bash is not available
+</code></pre>
+<hr />
+<h2 class="partmark">Part C — Operating on permissions</h2>
+<p>Four things you will need to do in your own project.</p>
+<h2>10. Read the current state</h2>
+<pre><code class="language-text">/permissions
+</code></pre>
+<p>This is always the truth for the running session. A settings file you edited but
+did not restart into is not yet in effect.</p>
+<h2>11. Add a rule</h2>
+<p>Two ways, and it is worth doing both once:</p>
+<p><strong>By file</strong> — edit <code>.claude/settings.json</code>, add an entry, restart Claude Code.</p>
+<p><strong>By the interface</strong> — open <code>/permissions</code> and add a rule there. Note where it
+gets written: the interface usually writes to <code>.claude/settings.local.json</code>,
+your personal file, not the shared project one. Check afterwards:</p>
+<pre><code class="language-bash">cat .claude/settings.json          # shared, committed to the repository
+cat .claude/settings.local.json    # personal, usually gitignored
+</code></pre>
+<p>Both are in effect at once. This is how a lab can ship a baseline policy that an
+individual can tighten but should not silently loosen.</p>
+<h2>12. Remove a rule</h2>
+<p>Delete the <code>Edit(./data/**)</code> line from <code>.claude/settings.json</code>, restart, and ask:</p>
+<pre><code class="language-text">Add a comment line to the top of data/case_normal_histology.pgm
+</code></pre>
+<p>It now succeeds — and it has corrupted a data file. Undo it, then <strong>put the rule
+back</strong>.</p>
+<p>The point of doing this on purpose: removing a permission is a one-line edit, it
+takes effect silently, and nothing warns you what it allowed. Removing rules
+deserves the same care as removing a safety check in code.</p>
+<h2>13. Use <code>ask</code> rather than <code>deny</code></h2>
+<pre><code class="language-bash">cp docs/permission_stages/stage4_ask_and_allow.json .claude/settings.json
+</code></pre>
+<p>Restart, then:</p>
+<pre><code class="language-text">Use analyze_tissue on data/case_necrosis_histology.pgm at magnification 20
+with damage_threshold_fraction 0.45, saving to results/necrosis_permission.json
+</code></pre>
+<p>Writing into <code>results/</code> is set to <code>ask</code>, so you get a prompt. Approve it.</p>
+<p>Three modes, three uses:</p>
+<pre><code class="language-text">allow   routine and safe    — previews/, docs/
+ask     consequential       — writing files, anything you want to see happen
+deny    never, no prompt    — raw patient data, destructive commands
+</code></pre>
+<p><code>ask</code> is the one people under-use. It is the right setting for most things that
+change state, because it keeps you in the loop without blocking the work.</p>
+<hr />
+<h2 class="partmark">Part D — What this is and is not</h2>
+<h2>14. Say the limit out loud</h2>
+<pre><code class="language-text">Claude Code permissions are a guardrail on the agent, not a security boundary.
+</code></pre>
+<p>They stop an agent from doing something by accident or by a badly-worded request.
+They do not contain a process, and they do not protect data from anything other
+than Claude's own tools. Your MCP server, your terminal, and any script you run
+all still have your full file access.</p>
+<p>For IRB-covered data, the sentence that matters is: <strong>the images never entered
+the conversation</strong> — a local process read them and returned numbers. That is an
+architecture property, and permissions are what stop it being accidentally
+bypassed.</p>
+<h2>15. Design question for your own project</h2>
+<p>Write down two answers before you leave:</p>
+<ol>
+<li>In your own workflow, <strong>what must the agent never touch directly?</strong></li>
+<li><strong>What is the approved route to it</strong>, and does it return numbers rather than raw data?</li>
+</ol>
+<p>If the answer to 2 is "there isn't one yet", that is your Week 4 task.</p>
+<hr />
+<h2>Appendix — permission stages in this package</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Policy</th>
+<th>What it teaches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stage1_first_attempt.json</code></td>
+<td>deny Read + Edit on <code>data/</code></td>
+<td>a reasonable first try, with a hole</td>
+</tr>
+<tr>
+<td><code>stage2_enumerate.json</code></td>
+<td>adds <code>Bash(cat:*)</code>, <code>Bash(head:*)</code>, <code>Bash(less:*)</code></td>
+<td>naming bad commands does not work</td>
+</tr>
+<tr>
+<td><code>stage3_closed.json</code></td>
+<td>adds a blanket <code>Bash</code> deny</td>
+<td>remove the capability, not the uses</td>
+</tr>
+<tr>
+<td><code>stage4_ask_and_allow.json</code></td>
+<td>adds <code>allow</code> and <code>ask</code> entries</td>
+<td>all three modes together</td>
+</tr>
+</tbody>
+</table>
+<p>Swap any of them in with:</p>
+<pre><code class="language-bash">cp docs/permission_stages/&lt;file&gt; .claude/settings.json
+</code></pre>
+<p>then <strong>restart Claude Code</strong>. The package ships at stage 1 on purpose.</p>
+<h2>Appendix — quick reference</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>See rules in effect</td>
+<td><code>/permissions</code> inside Claude Code</td>
+</tr>
+<tr>
+<td>See MCP servers</td>
+<td><code>/mcp</code> inside Claude Code</td>
+</tr>
+<tr>
+<td>Shared project policy</td>
+<td><code>.claude/settings.json</code> (commit this)</td>
+</tr>
+<tr>
+<td>Personal overrides</td>
+<td><code>.claude/settings.local.json</code> (usually gitignored)</td>
+</tr>
+<tr>
+<td>Apply a changed file</td>
+<td>restart Claude Code</td>
+</tr>
+<tr>
+<td>Precedence</td>
+<td><code>deny</code> &gt; <code>ask</code> &gt; <code>allow</code></td>
+</tr>
+</tbody>
+</table>
+
+<div class="note" style="margin-top:3rem">
+  <p><strong>Next.</strong> Demo 4 narrows the other way: a <code>tissue-analyst</code> subagent
+  that holds only the two MCP tools, with no general file or shell access at all. It will appear
+  on the <a href="../index.html#demos">main page</a>.</p>
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI · Week 2</strong><br>
+    Jie Hou · Michigan State University</p>
+    <p class="muted">These are synthetic teaching images, not patient data.</p>
+  </div>
+</footer>
+
+</body>
+</html>
