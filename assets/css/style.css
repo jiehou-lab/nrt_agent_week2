@@ -147,3 +147,7 @@ main,.wrap,.guide main{min-width:0}
 .pagehead .btn{max-width:100%;white-space:normal;text-align:center}
 pre{width:100%;box-sizing:border-box}
 .btn{overflow-wrap:anywhere}
+
+/* bottom navigation on guide pages */
+.guidenav{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;margin:2.6rem 0 .4rem;padding-top:1.6rem;border-top:1px solid var(--rule)}
+.guidenav .btn{max-width:100%;white-space:normal;text-align:center}
