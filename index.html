@@ -37,7 +37,7 @@
     <h1>AI Models in Agentic AI:<br>How They Learn, Fail, and Connect to Research Workflows</h1>
     <p class="lede">How AI models work, where they fail, and how to connect them reliably to
     research workflows — followed by four hands-on demos that progressively turn one analysis
-    package into a safer agent-ready system.</p>
+    package into a more structured and controlled agent-ready system.</p>
     <div class="hero-facts">
       <div><strong>Friday, Sep 25, 2026</strong><span>2:30 – 4:30 PM</span></div>
       <div><strong>Jie Hou</strong><span>Michigan State University</span></div>
@@ -51,10 +51,9 @@
 
 <section id="lecture">
   <h2>What the lecture covers</h2>
-  <p>The first half explains how AI models generate outputs, why plausible answers can still be
-  wrong, and where those errors come from. The second half focuses on how to design more reliable
-  agent workflows using structured tool interfaces, MCP, permissions, and scoped subagents —
-  followed by four hands-on demos.</p>
+  <p>The first half explains how AI models generate outputs and why plausible answers can still
+  be wrong. The second half shows how to build more reliable agent workflows with structured tool
+  interfaces, MCP, permissions, and scoped subagents — ending with four hands-on demos.</p>
 
   <table>
     <tr><th style="width:28%">Part</th><th>What it covers</th></tr>
@@ -64,8 +63,8 @@
     <tr><td><strong>Why coding agents fail</strong></td><td>Context dilution, competing examples, ambiguous parameters, and silent software errors.</td></tr>
     <tr><td><strong>Structured tool interfaces</strong></td><td>Capability descriptions, schemas, validation, and structured inputs and outputs.</td></tr>
     <tr><td><strong>Model Context Protocol</strong></td><td>How MCP exposes selected research capabilities through a common interface.</td></tr>
-    <tr><td><strong>Permissions and scoped agents</strong></td><td>Restricting direct access, narrowing tool sets, and delegating tasks to specialized subagents.</td></tr>
-    <tr><td><strong>Live tissue-analysis demos</strong></td><td>Progressing from a raw repository to MCP, permissions, and subagent-based execution.</td></tr>
+    <tr><td><strong>Permissions and scoped subagents</strong></td><td>Restricting direct access, narrowing tool sets, and delegating work to scoped subagents.</td></tr>
+    <tr><td><strong>Live tissue-analysis demos</strong></td><td>Progressing from a raw repository to MCP, permissions, and scoped subagent delegation.</td></tr>
   </table>
 
   <div class="callout">
@@ -85,7 +84,7 @@
 
   <div class="path">
     <div><span>Level 1</span><strong>Repository as context</strong></div>
-    <div><span>Level 2</span><strong>Explicit MCP interface</strong></div>
+    <div><span>Level 2</span><strong>MCP interface</strong></div>
     <div><span>Level 3</span><strong>Permission-controlled access</strong></div>
     <div><span>Level 4</span><strong>Scoped subagent delegation</strong></div>
   </div>
@@ -147,7 +146,7 @@
         <h4>What it teaches</h4>
         <ul>
           <li>Claude no longer reconstructs the interface from source; it is handed one.</li>
-          <li>A schema records what a number <em>means</em> — the thing Demo 1 could only put in prose.</li>
+          <li>A schema makes parameter meaning and valid ranges explicit — information Demo 1 leaves mostly in documentation.</li>
           <li>The MCP lifecycle itself: configure, inspect, remove, restore, connect.</li>
         </ul>
       </div>
@@ -173,14 +172,14 @@
         <h4>What you will do</h4>
         <ul>
           <li>Start from a reasonable-looking policy that denies <code>Read</code> and <code>Edit</code> on <code>data/</code>, and watch it refuse.</li>
-          <li><strong>Then break it yourself</strong> — ask for the same file through a shell command, and get it.</li>
+          <li><strong>Then test a bypass path</strong> — ask for the same file through a shell command and see why the initial policy is incomplete.</li>
           <li>Patch by naming bad commands, watch that fail too, then close it properly.</li>
           <li>Practise the four operations: read the rules, add one, remove one, and switch a rule from <code>deny</code> to <code>ask</code>.</li>
         </ul>
         <h4>What it teaches</h4>
         <ul>
-          <li>MCP and permissions are separate layers: MCP defines the capability, permissions decide which direct actions are available.</li>
-          <li>A deny list protects only what you remembered to deny — removing a capability beats blocking its uses.</li>
+          <li>MCP and permissions are separate layers: MCP defines the tool interface, permissions decide which direct actions are available.</li>
+          <li>A deny list protects only what you explicitly block; reducing the available capability set is often more robust than enumerating every prohibited use.</li>
           <li>These are guardrails on the agent, not an OS sandbox: the MCP server reads the file Claude cannot open.</li>
         </ul>
       </div>
@@ -212,9 +211,9 @@
         </ul>
         <h4>What it teaches</h4>
         <ul>
-          <li>Two different boundaries: Demo 3 denies a capability you hold; a subagent simply does not hold it.</li>
-          <li>The report <em>is</em> the interface — whatever the subagent saw but did not say is gone.</li>
-          <li>Scoping a worker is not a security boundary: the MCP server still opens the file with your permissions.</li>
+          <li>Two different control styles: Demo 3 blocks actions through project permissions; Demo 4 gives the subagent a narrower tool set from the start.</li>
+          <li>The report becomes the interface — information the subagent does not return is not passed back through that delegation step.</li>
+          <li>Scoping a subagent is not a security boundary: the MCP server still accesses files with the permissions of the process running it.</li>
           <li>A rule that sounds correct is not the same as one that covers the case you care about.</li>
         </ul>
       </div>
@@ -229,8 +228,8 @@
 
 <section id="setup">
   <h2>Before you arrive</h2>
-  <p>This is the preparation that went out by email — everything referred to there is downloadable
-  below. Friday is hands-on, so the setup really does need to be done beforehand.</p>
+  <p>Everything referenced in the preparation email is available below. Because Friday is
+  hands-on, please complete the setup beforehand.</p>
 
   <div class="files">
     <a class="filecard" href="downloads/Field-Guide_Claude.pptx">
