@@ -151,3 +151,9 @@ pre{width:100%;box-sizing:border-box}
 /* bottom navigation on guide pages */
 .guidenav{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;margin:2.6rem 0 .4rem;padding-top:1.6rem;border-top:1px solid var(--rule)}
 .guidenav .btn{max-width:100%;white-space:normal;text-align:center}
+
+/* narrow screens: let the masthead nav take its own line instead of overflowing */
+@media (max-width:560px){
+  .masthead-inner{flex-wrap:wrap;gap:.4rem}
+  .masthead nav{margin-left:0;width:100%;gap:1.1rem;flex-wrap:wrap}
+}
