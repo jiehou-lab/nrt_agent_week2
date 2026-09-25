@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NRT Hot Topics: Agentic AI — Lecture 2 Handout (updated)</title>
+<style>
+  @page { size: Letter; margin: 0.42in; }
+  :root{
+    --green:#18453B; --navy:#183A6B; --blue:#DCEAF7; --mint:#E2F0E8;
+    --cream:#FFF4DD; --yellow:#FFF9CC; --cyan:#C8F3F8; --ink:#111;
+    --muted:#4a4a4a; --orange:#A95C00;
+  }
+  * { box-sizing: border-box; }
+  body{
+    margin:0; font-family:"Aptos","Segoe UI",Arial,sans-serif; color:var(--ink);
+    background:white; font-size:10.3pt; line-height:1.20;
+  }
+  .page{ page-break-after: always; min-height:10.1in; display:flex; flex-direction:column; }
+  .page:last-child{ page-break-after:auto; }
+  h1{ margin:0; font-size:22.5pt; line-height:1.05; font-weight:600; }
+  .rule{ height:3px; background:#111; width:67%; margin:8px 0 10px; }
+  .subtitle{ font-size:10.2pt; color:var(--muted); margin-bottom:8px; }
+  .lead{ border-left:5px solid var(--green); background:#f7faf9; padding:8px 10px; margin-bottom:8px; font-size:10.8pt; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .card{ border:1.4px solid #222; border-radius:12px; padding:8px 10px; break-inside:avoid; }
+  .blue{ background:var(--blue); border-color:var(--navy); }
+  .mint{ background:var(--mint); border-color:var(--green); }
+  .cream{ background:var(--cream); }
+  .yellow{ background:var(--yellow); }
+  .card h2{ margin:0 0 4px; font-size:13.4pt; line-height:1.05; }
+  ul, ol{ margin:4px 0 0 18px; padding:0; }
+  li{ margin:1px 0; }
+  .keyline{
+    margin:7px 0; padding:7px 9px; background:var(--cyan);
+    border-left:5px solid var(--green); font-size:11pt; font-weight:600;
+  }
+  code{
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    background:#f4f4f4; border:1px solid #ddd; border-radius:3px; padding:0 2px; font-size:9.2pt;
+  }
+  .flow{ display:flex; align-items:center; gap:4px; margin:7px 0 8px; font-size:9.4pt; font-weight:600; }
+  .flow .box{
+    border:1.2px solid #222; border-radius:7px; padding:6px 6px; background:white;
+    text-align:center; flex:1 1 0;
+  }
+  .flow .arrow{ flex:0 0 auto; font-size:13pt; }
+  .think{
+    border:1.3px dashed var(--orange); background:#fffaf2; padding:8px 10px; margin-top:7px;
+    break-inside:avoid;
+  }
+  .think strong{ color:var(--orange); }
+  table{ border-collapse:collapse; width:100%; font-size:9.5pt; }
+  th, td{ border:1px solid #777; padding:5px 6px; vertical-align:top; }
+  th{ background:#f4ead9; text-align:left; }
+  .small{ font-size:9pt; }
+  .footer{
+    margin-top:auto; border-top:3px solid var(--green); padding-top:5px;
+    display:flex; justify-content:space-between; color:#555; font-size:8.6pt;
+  }
+</style>
+</head>
+<body>
+
+<section class="page">
+  <h1>NRT Hot Topics: Agentic AI — Lecture 2</h1>
+  <div class="rule"></div>
+  <div class="subtitle">Two-page reference: from AI models and LLM behavior to research-agent interfaces, MCP, permissions, and scoped subagents.</div>
+
+  <div class="lead"><strong>Core idea:</strong> Using an agent means delegating work to an LLM-driven system. Designing an agent means deciding what the AI should — and should not — have to figure out.</div>
+
+  <div class="grid2">
+    <div class="card blue">
+      <h2>1. Model, workflow, tool</h2>
+      <ul>
+        <li><strong>Model:</strong> learned mapping from input to output.</li>
+        <li><strong>Workflow:</strong> preprocessing + model/algorithm + postprocessing + reporting.</li>
+        <li><strong>Tool:</strong> callable software interface to a model or workflow.</li>
+      </ul>
+      <div class="small" style="margin-top:5px;"><strong>Research example:</strong> image → preprocess → segment/classify → postprocess → report.</div>
+    </div>
+
+    <div class="card mint">
+      <h2>2. Why repository-as-context can fail</h2>
+      <ul>
+        <li>context dilution</li>
+        <li>competing examples or aliases</li>
+        <li>learned language priors</li>
+        <li>semantic ambiguity</li>
+        <li>silent, executable errors</li>
+      </ul>
+      <div class="small" style="margin-top:5px;"><code>20x</code> may look plausible even when the tool requires <code>20</code>.</div>
+    </div>
+  </div>
+
+  <div class="keyline">Plausible continuation ≠ correct tool call.</div>
+
+  <div class="grid2">
+    <div class="card cream">
+      <h2>3. Interface-design response</h2>
+      <ul>
+        <li>Make parameter names explicit.</li>
+        <li>Define allowed values/ranges.</li>
+        <li>Validate before execution.</li>
+        <li>Return structured results.</li>
+      </ul>
+      <div class="small" style="margin-top:5px;"><strong>Design principle:</strong> Do not ask the LLM to infer what the software can specify explicitly.</div>
+    </div>
+
+    <div class="card yellow">
+      <h2>4. When designing an agent is a good option</h2>
+      <ul>
+        <li>repeated workflow across many samples/files</li>
+        <li>specialized lab tools, scripts, or databases</li>
+        <li>hard constraints on units, parameters, or outputs</li>
+        <li>local/private data or permission boundaries matter</li>
+        <li>results should be reusable, auditable, or shared across a team</li>
+      </ul>
+      <div class="small" style="margin-top:5px;"><strong>Maybe not necessary</strong> for one-off, generic, low-stakes tasks when an existing GUI already works well.</div>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="box">Inputs</div><div class="arrow">→</div>
+    <div class="box">Parameters / Schema</div><div class="arrow">→</div>
+    <div class="box">Workflow</div><div class="arrow">→</div>
+    <div class="box">Structured Output</div>
+  </div>
+
+  <div class="think">
+    <strong>Stop & think:</strong> Pick one research task you already do. Which parts are true scientific judgment, and which parts could be made explicit as fields, constraints, validation rules, and structured outputs?
+  </div>
+
+  <div class="think">
+    <strong>Stop & think:</strong> Would an agent need to call only the model, or is the <em>whole workflow</em> the safer and more useful capability to expose?
+  </div>
+
+  <div class="footer">
+    <span>NRT Hot Topics: Agentic AI | Lecture 2</span>
+    <span>Page 1 of 2</span>
+  </div>
+</section>
+
+<section class="page">
+  <h1>Research Agents: MCP, Permissions, and Scoped Delegation</h1>
+  <div class="rule"></div>
+
+  <div class="card blue">
+    <h2>5. MCP: a common protocol for callable capabilities</h2>
+    <div class="small">MCP helps an AI application discover and invoke selected external tools/resources through standardized interfaces. It does <strong>not</strong> replace the scientific computation itself.</div>
+    <div class="flow">
+      <div class="box">User</div><div class="arrow">→</div>
+      <div class="box">Agent / MCP client</div><div class="arrow">→</div>
+      <div class="box">MCP server</div><div class="arrow">→</div>
+      <div class="box">Research workflow</div><div class="arrow">→</div>
+      <div class="box">Structured result</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:8px;">
+    <div class="card mint">
+      <h2>6. Permissions</h2>
+      <ul>
+        <li><strong>Allow:</strong> execute without asking.</li>
+        <li><strong>Ask:</strong> require user approval.</li>
+        <li><strong>Deny:</strong> block the operation.</li>
+      </ul>
+      <div class="small" style="margin-top:5px;">Permission rules move access control from model judgment into explicit configuration.</div>
+    </div>
+
+    <div class="card yellow">
+      <h2>7. Scoped subagent</h2>
+      <ul>
+        <li>specialized instructions</li>
+        <li>scoped context</li>
+        <li>approved tools</li>
+        <li>permission boundary</li>
+      </ul>
+      <div class="small" style="margin-top:5px;">Main agent coordinates; the subagent performs a bounded subtask and returns a structured result.</div>
+    </div>
+  </div>
+
+  <div class="keyline">Permissions define <em>what can be accessed</em>; subagents define <em>who is delegated to work within that scope</em>.</div>
+
+  <h2 style="font-size:13.6pt; margin:4px 0 5px;">Four-demo progression</h2>
+  <table>
+    <thead>
+      <tr><th>Demo</th><th>Question to watch</th><th>Main idea</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>1. Repository-as-Context</strong></td><td>What must the agent infer?</td><td>Interface reconstructed from files/context.</td></tr>
+      <tr><td><strong>2. MCP Interface</strong></td><td>What becomes explicit?</td><td>Declared capabilities, schema, structured results.</td></tr>
+      <tr><td><strong>3. Permissions</strong></td><td>What can the agent access?</td><td>Approved path remains available; direct access can be blocked.</td></tr>
+      <tr><td><strong>4. Scoped Subagent</strong></td><td>Who is delegated, and with what scope?</td><td>Specialized instructions + selected tools + permissions.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="grid2" style="margin-top:8px;">
+    <div class="card mint">
+      <h2>Helps with</h2>
+      <ul>
+        <li>explicit parameters and schemas</li>
+        <li>bounded structured outputs</li>
+        <li>auditable tool calls</li>
+        <li>minimizing unnecessary raw-data transfer</li>
+        <li>limiting tools/data per subagent</li>
+      </ul>
+    </div>
+
+    <div class="card cream">
+      <h2>Does not automatically guarantee</h2>
+      <ul>
+        <li>scientific correctness</li>
+        <li>data privacy / confidentiality</li>
+        <li>correct authorization or safe permissions</li>
+        <li>correct choice among valid options</li>
+        <li>absence of model mistakes</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="think">
+    <strong>Stop & think:</strong> What data should remain local in your workflow? What should the LLM see: raw data, derived summaries, file paths, or only final structured results?
+  </div>
+
+  <div class="keyline">Take-home framework: Inputs → Parameters → Workflow → Structured Output → Permissions + Human Review</div>
+
+  <div class="footer">
+    <span>NRT Hot Topics: Agentic AI | Lecture 2</span>
+    <span>Page 2 of 2</span>
+  </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "tool": "analyze_tissue",
+  "slide": "/mnt/data/tissue_analyzer_mcp_realistic_histology_f105f429/data/case_fold_artifact_histology.pgm",
+  "magnification": 20,
+  "damage_threshold_fraction": 0.45,
+  "n_tiles_tissue": 576,
+  "n_tiles_damaged": 135,
+  "damage_fraction": 0.234,
+  "hard_edge_rate": 0.17,
+  "confidence": 0.55,
+  "low_confidence": true,
+  "usable": true,
+  "notes": "elevated edge rate - possible fold or tear"
+}

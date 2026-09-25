@@ -1,0 +1,12 @@
+{
+  "_comment": "STAGE 2 - patching the hole by naming bad commands. Still leaky. Why?",
+  "permissions": {
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(less:*)"
+    ]
+  }
+}
