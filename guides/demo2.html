@@ -302,6 +302,23 @@ claude mcp get tissue-analyzer
 <h2>9. Start Claude Code from the project root</h2>
 <pre><code class="language-bash">claude
 </code></pre>
+<div class="note">
+  <p><strong>A prompt appears the first time you start Claude Code here, and the default answer is
+  the wrong one.</strong> It reads <em>"New MCP server found in this project: tissue-analyzer"</em>
+  and offers three choices:</p>
+<pre><code class="language-text">  Use this MCP server
+  Use this and all future MCP servers in this project
+&gt; Continue without using this MCP server        &lt;- pre-selected
+</code></pre>
+  <p>Press Enter straight away and the server is switched off, quietly, for this project. Every MCP
+  step after that fails, and nothing tells you why.</p>
+  <p><strong>Press <code>↑</code> to reach "Use this MCP server", then Enter.</strong></p>
+  <p>If you already pressed Enter too fast, it is recoverable. Leave Claude Code with
+  <code>/exit</code>, then run:</p>
+<pre><code class="language-bash">claude mcp reset-project-choices
+</code></pre>
+  <p>and start Claude Code again from the project root.</p>
+</div>
 <p>Inside Claude Code:</p>
 <pre><code class="language-text">/mcp
 </code></pre>
@@ -309,7 +326,6 @@ claude mcp get tissue-analyzer
 <pre><code class="language-text">tissue-analyzer
 </code></pre>
 <p>is connected.</p>
-<p>Approve the project MCP server if Claude asks for trust/permission.</p>
 <hr />
 <h2>10. Ask Claude to list available MCP tools</h2>
 <p>Prompt:</p>

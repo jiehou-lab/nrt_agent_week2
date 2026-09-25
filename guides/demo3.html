@@ -82,6 +82,23 @@ advice and the settings file is enforcement — the difference matters.</p>
 <pre><code class="language-bash">claude
 </code></pre>
 <div class="note">
+  <p><strong>A prompt appears the first time you start Claude Code here, and the default answer is
+  the wrong one.</strong> It reads <em>"New MCP server found in this project: tissue-analyzer"</em>
+  and offers three choices:</p>
+<pre><code class="language-text">  Use this MCP server
+  Use this and all future MCP servers in this project
+&gt; Continue without using this MCP server        &lt;- pre-selected
+</code></pre>
+  <p>Press Enter straight away and the server is switched off, quietly, for this project. Every MCP
+  step after that fails, and nothing tells you why.</p>
+  <p><strong>Press <code>↑</code> to reach "Use this MCP server", then Enter.</strong></p>
+  <p>If you already pressed Enter too fast, it is recoverable. Leave Claude Code with
+  <code>/exit</code>, then run:</p>
+<pre><code class="language-bash">claude mcp reset-project-choices
+</code></pre>
+  <p>and start Claude Code again from the project root.</p>
+</div>
+<div class="note">
   <p><strong>Stay in the default permission mode for this demo.</strong> Claude Code asks before it
   acts; that is the default, and it is what every step below assumes. Pressing
   <code>shift+tab</code> cycles to other modes &mdash; an accept-edits mode, and a bypass mode that
