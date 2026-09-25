@@ -283,9 +283,15 @@ at magnification 20 with a 50% threshold.
 <hr />
 <h2>14. See what those mistakes actually cost</h2>
 <p>Steps 12 and 13 test whether Claude <em>converts</em> correctly. They never show what
-happens when a wrong number gets through — so leave Claude Code for a moment and
-make both mistakes yourself:</p>
-<pre><code class="language-text">/exit
+happens when a wrong number gets through — so run both mistakes yourself, in a plain shell.</p>
+<p><strong>Do this in a second terminal tab, and leave Claude Code running in the first</strong>
+(<code>⌘T</code> in Terminal; the <code>+</code> or split button in the VS Code terminal panel).
+Two reasons: you keep your conversation, and — more importantly — Claude does not see these runs.
+The second half of this step asks whether it notices the problem on its own, and that only means
+something if it has not just watched the error scroll past.</p>
+<p>In the new tab, activate the same environment and move into the project:</p>
+<pre><code class="language-bash">cd Demo1_tissue_analyzer
+source .demo_venv/bin/activate
 </code></pre>
 <p><strong>First, the mistake that does not stop you.</strong> Pass the threshold as a percent
 instead of a fraction:</p>
@@ -323,9 +329,7 @@ wrong number into a file you will later read as a result. Neither value is
 checked anywhere: the repository states the valid ranges in prose, and prose is
 not something a program can enforce. That is the gap Demo 2 closes.</p>
 <h3>Does Claude notice?</h3>
-<p>Start Claude Code again and hand it the failing one:</p>
-<pre><code class="language-bash">claude
-</code></pre>
+<p>Go back to the tab where Claude Code is still running, and hand it the failing one:</p>
 <pre><code class="language-text">Analyze data/case_mild_injury_histology.pgm
 at magnification 25 with threshold 0.45.
 </code></pre>
