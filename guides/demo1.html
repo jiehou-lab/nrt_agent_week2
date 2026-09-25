@@ -125,6 +125,12 @@ source .demo_venv/bin/activate
 <p>Inspect the output:</p>
 <pre><code class="language-bash">cat results/mild_analysis.json
 </code></pre>
+<blockquote>
+<p>If the last line comes back as <code>}%</code> rather than <code>}</code>, that trailing <code>%</code> is your
+shell (zsh) telling you the file does not end in a newline. It is not part of
+the JSON. <code>python3 -m json.tool results/mild_analysis.json</code> prints it without
+the marker.</p>
+</blockquote>
 <hr />
 <h2>6. Run the classifier directly</h2>
 <p>Depending on the repository version, use the repository's documented classifier invocation.</p>
@@ -206,10 +212,27 @@ one step before the answer &mdash; remember this slide, it comes back in Demo 4.
 <hr />
 <h2 class="partmark">Part B — Test inside Claude Code</h2>
 <h2>10. Start Claude Code</h2>
-<p>From the project root:</p>
+<p><strong>First, clear what Part A left behind.</strong> You have just written six JSON files
+into <code>results/</code>. Claude reads the repository to work out what to do — and that
+includes your leftovers. Given a <code>results/mild_analysis.json</code> that already holds
+the right answer, it may simply read it back to you instead of running anything,
+and Part B stops testing what it is meant to test:</p>
+<pre><code class="language-bash">rm -f results/*.json
+ls results/
+</code></pre>
+<p>That is worth noticing in its own right: <strong>an agent treats whatever it finds in
+the folder as evidence</strong>, including files you forgot were there.</p>
+<p>Now start Claude Code from the project root:</p>
 <pre><code class="language-bash">claude
 </code></pre>
 <p>There is no MCP server in this version.</p>
+<blockquote>
+<p><strong>When Claude asks for permission, choose <code>Yes</code>.</strong> Every prompt below needs to
+run a command, so you will be asked. Take the plain <code>Yes</code> each time — not
+"don't ask again", and not the option that switches to an automatic mode.
+Watching each request arrive <em>is</em> the exercise; from Demo 3 onward these
+prompts are the whole subject.</p>
+</blockquote>
 <p>Ask Claude:</p>
 <pre><code class="language-text">Please inspect this repository and tell me how to analyze
 data/case_mild_injury_histology.pgm at magnification 20
