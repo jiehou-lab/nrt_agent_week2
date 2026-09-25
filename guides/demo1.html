@@ -52,9 +52,17 @@
 <pre><code class="language-bash">unzip Demo1_tissue_analyzer.zip
 cd Demo1_tissue_analyzer
 </code></pre>
-<p>Optional:</p>
-<pre><code class="language-bash">tree -L 3
+<p>Optional &mdash; list what is inside:</p>
+<pre><code class="language-bash">ls -R | head -40
 </code></pre>
+<div class="note">
+  <p><strong>If you would rather see a tree.</strong> macOS and Linux do not ship <code>tree</code>
+  by default. Install it with <code>brew install tree</code> (macOS) or
+  <code>sudo apt install tree</code> (Ubuntu / WSL), then run <code>tree -L 3</code>. On Windows,
+  <code>tree /F</code> already works in PowerShell and Command Prompt with nothing to install, or
+  use <code>Get-ChildItem -Recurse -Depth 2</code>.</p>
+  <p>Nothing here depends on it &mdash; <code>ls -R</code> shows the same folders.</p>
+</div>
 <p>You should see important folders such as:</p>
 <pre><code class="language-text">data/
 previews/

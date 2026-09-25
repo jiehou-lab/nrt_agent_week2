@@ -60,9 +60,18 @@
 <pre><code class="language-bash">unzip Demo2_MCP_Tissue_Analyzer.zip
 cd Demo2_MCP_Tissue_Analyzer
 </code></pre>
-<p>Inspect:</p>
-<pre><code class="language-bash">tree -a -L 3
+<p>Inspect. The second command is the one that matters &mdash; <code>.mcp.json</code> starts
+with a dot, so it is hidden from a plain <code>ls</code>:</p>
+<pre><code class="language-bash">ls -R | head -40
+ls -a
 </code></pre>
+<div class="note">
+  <p><strong>If you would rather see a tree.</strong> macOS and Linux do not ship <code>tree</code>
+  by default. Install it with <code>brew install tree</code> (macOS) or
+  <code>sudo apt install tree</code> (Ubuntu / WSL), then run <code>tree -a -L 3</code> &mdash; the
+  <code>-a</code> is what shows <code>.mcp.json</code>. On Windows, <code>tree /F</code> works with
+  nothing to install, or use <code>Get-ChildItem -Force -Recurse -Depth 2</code>.</p>
+</div>
 <p>Important files include:</p>
 <pre><code class="language-text">server.py
 .mcp.json

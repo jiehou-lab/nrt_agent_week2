@@ -1,0 +1,6 @@
+# Analysis parameters. Edit here rather than passing flags.
+magnification: 20
+damage_threshold: 0.45      # grey level fraction below which a tile is damaged
+min_tiles: 40               # fewer than this and the estimate is unstable
+edge_spread_cutoff: 140     # tile grey range above this suggests a fold
+model_path: models/tissue_rf.json
