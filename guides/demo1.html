@@ -181,10 +181,28 @@ python3 scripts/classify_tissue.py \
   --threshold 0.45 \
   --out results/fold_analysis.json
 </code></pre>
-<p>This case is useful for discussing:</p>
+<p>Now classify it, exactly as you did for the other three:</p>
+<pre><code class="language-bash">python3 scripts/classify_tissue.py \
+  --slide data/case_fold_artifact_histology.pgm \
+  --magnification 20 \
+  --threshold 0.45 \
+  --out results/fold_classification.json
+</code></pre>
+<p>Expected class:</p>
+<pre><code class="language-text">mild_injury
+</code></pre>
+<p>Compare the two files side by side:</p>
+<pre><code class="language-bash">cat results/fold_analysis.json
+cat results/fold_classification.json
+</code></pre>
+<p>The analysis carries <code>"edge_rate": 0.17</code> &mdash; four times the genuine mild case, and
+the only sign anything is wrong with this slide. The classification carries <code>mild_injury</code>
+at <code>0.7</code>, <strong>identical to the real mild-injury case</strong>, and no trace of the
+edge rate at all.</p>
 <pre><code class="language-text">valid output != equally trustworthy output
 </code></pre>
-<p>because the image is designed to have an elevated edge/artifact signal.</p>
+<p>Nothing failed. Nothing warned you. The number that should have made you suspicious was dropped
+one step before the answer &mdash; remember this slide, it comes back in Demo 4.</p>
 <hr />
 <h2 class="partmark">Part B — Test inside Claude Code</h2>
 <h2>10. Start Claude Code</h2>
