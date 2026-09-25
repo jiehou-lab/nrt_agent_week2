@@ -43,13 +43,6 @@
 <main class="wrap">
 <a class="backlink" href="../index.html">← Back to all four demos</a>
 
-<div class="note">
-  <p><strong>If <code>python3 server.py</code> looks like it has frozen, it is working.</strong>
-  An stdio MCP server sits waiting for messages on standard input — a blinking cursor and no
-  output is exactly right. Press <code>Ctrl C</code> to stop it. You never need to start it by
-  hand; Claude Code launches it for you.</p>
-</div>
-
 
 <p>Package:</p>
 <p><code>Demo2_MCP_Tissue_Analyzer.zip</code></p>
@@ -150,6 +143,9 @@ fold artifact -&gt; plausible class + elevated artifact/edge behavior
 <h2>8. Inspect the MCP server</h2>
 <pre><code class="language-bash">less server.py
 </code></pre>
+<p class="muted">Read it — do not run it. If you do run <code>python3 server.py</code> out of
+curiosity, the blinking cursor and total silence are correct: an stdio server waits for messages on
+standard input. <code>Ctrl C</code> stops it. Claude Code starts it for you.</p>
 <p>Look for the tool definitions:</p>
 <pre><code class="language-text">analyze_tissue
 classify_tissue
