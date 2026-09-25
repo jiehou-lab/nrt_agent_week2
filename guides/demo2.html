@@ -160,142 +160,114 @@ damage_threshold_fraction ∈ [0, 1]
 </code></pre>
 <hr />
 <h2>8A. Practice Claude Code MCP management commands</h2>
-<p>Before starting the interactive Claude Code session, try the MCP-management commands from a normal terminal.</p>
-<h3>List configured MCP servers</h3>
+<p>Before starting the interactive session, work through the MCP-management commands
+from a normal terminal. Do these <strong>in order</strong> — each one sets up the next.</p>
+<h3>1. Look before you touch</h3>
 <pre><code class="language-bash">claude mcp list
+claude mcp get tissue-analyzer
 </code></pre>
-<p>For this demo, look for:</p>
-<pre><code class="language-text">tissue-analyzer
+<p><code>tissue-analyzer</code> is already there. Nobody registered it by hand: it is in the
+package's <code>.mcp.json</code>, and Claude Code reads that file when it starts in this
+folder.</p>
+<pre><code class="language-bash">cat .mcp.json
 </code></pre>
-<p>This command is useful for checking both whether the server is configured and whether Claude Code can connect to it.</p>
-<p>Typical states conceptually mean:</p>
+<p>The states <code>claude mcp list</code> can report:</p>
 <pre><code class="language-text">Connected             -&gt; configuration exists and Claude Code can connect
 Needs authentication  -&gt; configuration exists but login is required
-Failed to connect     -&gt; configuration exists but the server could not start/connect
+Failed to connect     -&gt; configuration exists but the server could not start
 </code></pre>
-<h3>Inspect one MCP server</h3>
-<pre><code class="language-bash">claude mcp get tissue-analyzer
-</code></pre>
-<p>Use this to inspect details for one server, including how Claude Code starts it.</p>
-<p>For this project, the server process should be equivalent to:</p>
-<pre><code class="language-text">python3 server.py
-</code></pre>
-<p>This command is especially useful when diagnosing the wrong Python interpreter, wrong command, wrong scope, or server startup failure.</p>
-<h3>Understand scopes</h3>
-<p>Claude Code MCP configuration can use different scopes:</p>
-<pre><code class="language-text">local
-  available only to you for the current project
-
-project
-  stored in the project's .mcp.json
-  can be shared with the repository
-
-user
-  available to you across projects
-</code></pre>
-<p>For this classroom demo, <code>project</code> scope is useful because students can see the <code>.mcp.json</code> file directly.</p>
-<h3>Add this local stdio MCP server manually</h3>
-<p>The package already contains <code>.mcp.json</code>, so normally you do not need to add it again. As practice, the equivalent command is:</p>
+<p><code>claude mcp get</code> shows how the server is started — for this project, the
+equivalent of <code>python3 server.py</code>. It is the first thing to check when the wrong
+Python interpreter, the wrong command or the wrong scope is suspected.</p>
+<h3>2. Try to add it again — and watch it refuse</h3>
 <pre><code class="language-bash">claude mcp add \
   --scope project \
   --transport stdio \
   tissue-analyzer \
   -- python3 server.py
 </code></pre>
-<p>The <code>--</code> separates Claude Code options from the command used to start the MCP server.</p>
-<p>Conceptually:</p>
+<p><strong>This fails</strong>, and it is meant to: a server called <code>tissue-analyzer</code> already
+exists in this project. That is the point of running it. The registration came
+from a <em>file</em>, so a command that creates the same name has nothing to do.</p>
+<p>Nothing is broken. Move on.</p>
+<h3>3. Remove it, and watch the file change</h3>
+<pre><code class="language-bash">claude mcp remove tissue-analyzer --scope project
+claude mcp list
+cat .mcp.json
+</code></pre>
+<p>Gone from the list, and gone from <code>.mcp.json</code> — the command edited the file.
+Removing the registration does <strong>not</strong> delete <code>server.py</code>, the tools, the model
+or the data. It removes only the line that tells Claude Code how to reach them.</p>
+<h3>4. Now add it back by hand</h3>
+<p>The same command that failed in step 2 now works:</p>
+<pre><code class="language-bash">claude mcp add \
+  --scope project \
+  --transport stdio \
+  tissue-analyzer \
+  -- python3 server.py
+</code></pre>
+<pre><code class="language-bash">claude mcp list
+cat .mcp.json
+</code></pre>
+<p>You have just written <code>.mcp.json</code> yourself. Shipping that file in the package and
+typing this command are two routes to the same registration.</p>
+<p>What the parts mean — <code>--</code> separates Claude Code's own options from the command
+used to start the server:</p>
 <pre><code class="language-text">name       = tissue-analyzer
 scope      = project
 transport  = stdio
 command    = python3 server.py
 </code></pre>
-<p>After adding it, verify:</p>
-<pre><code class="language-bash">claude mcp list
-claude mcp get tissue-analyzer
+<p>And the scopes:</p>
+<pre><code class="language-text">local     only you, only this project
+project   stored in the project's .mcp.json - shareable with the repository
+user      you, across all projects
 </code></pre>
-<h3>Make the Python environment explicit</h3>
-<p>If you created a virtual environment:</p>
-<pre><code class="language-bash">python3 -m venv .demo_venv
-source .demo_venv/bin/activate
-</code></pre>
-<p>you can register the MCP server with the exact interpreter:</p>
-<pre><code class="language-bash">claude mcp add \
+<p><code>project</code> scope is the useful one here, because students can open <code>.mcp.json</code> and
+read it.</p>
+<h3>5. Optional — pin the exact Python interpreter</h3>
+<p><code>python3</code> means whichever <code>python3</code> is first on the PATH when the server starts.
+To remove that ambiguity, register the interpreter from your virtual environment
+instead. <strong>Remove first</strong> — otherwise this is step 2 again:</p>
+<pre><code class="language-bash">claude mcp remove tissue-analyzer --scope project
+
+claude mcp add \
   --scope project \
   --transport stdio \
   tissue-analyzer \
   -- .demo_venv/bin/python3 server.py
 </code></pre>
-<p>This avoids ambiguity about which Python starts the MCP server.</p>
-<p>You can also check:</p>
+<p>Useful when the server starts under a Python that lacks the packages it needs:</p>
 <pre><code class="language-bash">which python3
 python3 --version
 </code></pre>
-<h3>Remove an MCP server registration</h3>
+<p><strong>Put the package back the way it shipped before continuing</strong>, so everyone in the
+room is running the same thing:</p>
 <pre><code class="language-bash">claude mcp remove tissue-analyzer --scope project
-</code></pre>
-<p>Then verify:</p>
-<pre><code class="language-bash">claude mcp list
-</code></pre>
-<p>Removing the registration does <strong>not</strong> delete <code>server.py</code>, the analysis tools, models, or data. It only removes the Claude Code configuration that tells Claude how to connect to the MCP server.</p>
-<p>Restore it with:</p>
-<pre><code class="language-bash">claude mcp add \
+
+claude mcp add \
   --scope project \
   --transport stdio \
   tissue-analyzer \
   -- python3 server.py
 </code></pre>
-<h3>Reset a previously rejected project MCP decision</h3>
-<p>If a valid <code>.mcp.json</code> exists but Claude Code still does not load the project MCP server, you can reset stored project MCP approval choices:</p>
+<h3>6. If a project MCP server will not load at all</h3>
+<p>If <code>.mcp.json</code> looks right and the server still does not appear, the trust prompt
+was probably declined at some point. Clear that decision:</p>
 <pre><code class="language-bash">claude mcp reset-project-choices
 </code></pre>
-<p>Then restart Claude Code from the project root.</p>
-<h3>Terminal MCP commands vs. <code>/mcp</code></h3>
-<p>From a normal terminal:</p>
-<pre><code class="language-bash">claude mcp list
-claude mcp get tissue-analyzer
-claude mcp add ...
-claude mcp remove ...
-</code></pre>
-<p>These commands inspect or modify MCP configuration.</p>
-<p>Inside an active Claude Code session:</p>
-<pre><code class="language-text">/mcp
-</code></pre>
-<p>opens the interactive MCP status/management panel.</p>
-<p>A useful mental model is:</p>
-<pre><code class="language-text">Terminal CLI
-    configure and inspect MCP servers
+<p>Then start Claude Code again from the project root and choose <strong>Use this MCP
+server</strong>.</p>
+<h3>Terminal commands vs. <code>/mcp</code></h3>
+<pre><code class="language-text">Terminal CLI            configure and inspect MCP servers
+  claude mcp list / get / add / remove
 
-Claude Code /mcp
-    inspect/manage MCP servers in the current session
+Claude Code /mcp        inspect and manage servers in the running session
 </code></pre>
-<h3>Suggested five-minute practice sequence</h3>
-<pre><code class="language-bash">claude mcp list
-claude mcp get tissue-analyzer
-</code></pre>
-<p>If it is already configured, do not add a duplicate.</p>
-<p>For practice, you can remove and restore it:</p>
-<pre><code class="language-bash">claude mcp remove tissue-analyzer --scope project
-claude mcp list
-</code></pre>
-<p>Restore:</p>
-<pre><code class="language-bash">claude mcp add \
-  --scope project \
-  --transport stdio \
-  tissue-analyzer \
-  -- python3 server.py
-</code></pre>
-<p>Verify again:</p>
-<pre><code class="language-bash">claude mcp list
-claude mcp get tissue-analyzer
-</code></pre>
-<p>Then start Claude Code:</p>
-<pre><code class="language-bash">claude
-</code></pre>
-<p>and inside Claude Code run:</p>
-<pre><code class="language-text">/mcp
-</code></pre>
-<p>This demonstrates the lifecycle:</p>
-<pre><code class="language-text">configure -&gt; inspect -&gt; remove -&gt; restore -&gt; connect -&gt; use tools
+<p>The terminal commands change configuration on disk. <code>/mcp</code> shows you what the
+current session actually has.</p>
+<h3>The lifecycle you just walked through</h3>
+<pre><code class="language-text">inspect -&gt; add (refused, already there) -&gt; remove -&gt; add (works) -&gt; connect -&gt; use tools
 </code></pre>
 <hr />
 <h2 class="partmark">Part B — Test inside Claude Code</h2>
