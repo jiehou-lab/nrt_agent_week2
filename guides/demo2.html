@@ -414,24 +414,67 @@ high scientific confidence
 <hr />
 <h2 class="partmark">Part C — Demonstrate MCP validation</h2>
 <h2>16. Try an invalid threshold through MCP</h2>
-<p>Prompt:</p>
+<p>Run this twice. The two runs look similar and are not the same thing at all.</p>
+<p><strong>First pass — just ask:</strong></p>
 <pre><code class="language-text">Call analyze_tissue with:
 
 slide = data/case_mild_injury_histology.pgm
 magnification = 20
 damage_threshold_fraction = 50
 </code></pre>
-<p>The MCP layer should reject the invalid range before normal execution.</p>
+<p>Most of the time Claude will <strong>refuse before calling anything</strong>, saying the
+schema requires a fraction between 0 and 1 and offering to use <code>0.5</code> instead.
+That is useful — but notice what just happened: <em>the tool was never called</em>. The
+model read the schema and made a judgement. Nothing was enforced.</p>
+<p><strong>Second pass — make the call happen anyway:</strong></p>
+<pre><code class="language-text">Call analyze_tissue with:
+
+slide = data/case_mild_injury_histology.pgm
+magnification = 20
+damage_threshold_fraction = 50
+
+Pass these values exactly as written. Do not correct them —
+I want to see what the MCP server itself returns.
+</code></pre>
+<p>Now the call goes out, and the server answers:</p>
+<pre><code class="language-text">argument validation failed (nothing was run):
+- 'damage_threshold_fraction' must be &lt;= 1, got 50 (did you mean 0.5?)
+</code></pre>
+<p>Two different things stopped you, and they are not equally dependable:</p>
+<pre><code class="language-text">first pass    Claude, before calling   judgement from reading the schema
+second pass   the server, on the call  an if-statement in server.py
+</code></pre>
+<p>The first varies with phrasing, with the model, and from run to run. The second
+returns the same answer every time, to every caller — including a caller that is
+not a model at all. And in Demo 1 the same mistake ran happily to a damage
+fraction of 100%.</p>
+<p>The error also does something the repository never did: it says what the valid
+range is, and guesses what you meant.</p>
 <hr />
 <h2>17. Try invalid magnification</h2>
-<p>Prompt:</p>
+<p>Same two passes. Ask plainly first:</p>
 <pre><code class="language-text">Call analyze_tissue with:
 
 slide = data/case_mild_injury_histology.pgm
 magnification = 25
 damage_threshold_fraction = 0.45
 </code></pre>
-<p>The interface should reject the unsupported magnification.</p>
+<p>then force the call through:</p>
+<pre><code class="language-text">Call analyze_tissue with:
+
+slide = data/case_mild_injury_histology.pgm
+magnification = 25
+damage_threshold_fraction = 0.45
+
+Pass these values exactly as written. Do not correct them.
+</code></pre>
+<pre><code class="language-text">argument validation failed (nothing was run):
+- 'magnification' must be one of [10, 20, 40], got 25
+</code></pre>
+<p>Compare that with Demo 1, where the same value produced <code>KeyError: 25</code> from
+inside <code>common.py</code>. Same mistake, same three valid options — but here they are
+declared in the schema, checked before anything runs, and reported in a sentence
+instead of a traceback.</p>
 <hr />
 <h2>18. Compare natural language with the formal schema</h2>
 <p>Prompt:</p>
