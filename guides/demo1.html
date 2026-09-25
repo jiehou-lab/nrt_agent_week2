@@ -258,7 +258,78 @@ at magnification 20 with a 50% threshold.
 </code></pre>
 <p>This is useful because the original repository depends more heavily on Claude understanding the semantics correctly.</p>
 <hr />
-<h2>14. Ask Claude where it learned the interface</h2>
+<h2>14. See what those mistakes actually cost</h2>
+<p>Steps 12 and 13 test whether Claude <em>converts</em> correctly. They never show what
+happens when a wrong number gets through — so leave Claude Code for a moment and
+make both mistakes yourself:</p>
+<pre><code class="language-text">/exit
+</code></pre>
+<p><strong>First, the mistake that does not stop you.</strong> Pass the threshold as a percent
+instead of a fraction:</p>
+<pre><code class="language-bash">python3 scripts/analyze_tissue.py \
+  --slide data/case_mild_injury_histology.pgm \
+  --magnification 20 \
+  --threshold 50 \
+  --out results/bad_threshold.json
+</code></pre>
+<p>No error. Exit code 0. A JSON file written to disk. And this:</p>
+<pre><code class="language-text">Threshold:                 50.00
+Damaged tiles:             576
+Damage fraction:           100.0%
+</code></pre>
+<p>Every one of the 576 tiles is now "damaged" — against 22.0% for the same slide at
+<code>0.45</code>. The run looks exactly as successful as a correct one.</p>
+<p><strong>Now the mistake that does stop you.</strong> Ask for a magnification the code does not
+support:</p>
+<pre><code class="language-bash">python3 scripts/analyze_tissue.py \
+  --slide data/case_mild_injury_histology.pgm \
+  --magnification 25 \
+  --threshold 0.45 \
+  --out results/bad_magnification.json
+</code></pre>
+<pre><code class="language-text">KeyError: 25
+  size = {10: 16, 20: 8, 40: 4}[mag]
+</code></pre>
+<p>A traceback into the internals — no message telling you 10, 20 and 40 are the
+only options.</p>
+<pre><code class="language-text">threshold 50      wrong answer, no warning
+magnification 25  no answer, and a crash you have to read code to understand
+</code></pre>
+<p><strong>The crash is the lucky one.</strong> It stops you. The other writes a confident,
+wrong number into a file you will later read as a result. Neither value is
+checked anywhere: the repository states the valid ranges in prose, and prose is
+not something a program can enforce. That is the gap Demo 2 closes.</p>
+<h3>Does Claude notice?</h3>
+<p>Start Claude Code again and hand it the failing one:</p>
+<pre><code class="language-bash">claude
+</code></pre>
+<pre><code class="language-text">Analyze data/case_mild_injury_histology.pgm
+at magnification 25 with threshold 0.45.
+</code></pre>
+<p>Watch which of these happens:</p>
+<pre><code class="language-text">a) it runs, hits the KeyError, reports it, and tells you 10/20/40 are the options
+b) it runs, hits the KeyError, and quietly re-runs with 20 — reporting a result
+c) it reads the code first and tells you 25 is unsupported before running anything
+</code></pre>
+<p>All three are plausible, and you may get different ones on different runs. <strong>(b)
+is the one worth catching.</strong> You asked for 25 and received an answer computed at
+20; unless the report says so, nothing anywhere records that your question was
+changed on the way to the answer.</p>
+<p>Then try the silent one:</p>
+<pre><code class="language-text">Run analyze_tissue.py on data/case_mild_injury_histology.pgm with
+--magnification 20 and --threshold 50, exactly as written. Do not convert it.
+</code></pre>
+<p>Here there is no error to catch, so nothing forces the issue. Whether the 100%
+result gets questioned depends entirely on whether the model happens to recall
+what it read in the docs — which is a different kind of guarantee from a schema
+that rejects the value before anything runs.</p>
+<blockquote>
+<p>Compare across tables. Different groups will get different behaviour from the
+same prompt, and that variability is itself the point: this layer is judgement,
+not validation.</p>
+</blockquote>
+<hr />
+<h2>15. Ask Claude where it learned the interface</h2>
 <p>Prompt:</p>
 <pre><code class="language-text">Which files did you use to determine:
 - the correct script,
@@ -269,7 +340,7 @@ at magnification 20 with a 50% threshold.
 </code></pre>
 <p>This helps illustrate repository-as-context.</p>
 <hr />
-<h2>15. Main lecture takeaway</h2>
+<h2>16. Main lecture takeaway</h2>
 <p>Original repository flow:</p>
 <pre><code class="language-text">User request
    ↓
