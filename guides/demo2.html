@@ -20,8 +20,12 @@
       </span>
     </a>
     <nav>
-      <a href="../index.html">All demos</a>
-      <a href="../downloads/Demo2_MCP_Tissue_Analyzer.zip">Download</a>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
     </nav>
   </div>
 </header>
@@ -42,6 +46,16 @@
 
 <main class="wrap">
 <a class="backlink" href="../index.html">← Back to all four demos</a>
+
+<div class="note">
+  <p><strong>Before you start, three things have to be working:</strong> a terminal (the macOS
+  Terminal, or the one inside VS Code), Python 3, and Claude Code signed in to the NRT
+  organization. Check with <code>python3 --version</code> and <code>claude</code>, then
+  <code>/status</code>.</p>
+  <p>If any of those fail, stop here and work through
+  <a href="../index.html#setup">the setup steps</a> first — about ten minutes. Nothing below will
+  work without them.</p>
+</div>
 
 
 <p>Package:</p>
@@ -72,7 +86,7 @@ tools/
 data/
 previews/
 results/
-EXPECTED_SYNTHETIC_RESULTS.md
+docs/EXPECTED_SYNTHETIC_RESULTS.md
 </code></pre>
 <hr />
 <h2>2. Review the synthetic images</h2>

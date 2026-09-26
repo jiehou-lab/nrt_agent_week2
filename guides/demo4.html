@@ -20,8 +20,12 @@
       </span>
     </a>
     <nav>
-      <a href="../index.html">All demos</a>
-      <a href="../downloads/Demo4_subagent_tissue_analyzer.zip">Download</a>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
     </nav>
   </div>
 </header>
@@ -43,6 +47,16 @@
 
 <main class="wrap">
 <a class="backlink" href="../index.html">← Back to all four demos</a>
+
+<div class="note">
+  <p><strong>Before you start, three things have to be working:</strong> a terminal (the macOS
+  Terminal, or the one inside VS Code), Python 3, and Claude Code signed in to the NRT
+  organization. Check with <code>python3 --version</code> and <code>claude</code>, then
+  <code>/status</code>.</p>
+  <p>If any of those fail, stop here and work through
+  <a href="../index.html#setup">the setup steps</a> first — about ten minutes. Nothing below will
+  work without them.</p>
+</div>
 
 <div class="note">
   <p><strong>The subagent in this package has a gap in its rules, on purpose.</strong> Part D
@@ -268,7 +282,7 @@ somebody else's context, and you get the conclusion.</p>
 <h2 class="partmark">Part D — Test whether it is any good</h2>
 <p>Delegation is easy. Judging the result is the skill.</p>
 <h2>12. Score it against the expected values</h2>
-<pre><code class="language-bash">cat EXPECTED_SYNTHETIC_RESULTS.md
+<pre><code class="language-bash">cat docs/EXPECTED_SYNTHETIC_RESULTS.md
 </code></pre>
 <p>At magnification 20 and threshold 0.45:</p>
 <table>
