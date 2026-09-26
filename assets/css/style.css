@@ -3,7 +3,7 @@
   color-scheme: light;
   --green:#18453B; --green-700:#0f2f28; --green-300:#4a7d70;
   --accent:#C8842B; --accent-soft:#fdf3e3;
-  --ink:#16211f; --ink-soft:#4d5b58; --ink-faint:#7b8683;
+  --ink:#16211f; --ink-soft:#4d5b58; --ink-faint:#5d6a66;
   --rule:#e2e7e5; --bg:#fff; --bg-soft:#f8faf9; --bg-tint:#eff4f2;
   --radius:10px;
   --shadow:0 1px 2px rgba(22,33,31,.06), 0 8px 24px -12px rgba(22,33,31,.18);
@@ -29,7 +29,8 @@ pre{background:#f6f8f7;border:1px solid var(--rule);border-radius:var(--radius);
 pre code{background:none;padding:0;font-size:inherit}
 .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;font-weight:650;color:var(--green-300);margin:0 0 .6rem}
 .lede{font-size:1.14rem;color:var(--ink-soft);max-width:64ch}
-.muted{color:var(--ink-faint);font-size:.92rem}
+.muted{color:var(--ink-faint);font-size:.95rem}
+.session-line{color:var(--ink);max-width:64ch;margin:.5rem 0 0;font-size:1rem;line-height:1.6}
 
 /* header */
 .masthead{border-bottom:1px solid var(--rule);background:#fff;position:sticky;top:0;z-index:20}
