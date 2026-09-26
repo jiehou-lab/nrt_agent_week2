@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 5 · Streamlit research app — Agentic AI Week 2</title>
+<meta name="description" content="A web front end over the Demo 2 server. A button reaches the tool directly; a text box reaches it through Claude Code. Same numbers, different guarantees — and a design question for your own project.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>5</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI · Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../advanced.html">Advanced</a>
+      <a href="../index.html#setup">Setup</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 5 · ADVANCED — THE SAME ANALYSIS, TWO ROUTES</p>
+    <h1>Streamlit research app</h1>
+    <p class="lede">A web front end over the Demo 2 server. A button reaches the tool directly; a text box reaches it through Claude Code. Same numbers, different guarantees — and a design question for your own project.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo5_streamlit_tissue_app.zip">Download Demo 5 &nbsp;↓</a>
+      <a class="btn btn-ghost" href="demo4.html">← Demo 4</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">← Back to the advanced demos</a>
+
+<div class="note">
+  <p><strong>This demo assumes Demos 1&ndash;4.</strong> You need a terminal, Python 3, and Claude
+  Code signed in to the NRT organization, and you should have run at least Demo 2 so the MCP
+  pieces are familiar. If not, start with <a href="../index.html#setup">the setup steps</a> and
+  the <a href="../index.html#demos">four core demos</a>.</p>
+</div>
+
+<p>Package:</p>
+<p><code>Demo5_streamlit_tissue_app.zip</code></p>
+<p>This is Demo 2's MCP server with a web front end on top. The app reaches the same
+analysis two ways, and the whole point is the difference between them:</p>
+<pre><code class="language-text">Path A   a button     -&gt;  MCP tool                 -&gt;  result   (no model)
+Path B   a text box   -&gt;  Claude Code -&gt; MCP tool  -&gt;  result   (a model interprets)
+</code></pre>
+<p>Same server, same slides, same numbers. Only the route changes — which is the
+same experiment Demos 1 to 4 ran, moved up one level to the interface.</p>
+<hr />
+<h2>1. Unzip and install</h2>
+<pre><code class="language-bash">unzip Demo5_streamlit_tissue_app.zip
+cd Demo5_streamlit_tissue_app
+
+python3 -m venv .demo_venv
+source .demo_venv/bin/activate
+pip install -r requirements.txt
+</code></pre>
+<p>On Windows the activate line is <code>.demo_venv\Scripts\activate</code>.</p>
+<p><strong>Start it from a terminal where <code>claude --version</code> works.</strong> A GUI process only
+inherits the environment of the shell that launched it; if <code>claude</code> is not on
+that PATH, Path B has no way to find it.</p>
+<pre><code class="language-bash">./run.sh          # or: streamlit run app.py
+</code></pre>
+<p>A browser tab opens. The sidebar tells you whether Claude Code was found.</p>
+<hr />
+<h2>2. Look at what is here before you click anything</h2>
+<pre><code class="language-bash">ls -a
+cat mcp_client.py
+</code></pre>
+<p><code>mcp_client.py</code> is about seventy lines and does exactly what Claude Code does:
+start <code>server.py</code>, send <code>initialize</code>, send <code>tools/list</code>, send <code>tools/call</code>. There
+is no framework in between. You can import it from any Python program.</p>
+<pre><code class="language-bash">python3 mcp_client.py
+</code></pre>
+<p>Run on its own it lists the tools and analyses one slide — no Streamlit, no
+model, no agent. Worth seeing once: <strong>the MCP server is just a program that
+answers questions on stdin.</strong></p>
+<hr />
+<h2 class="partmark">Part A — The path with no model in it</h2>
+<h2>3. Run the analysis from the form</h2>
+<p>In the app, leave the defaults (<code>case_mild_injury_histology.pgm</code>, magnification
+20, threshold 0.45) and press <strong>Run analyze_tissue</strong>.</p>
+<p>Above the button the app prints exactly what it is about to send:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;analyze_tissue&quot;,
+  &quot;arguments&quot;: {
+    &quot;slide&quot;: &quot;data/case_mild_injury_histology.pgm&quot;,
+    &quot;magnification&quot;: 20,
+    &quot;damage_threshold_fraction&quot;: 0.45
+  }
+}
+</code></pre>
+<p>Expected: damage fraction <code>0.22</code>, edge rate <code>0.042</code>, confidence <code>0.95</code>.</p>
+<p>Nothing in that round trip involved a language model. The app already knew which
+tool to call and what the arguments meant, because a human — you — decided when
+the form was built.</p>
+<h2>4. Find out where the validation actually lives</h2>
+<p>Drag the threshold slider to <code>1.00</code>. Fine. Now open <code>app.py</code> and change the
+slider's maximum from <code>1.0</code> to <code>100.0</code>:</p>
+<pre><code class="language-python">threshold = st.sidebar.slider(&quot;damage_threshold_fraction&quot;, 0.0, 100.0, 0.45, 0.01)
+</code></pre>
+<p>Save; Streamlit reloads. Set the slider to <code>50</code> and press the button.</p>
+<pre><code class="language-text">argument validation failed (nothing was run):
+- 'damage_threshold_fraction' must be &lt;= 1, got 50.0 (did you mean 0.5?)
+</code></pre>
+<p><strong>The form let it through and the server did not.</strong> That is the arrangement you
+want: a GUI is a convenience, not a guarantee, and anything that must be true has
+to be checked where the work happens. Put the slider back when you are done.</p>
+<h2>5. The fold-artifact slide, in a GUI this time</h2>
+<p>Pick <code>case_fold_artifact_histology.pgm</code> and run it. The app shows a warning
+because <code>low_confidence</code> is true — it has to, because the app author wrote a line
+that checks that field.</p>
+<p>Now press <strong>Then classify it</strong>.</p>
+<pre><code class="language-text">mild_injury  (probability 0.7)
+</code></pre>
+<p>Identical to the genuinely mild slide, and the classification JSON contains no
+edge rate, no confidence and no notes. The app flags it only because somebody
+remembered to look. <strong>Every display is a decision about what not to show.</strong></p>
+<hr />
+<h2 class="partmark">Part B — The path with a model in it</h2>
+<h2>6. Ask for the same thing in words</h2>
+<p>Open the <strong>Ask in English</strong> tab. The default text is something like:</p>
+<pre><code class="language-text">Analyze data/case_fold_artifact_histology.pgm at 20x magnification with a
+45% damage threshold, then tell me whether the slide is usable.
+</code></pre>
+<p>Notice <code>20x</code> and <code>45%</code> — neither is a valid argument. The form could not have
+accepted them; a model can convert them. Press <strong>Send to Claude Code</strong>.</p>
+<p>The app shows the command it runs:</p>
+<pre><code class="language-bash">cd /path/to/Demo5_streamlit_tissue_app
+claude -p &quot;Analyze data/...&quot; --output-format json
+</code></pre>
+<p>Two details make this work, and both are easy to get wrong:</p>
+<ul>
+<li><strong><code>cwd</code> is the project folder.</strong> That is how Claude Code finds <code>.mcp.json</code>,
+  <code>CLAUDE.md</code> and the tool schemas. Start it anywhere else and it has no tools.</li>
+<li><strong><code>--output-format json</code></strong> means your app reads fields instead of trying to
+  regex English out of a paragraph.</li>
+</ul>
+<h2>7. Why it works at all — and how to break it</h2>
+<pre><code class="language-bash">cat .claude/settings.json
+</code></pre>
+<pre><code class="language-json">&quot;allow&quot;: [
+  &quot;mcp__tissue-analyzer__analyze_tissue&quot;,
+  &quot;mcp__tissue-analyzer__classify_tissue&quot;,
+  ...
+]
+</code></pre>
+<p>In <code>-p</code> mode there is nobody at the keyboard, so Claude Code <strong>cannot stop and
+ask for permission</strong>. Anything not already allowed is simply not used.</p>
+<p>Try it. Delete the two <code>mcp__tissue-analyzer__...</code> lines, save, and send the same
+request again.</p>
+<p>You will not get an error dialog. You will get an answer — a plausible,
+well-written answer that quietly did less than you asked. Put the lines back.</p>
+<blockquote>
+<p>This is the Demo 3 lesson arriving with consequences. In an interactive session
+a missing permission is a prompt you notice. In an application it is a silent
+difference in what happened.</p>
+</blockquote>
+<hr />
+<h2 class="partmark">Part C — Put the two side by side</h2>
+<h2>8. Compare</h2>
+<p>Open the <strong>Compare</strong> tab after running both paths.</p>
+<pre><code class="language-text">Path A   deterministic; same input, same output; fast; free
+         cannot answer a question the form has no field for
+
+Path B   handles wording the form never anticipated; can chain steps;
+         slower; costs tokens; may differ between runs
+</code></pre>
+<p>Run Path B twice with the same sentence. Compare the wording of the two answers,
+then compare the numbers. The prose moves; the measurements do not. That is
+exactly what you want, and it is worth saying out loud: <strong>the model is varying
+the explanation, not the result</strong> — because the result comes from a tool with a
+schema, not from the model.</p>
+<h2>9. The question this demo is really asking</h2>
+<p>Every control in an interface decides <strong>who interprets the request</strong>.</p>
+<pre><code class="language-text">a button    you already decided, at design time
+a text box  the model decides, at run time
+</code></pre>
+<p>A model behind a button that always does the same thing adds latency, cost and
+variance and buys nothing. A form in front of a request nobody anticipated is a
+wall. Most research applications want both, and knowing which is which is the
+design skill.</p>
+<hr />
+<h2 class="partmark">Part D — Take it to your own work</h2>
+<h2>10. Sketch your own two paths</h2>
+<p>For one analysis you actually run:</p>
+<pre><code class="language-text">1. What are the three or four parameters a colleague would always set?
+   -&gt; those are form controls
+
+2. What request would you make that no form you would tolerate could hold?
+   -&gt; that is the text box
+
+3. What must be true of every run, no matter which path produced it?
+   -&gt; that belongs in the server, as a schema or a check
+</code></pre>
+<p>Point 3 is the one people skip. It is also the only one that still protects you
+at 2am six months from now.</p>
+<h2>11. If you build on this</h2>
+<p>The architecture here — a GUI shelling out to <code>claude -p</code> — is a sound prototype
+and an awkward product. It starts a fresh process per request, so there is no
+conversation, no memory between clicks, and no way to stream progress.</p>
+<p>When a project outgrows that, the next step is a programmatic agent interface
+rather than treating the CLI as an API. For a course project, this is the right
+amount of machinery: it is inspectable, it is three files, and every part of it
+is something you have already seen.</p>
+<hr />
+<h2>Appendix — the three messages, again</h2>
+<pre><code class="language-text">initialize   -&gt;  who are you, what protocol
+tools/list   -&gt;  what can you do, with what schema
+tools/call   -&gt;  do this one, with these arguments
+</code></pre>
+<p><code>mcp_client.py</code> sends those three. Claude Code sends those three. The server
+cannot tell the difference, and does not need to.</p>
+<nav class="guidenav">
+  <a class="btn" href="demo6.html">Next: Demo 6 &nbsp;→</a>
+  <a class="btn btn-ghost" href="demo4.html">← Demo 4</a>
+  <a class="btn btn-ghost" href="../index.html#demos">All four core demos</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI · Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/">Jie Hou</a> · Michigan State University</p>
+    <p class="muted">These are synthetic teaching images, not patient data.</p>
+  </div>
+</footer>
+
+</body>
+</html>
