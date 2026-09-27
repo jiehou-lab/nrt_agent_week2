@@ -151,14 +151,56 @@ fold artifact -&gt; plausible class + elevated artifact/edge behavior
 <h2>7. Inspect the MCP configuration</h2>
 <pre><code class="language-bash">cat .mcp.json
 </code></pre>
-<p>The project should register a local MCP server called:</p>
-<pre><code class="language-text">tissue-analyzer
+<pre><code class="language-json">{
+  "mcpServers": {
+    "tissue-analyzer": {
+      "command": "python3",
+      "args": ["server.py"]
+    }
+  }
+}
 </code></pre>
+<p>Four lines of content, and each one is doing a specific job:</p>
+<table>
+<thead><tr><th style="width:26%">key</th><th>what it is for</th></tr></thead>
+<tbody>
+<tr><td><code>mcpServers</code></td><td>The file is a map of the servers this project offers. Add a second entry and the project has two.</td></tr>
+<tr><td><code>tissue-analyzer</code></td><td>The name the server is known by &mdash; <strong>you choose it</strong>. It prefixes every tool the server exposes: <code>analyze_tissue</code> appears as <code>mcp__tissue-analyzer__analyze_tissue</code> in permission rules and in <code>/context</code>.</td></tr>
+<tr><td><code>command</code></td><td>What to run to start the server. <code>python3</code> here; a Node server would say <code>node</code>.</td></tr>
+<tr><td><code>args</code></td><td>What to pass it. <code>server.py</code> is relative to the project folder.</td></tr>
+</tbody>
+</table>
+<p><strong>Is this file required to make MCP work?</strong> Not by the protocol.
+<code>server.py</code> never reads it, and would behave identically if you started it by hand.
+It is required by the <em>client</em>. MCP has no discovery mechanism: something has to tell
+Claude Code that this server exists and how to launch it, and <code>.mcp.json</code> is the
+project-scoped way to say so. Because it lives in the repository, everyone who opens the
+project gets the same server with no setup. The alternative is <code>claude mcp add</code>,
+which you will practise in 8A &mdash; that records the same three facts in your own user
+configuration instead, where your collaborators cannot see them.</p>
+
+<div class="note">
+  <p><strong>Where an agent&rsquo;s role is actually configured.</strong> Four files, and they
+  do different jobs. It is worth knowing which one to open when you want to change what an
+  agent can do.</p>
+  <table>
+  <thead><tr><th style="width:30%">file</th><th>what it controls</th><th style="width:14%">demo</th></tr></thead>
+  <tbody>
+  <tr><td><code>.mcp.json</code></td><td>Which servers exist &mdash; which capabilities are on the table at all.</td><td>2</td></tr>
+  <tr><td><code>server.py</code> &rarr; <code>TOOLS</code></td><td>What each capability is called, what it accepts, and what it refuses.</td><td>2</td></tr>
+  <tr><td><code>.claude/settings.json</code></td><td>Which of those the agent may use freely, which need asking, which are denied outright.</td><td>3</td></tr>
+  <tr><td><code>.claude/agents/*.md</code></td><td>A narrower role handed to a subagent: a smaller tool list and its own instructions.</td><td>4</td></tr>
+  </tbody>
+  </table>
+  <p>The first two decide what the tool <em>is</em>; the second two decide what is
+  <em>allowed</em>. <code>CLAUDE.md</code> is a fifth file you will see, but it is advice to the
+  model, not enforcement &mdash; it can be ignored, and the other four cannot.</p>
+</div>
 <hr />
 <h2>8. Inspect the MCP server</h2>
-<pre><code class="language-bash">less server.py
+<pre><code class="language-bash">more server.py
 </code></pre>
-<p class="muted">Read it — do not run it. If you do run <code>python3 server.py</code> out of
+<p class="muted"><code>Space</code> pages down, <code>q</code> quits. Read it &mdash; do not run it. If you do run <code>python3 server.py</code> out of
 curiosity, the blinking cursor and total silence are correct: an stdio server waits for messages on
 standard input. <code>Ctrl C</code> stops it. Claude Code starts it for you.</p>
 <p>Look for the tool definitions:</p>
@@ -166,9 +208,175 @@ standard input. <code>Ctrl C</code> stops it. Claude Code starts it for you.</p>
 classify_tissue
 </code></pre>
 <p>The MCP layer makes explicit things such as:</p>
-<pre><code class="language-text">magnification ∈ {10, 20, 40}
-damage_threshold_fraction ∈ [0, 1]
+<pre><code class="language-text">magnification &isin; {10, 20, 40}
+damage_threshold_fraction &isin; [0, 1]
 </code></pre>
+
+<h3>What the file is made of &mdash; and how much of it you would have to change</h3>
+<p>The file has four parts. Some of them the protocol dictates and you should copy verbatim;
+the rest are this author&rsquo;s choices and are exactly what you would rewrite for your own
+project. Knowing which is which is the difference between adapting this in an afternoon and
+being afraid to touch it.</p>
+
+<details class="code">
+<summary>1. <code>TOOLS</code> &mdash; the catalogue. <em>Yours to change.</em></summary>
+<pre><code class="language-python">TOOLS = [
+    {
+        "name": "analyze_tissue",
+        "description": ("Measure damaged tissue on a slide. Run this FIRST. Reads the image "
+                        "locally and returns numbers only, with its own confidence."),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "slide": {"type": "string", "description": "path to a slide, e.g. data/case_003.pgm"},
+                "magnification": {"type": "integer", "enum": [10, 20, 40], "default": 20},
+                "damage_threshold_fraction": {
+                    "type": "number", "minimum": 0, "maximum": 1, "default": 0.45,
+                    "description": "a FRACTION between 0 and 1, never a percentage"},
+                "out": {"type": "string"},
+            },
+            "required": ["slide"],
+        },
+        "script": "tools/analyze_tissue.py",
+        "flags": {"slide": "--slide", "magnification": "--magnification",
+                  "damage_threshold_fraction": "--damage-threshold-fraction", "out": "--out"},
+    },
+    # classify_tissue follows, same shape
+]
+</code></pre>
+</details>
+<p>The <em>name</em> <code>TOOLS</code> means nothing to MCP &mdash; it is an ordinary Python
+variable. What the protocol fixes is the JSON that <code>tools/list</code> hands back: every
+entry needs a <code>name</code> and an <code>inputSchema</code>, and the schema must be
+JSON Schema. <code>description</code> is optional in the specification and essential in
+practice: it is not a comment, it is the text Claude reads when deciding whether this is the
+right tool and what to put in each field. &ldquo;a FRACTION between 0 and 1, never a
+percentage&rdquo; is written for a reader, and the reader is the model.</p>
+<p>Notice that each entry also carries <code>script</code> and <code>flags</code>, which are
+<strong>not part of MCP at all</strong>. They are this server&rsquo;s private bookkeeping &mdash;
+how to turn validated arguments into a command line. Which is why <code>tools/list</code> copies
+out three keys and no more:</p>
+<pre><code class="language-python">{"tools": [{k: t[k] for k in ("name", "description", "inputSchema")} for t in TOOLS]}
+</code></pre>
+<p>Claude never sees <code>script</code> or <code>flags</code>. <strong>This is the pattern worth
+copying:</strong> keep whatever your server needs in the entry, and publish only the keys the
+protocol defines.</p>
+
+<details class="code">
+<summary>2. <code>validate()</code> &mdash; <em>nothing in MCP requires this.</em> Demo 1 is why it exists.</summary>
+<pre><code class="language-python">def validate(schema, args):
+    errs, props = [], schema.get("properties", {})
+    for k in schema.get("required", []):
+        if k not in args:
+            errs.append("missing required argument '%s'" % k)
+    for k, v in args.items():
+        if k not in props:
+            errs.append("unknown argument '%s' (allowed: %s)" % (k, ", ".join(props)))
+            continue
+        s = props[k]
+        if s.get("type") == "integer" and not isinstance(v, int):
+            errs.append("'%s' must be an integer, got %r" % (k, v))
+        ...
+        if "enum" in s and v not in s["enum"]:
+            errs.append("'%s' must be one of %s, got %r" % (k, s["enum"], v))
+        ...
+            if "maximum" in s and v &gt; s["maximum"]:
+                hint = " (did you mean %g?)" % (v / 100) if s["maximum"] == 1 else ""
+                errs.append("'%s' must be &lt;= %s, got %s%s" % (k, s["maximum"], v, hint))
+    return errs
+</code></pre>
+</details>
+<p>There is no validation step in MCP. <code>inputSchema</code> is published to the client as a
+<em>description</em>; a good client uses it to steer the model, but nothing guarantees that the
+arguments which actually arrive satisfy it. A different client, a different model, or a raw
+JSON-RPC call &mdash; you will send one by hand in step 15 &mdash; can pass whatever it likes.</p>
+<p>So the refusals you are about to see in steps 16 and 17 are not &ldquo;MCP working&rdquo;.
+They are <em>these thirty lines</em> working. Delete <code>validate()</code> and the server still
+speaks perfect MCP; it simply accepts <code>magnification 25</code> and
+<code>damage_threshold_fraction 45</code>, runs, and returns a confident number &mdash; which is
+Demo 1 again, with more ceremony. <strong>If you carry one function from this file into your own
+project, carry this one.</strong></p>
+
+<details class="code">
+<summary>3. <code>call()</code> &mdash; <em>yours</em>, except the shape of what it returns.</summary>
+<pre><code class="language-python">def call(name, args):
+    spec = BY_NAME.get(name)
+    if not spec:
+        return "unknown tool: %s" % name, True
+    errs = validate(spec["inputSchema"], args)
+    if errs:
+        return "argument validation failed (nothing was run):\n- " + "\n- ".join(errs), True
+    cmd = [sys.executable, str(ROOT / spec["script"])]
+    for k, v in args.items():
+        cmd += [spec["flags"][k], str(v)]
+    p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    return (p.stdout or "") + (("\n[stderr]\n" + p.stderr) if p.stderr else ""), p.returncode != 0
+</code></pre>
+</details>
+<p>Validate first, and <strong>return before anything runs</strong> if validation failed &mdash;
+that ordering is the entire security model. After that it builds a command line and shells out,
+but nothing about <em>that</em> is MCP: an R project would call <code>Rscript</code>, and a server
+wrapping a library would import it and call a function directly.</p>
+<p>What the protocol does fix is the reply. <code>tools/call</code> returns content as a list of
+typed blocks, and a failure is reported with <code>isError: true</code> <em>inside a normal
+result</em> rather than as a JSON-RPC error. That is deliberate: it means the model <strong>sees
+the failure text</strong> and can correct itself, which is exactly what you will watch happen in
+step 16.</p>
+
+<details class="code">
+<summary>4. <code>main()</code> &mdash; <em>the protocol.</em> Copy this part verbatim.</summary>
+<pre><code class="language-python">def main():
+    for line in sys.stdin:
+        ...
+        msg = json.loads(line)
+        mid, method = msg.get("id"), msg.get("method")
+        if method == "initialize":
+            ver = (msg.get("params") or {}).get("protocolVersion") or "2024-11-05"
+            res = {"protocolVersion": ver, "capabilities": {"tools": {}},
+                   "serverInfo": {"name": "tissue-analyzer", "version": "2.0.0"}}
+        elif method == "tools/list":
+            res = {"tools": [{k: t[k] for k in ("name", "description", "inputSchema")}
+                             for t in TOOLS]}
+        elif method == "tools/call":
+            pr = msg.get("params") or {}
+            text, err = call(pr.get("name"), pr.get("arguments") or {})
+            res = {"content": [{"type": "text", "text": text}], "isError": err}
+        elif mid is None:
+            continue
+        else:
+            ... error -32601, no such method ...
+        if mid is not None:
+            print(json.dumps({"jsonrpc": "2.0", "id": mid, "result": res}), flush=True)
+</code></pre>
+</details>
+<p>One JSON message per line in on standard input, one JSON reply per line out on standard
+output. Three methods carry everything: <code>initialize</code> is the handshake (the client
+offers a protocol version, the server echoes one back with its capabilities and its name),
+then <code>tools/list</code> and <code>tools/call</code>.</p>
+<p>Two details that look like bugs and are not:</p>
+<ul>
+<li>A message with no <code>id</code> is a <strong>notification</strong> and must not be
+answered. The client sends <code>notifications/initialized</code> right after the handshake;
+<code>elif mid is None: continue</code> is what ignores it politely.</li>
+<li>Nothing is ever printed to standard output except JSON-RPC. <strong>One stray
+<code>print()</code> in an stdio server corrupts the stream</strong>, and the symptom is a server
+that appears to hang for no reason. Debug output goes to <code>stderr</code>.</li>
+</ul>
+
+<h4>So how much would you change for your own project?</h4>
+<table>
+<thead><tr><th style="width:30%">part</th><th>when you adapt it</th></tr></thead>
+<tbody>
+<tr><td><code>.mcp.json</code></td><td>Rename the server. One line.</td></tr>
+<tr><td><code>TOOLS</code></td><td><strong>Rewrite.</strong> One entry per capability: name, description, schema, and however your entry points are invoked.</td></tr>
+<tr><td><code>validate()</code></td><td><strong>Keep, then add your field&rsquo;s rules</strong> &mdash; the ones no schema keyword covers and no agent can infer. This is where your expertise goes.</td></tr>
+<tr><td><code>call()</code></td><td>Change how the work is started: a different interpreter, a direct function call, a job submission.</td></tr>
+<tr><td><code>main()</code></td><td>Copy unchanged.</td></tr>
+</tbody>
+</table>
+<p>A list and one function. That is the honest size of it &mdash; and it is why
+<a href="demo6.html">Demo 6</a> can hand you a project in a field you have never seen and still
+expect a working server out of it.</p>
 <hr />
 <h2>8A. Practice Claude Code MCP management commands</h2>
 <p>Before starting the interactive session, work through the MCP-management commands

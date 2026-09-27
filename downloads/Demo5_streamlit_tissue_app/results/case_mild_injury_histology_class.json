@@ -1,6 +1,6 @@
 {
   "tool": "classify_tissue",
-  "features_from": "results/case_mild_injury_histology.json",
+  "features_from": "results/case_mild_injury_histology_features.json",
   "label": "mild_injury",
   "probability": 0.7,
   "classes_the_model_knows": [

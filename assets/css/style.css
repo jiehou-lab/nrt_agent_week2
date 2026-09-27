@@ -167,3 +167,16 @@ pre{width:100%;box-sizing:border-box}
 .shot img{width:100%;height:auto;display:block;border:1px solid var(--rule);border-radius:var(--radius)}
 .shot figcaption{margin-top:.45rem;color:var(--ink-soft);font-size:.85rem;line-height:1.45}
 .guide .shot{margin:1.4rem 0}
+
+/* collapsible code panels in guides */
+details.code{border:1px solid var(--rule);border-radius:var(--radius);margin:1.1rem 0;background:#fbfcfc}
+details.code>summary{cursor:pointer;padding:.7rem .95rem;font-size:.92rem;color:var(--green);list-style:none}
+details.code>summary::-webkit-details-marker{display:none}
+details.code>summary::before{content:"\25B8  ";font-size:.85rem}
+details.code[open]>summary::before{content:"\25BE  "}
+details.code>summary:hover{background:#f1f5f3}
+details.code>summary:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+details.code>summary code{font-size:.9em}
+details.code>summary::after{content:" \2014 show the code";color:var(--ink-soft);font-size:.86em}
+details.code[open]>summary::after{content:" \2014 hide"}
+details.code pre{margin:0;border:0;border-top:1px solid var(--rule);border-radius:0 0 var(--radius) var(--radius)}
