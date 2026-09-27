@@ -24,6 +24,8 @@ from.
 
     app.py                  the Streamlit app, both paths
     mcp_client.py           ~70 lines of JSON-RPC: initialize, tools/list, tools/call
+    stream_parse.py         turns --output-format stream-json into drawable steps
+    docs/sample_trace.jsonl a recorded run, to see a trace without spending tokens
     server.py               the MCP server from Demo 2, unchanged
     CLAUDE.md               how Claude Code should behave in this folder
     .claude/settings.json   pre-approved tools - required for `claude -p`

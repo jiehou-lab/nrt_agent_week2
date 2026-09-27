@@ -18,6 +18,7 @@ from pathlib import Path
 import streamlit as st
 
 from mcp_client import MCPClient
+from stream_parse import parse_lines, summarise
 
 ROOT = Path(__file__).resolve().parent
 SLIDES = sorted(p.name for p in (ROOT / "data").glob("*.pgm"))
@@ -54,6 +55,67 @@ def show_measurement(d):
 
 def claude_available():
     return shutil.which("claude") is not None
+
+
+
+KEYS = ("damage_fraction", "hard_edge_rate", "confidence", "usable")
+
+
+def request_from_steps(steps):
+    """The arguments the model actually sent, dug out of a trace's tool calls."""
+    for st in steps or []:
+        if st.get("kind") == "tool_use" and "analyze" in st.get("name", ""):
+            return st.get("input", {}) or {}
+    return {}
+
+
+def measurement_from_steps(steps):
+    """The analyze_tissue numbers, dug out of a trace's tool results."""
+    for st in steps or []:
+        if st.get("kind") != "tool_result":
+            continue
+        d = parse_json_block(st.get("text", ""))
+        if isinstance(d, dict) and "damage_fraction" in d:
+            return d
+    return None
+
+
+def render_steps(steps, container):
+    """Draw a trace as a list of steps. The tool calls are the evidence."""
+    n = 0
+    for st in steps:
+        kind = st["kind"]
+        if kind == "text":
+            container.markdown("> " + st["text"].replace("\n", "\n> "))
+        elif kind == "tool_use":
+            n += 1
+            container.markdown("**%d. calls `%s`**" % (n, st["name"]))
+            container.code(json.dumps(st.get("input", {}), indent=2), language="json")
+        elif kind == "tool_result":
+            label = "returns an error" if st.get("is_error") else "gets back"
+            container.markdown("&nbsp;&nbsp;&nbsp;↳ *%s*" % label, unsafe_allow_html=True)
+            container.code((st.get("text") or "")[:2000], language="json")
+        elif kind == "result":
+            container.markdown("---")
+            container.markdown(st.get("text") or "")
+        else:
+            with container.expander("unrecognised event"):
+                container.json(st.get("raw"))
+
+
+def run_streaming(cmd, container):
+    """Run Claude Code and draw each step as it arrives. Returns (steps, code, stderr)."""
+    steps, lines = [], []
+    proc = subprocess.Popen(cmd, cwd=str(ROOT), stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, text=True, bufsize=1,
+                            env=os.environ.copy())
+    for line in proc.stdout:
+        lines.append(line)
+        for st in parse_lines([line]):
+            steps.append(st)
+            render_steps([st], container)
+    proc.wait(timeout=300)
+    return steps, proc.returncode, proc.stderr.read()
 
 
 # ----------------------------------------------------------------- sidebar
@@ -161,10 +223,17 @@ with tab_b:
         "then tell me whether the slide is usable." % (slide, magnification, int(threshold * 100)),
         height=110,
     )
-    cmd = ["claude", "-p", prompt, "--output-format", "json"]
+    show_steps = st.checkbox(
+        "Show Claude's steps as they happen (tool calls and results, not just the answer)",
+        value=False,
+        help="Uses --output-format stream-json, which emits one JSON event per line. "
+             "Tick this to see the tool calls rather than only the final answer.")
+    cmd = (["claude", "-p", prompt, "--output-format", "stream-json", "--verbose"]
+           if show_steps else ["claude", "-p", prompt, "--output-format", "json"])
     st.caption("The command this app runs (note the working directory):")
-    st.code("cd %s\n%s" % (ROOT, " ".join(
+    st.code("cd %s\n%s" % (ROOT.name, " ".join(
         [c if " " not in c else '"%s"' % c for c in cmd])), language="bash")
+    st.caption("Shown relative to where you unzipped it; the app runs it with the full path.")
 
     if not claude_available():
         st.warning(
@@ -173,17 +242,58 @@ with tab_b:
             "terminal where `claude --version` works."
         )
     elif st.button("Send to Claude Code", type="primary", key="run_agent"):
-        with st.spinner("Claude Code is working (this takes longer than Path A)…"):
+        st.session_state.pop("b_steps", None)
+        if show_steps:
+            st.markdown("#### What it actually did")
+            box = st.container()
             try:
-                p = subprocess.run(cmd, cwd=str(ROOT), capture_output=True,
-                                   text=True, timeout=300, env=os.environ.copy())
-                st.session_state["b_out"] = p.stdout
-                st.session_state["b_err"] = p.stderr
-                st.session_state["b_code"] = p.returncode
-            except subprocess.TimeoutExpired:
+                steps, code, err = run_streaming(cmd, box)
+                st.session_state["b_steps"] = steps
+                st.session_state["b_code"] = code
+                st.session_state["b_err"] = err
                 st.session_state["b_out"] = ""
-                st.session_state["b_err"] = "timed out after 300s"
+                if not steps:
+                    st.warning(
+                        "No steps came back. Your version of Claude Code may not support "
+                        "`--output-format stream-json`; untick the box above to use the "
+                        "plain JSON output instead.")
+            except Exception as exc:                      # noqa: BLE001
                 st.session_state["b_code"] = -1
+                st.session_state["b_err"] = str(exc)
+                st.session_state["b_out"] = ""
+        else:
+            with st.spinner("Claude Code is working (this takes longer than Path A)…"):
+                try:
+                    p = subprocess.run(cmd, cwd=str(ROOT), capture_output=True,
+                                       text=True, timeout=300, env=os.environ.copy())
+                    st.session_state["b_out"] = p.stdout
+                    st.session_state["b_err"] = p.stderr
+                    st.session_state["b_code"] = p.returncode
+                except subprocess.TimeoutExpired:
+                    st.session_state["b_out"] = ""
+                    st.session_state["b_err"] = "timed out after 300s"
+                    st.session_state["b_code"] = -1
+
+    sample = ROOT / "docs" / "sample_trace.jsonl"
+    if sample.exists():
+        with st.expander("Replay a saved trace (no tokens, no Claude Code needed)"):
+            st.write("A recorded run on the fold-artifact slide, so you can see the shape of "
+                     "a trace before spending anything on your own.")
+            if st.button("Replay", key="replay_sample"):
+                st.session_state["b_steps"] = list(parse_lines(sample.read_text().splitlines()))
+                st.session_state["b_code"] = 0
+                st.session_state["b_err"] = ""
+                st.session_state["b_out"] = ""
+
+    if st.session_state.get("b_steps"):
+        s_sum = summarise(st.session_state["b_steps"])
+        st.info("%d steps · %d tool call(s): %s" % (
+            s_sum["n_steps"], s_sum["n_tool_calls"], ", ".join(s_sum["tools"]) or "none"))
+        with st.expander("The trace, step by step", expanded=True):
+            render_steps(st.session_state["b_steps"], st)
+        st.caption(
+            "This is the part worth reading. The prose is what Claude says it did; the tool "
+            "calls above are what it did. When those two disagree, the tool calls are right.")
 
     if "b_out" in st.session_state:
         if st.session_state["b_code"] != 0:
@@ -222,10 +332,17 @@ with tab_c:
             "- fast, and free\n"
             "- cannot handle a request the form does not already cover"
         )
+    b = measurement_from_steps(st.session_state.get("b_steps"))
+    if b is None and st.session_state.get("b_out"):
+        b = parse_json_block(st.session_state["b_out"]) or {}
+        b = b if "damage_fraction" in b else None
+
     with right:
         st.markdown("**Path B — through the model**")
-        if "b_out" in st.session_state:
-            st.code((st.session_state["b_out"] or "")[:1200], language="json")
+        if b:
+            st.json({k: b.get(k) for k in KEYS})
+        elif st.session_state.get("b_steps") or st.session_state.get("b_out"):
+            st.warning("Path B ran, but no measurement came back in the trace.")
         else:
             st.info("Run Path B first.")
         st.markdown(
@@ -233,6 +350,42 @@ with tab_c:
             "- can chain steps and explain what it saw\n"
             "- slower, costs tokens, and may vary between runs"
         )
+
+    if a and b:
+        same = all(a.get(k) == b.get(k) for k in KEYS)
+        if same:
+            st.success(
+                "Identical values from both routes. The model varied the wording, not the "
+                "measurement — because the measurement came from a tool with a schema."
+            )
+        else:
+            sent = request_from_steps(st.session_state.get("b_steps"))
+            asked = {"slide": "data/" + slide, "magnification": magnification,
+                     "damage_threshold_fraction": threshold}
+            mismatched = [k for k in asked if k in sent and sent[k] != asked[k]]
+            if mismatched:
+                st.warning(
+                    "The two routes disagree, and the trace says why: Path B was run with "
+                    + ", ".join("`%s` = %r (the form has %r)" % (k, sent[k], asked[k])
+                                for k in mismatched)
+                    + ". Set the sidebar to match, or re-run Path A, before comparing."
+                )
+            else:
+                st.warning(
+                    "The two routes disagree. Read the arguments in the Path B trace — that is "
+                    "where the difference will be."
+                )
+        diff = {k: {"A": a.get(k), "B": b.get(k)} for k in KEYS}
+        with st.expander("Field by field"):
+            st.json(diff)
+
+    if st.session_state.get("b_out"):
+        with st.expander("Path B — the full reply from Claude Code"):
+            payload = parse_json_block(st.session_state["b_out"])
+            if payload:
+                st.json(payload)
+            else:
+                st.code(st.session_state["b_out"][:4000], language="text")
 
     st.divider()
     st.markdown(
