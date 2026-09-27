@@ -266,15 +266,20 @@ JSON Schema. <code>description</code> is optional in the specification and essen
 practice: it is not a comment, it is the text Claude reads when deciding whether this is the
 right tool and what to put in each field. &ldquo;a FRACTION between 0 and 1, never a
 percentage&rdquo; is written for a reader, and the reader is the model.</p>
-<p>Notice that each entry also carries <code>script</code> and <code>flags</code>, which are
-<strong>not part of MCP at all</strong>. They are this server&rsquo;s private bookkeeping &mdash;
-how to turn validated arguments into a command line. Which is why <code>tools/list</code> copies
-out three keys and no more:</p>
+<p>Now look at the last two keys, <code>script</code> and <code>flags</code>.
+<strong>Claude is never shown these.</strong> They are notes the server keeps for itself: which
+script to run, and which command-line flag each argument turns into. Claude has no business
+knowing that <code>damage_threshold_fraction</code> becomes
+<code>--damage-threshold-fraction</code>; that is the server&rsquo;s job.</p>
+<p>The split happens in one line. When Claude asks what tools exist, <code>tools/list</code>
+copies out three keys and leaves the rest behind:</p>
 <pre><code class="language-python">{"tools": [{k: t[k] for k in ("name", "description", "inputSchema")} for t in TOOLS]}
 </code></pre>
-<p>Claude never sees <code>script</code> or <code>flags</code>. <strong>This is the pattern worth
-copying:</strong> keep whatever your server needs in the entry, and publish only the keys the
-protocol defines.</p>
+<p>So each entry is doing two jobs at once: <strong>the part Claude reads</strong>
+(<code>name</code>, <code>description</code>, <code>inputSchema</code>) and <strong>the part the
+server needs in order to actually run something</strong> (<code>script</code>,
+<code>flags</code>). <strong>This is the pattern worth copying:</strong> put whatever private
+fields your own server needs into the entry, and publish only those three.</p>
 
 <details class="code">
 <summary>2. <code>validate()</code> &mdash; <em>nothing in MCP requires this.</em> Demo 1 is why it exists.</summary>
