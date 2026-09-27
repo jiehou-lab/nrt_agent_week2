@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Advanced demos — Agentic AI Week 2</title>
-<meta name="description" content="An optional demo for later weeks: a Streamlit research app over the MCP server, reaching the same analysis by button and by free text.">
+<meta name="description" content="Two optional demos for later weeks: a Streamlit research app over the MCP server, and a project that has not been prepared — turning existing research code into an agent-callable capability.">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>A</text></svg>">
 </head>
@@ -35,9 +35,10 @@
   <div class="wrap">
     <p class="eyebrow">Optional · for later weeks</p>
     <h1>Advanced demos</h1>
-    <p class="lede">An extra package, for anyone who wants to go past the four core demos. It is not
-    part of a session &mdash; it is a worked example of what a final project looks like once it
-    has a user interface on the front.</p>
+    <p class="lede">Two extra packages, for anyone who wants to go past the four core demos. Neither is
+    part of a session. <strong>Demo 5</strong> is a worked example of what a final project looks like once
+    it has a user interface on the front. <strong>Demo 6</strong> takes the preparation away and hands you
+    an unprepared project &mdash; the situation your own code is in.</p>
     <p class="hero-cta" style="margin-top:1.3rem">
       <a class="btn btn-ghost" href="index.html#demos">← The four core demos</a>
     </p>
@@ -48,16 +49,21 @@
 
 <section id="why">
   <h2>What this is for</h2>
-  <p>Demos 1&ndash;4 turn one analysis package into an agent-ready system. This one takes the same
-  package somewhere your own research might need to go: behind a user interface. It still runs the
+  <p>Demos 1&ndash;4 turn one analysis package into an agent-ready system. <strong>Demo 5</strong> takes
+  the same package somewhere your own research might need to go: behind a user interface. It still runs the
   identical tissue analysis on the identical slides, so anything that changes is the packaging and
   not the science.</p>
+  <p><strong>Demo 6</strong> goes the other way. Every demo so far handed you a package someone had already
+  prepared &mdash; the tool named, the arguments chosen, the legal values decided. That is the part of the
+  work the course has been quietly doing for you. Demo 6 takes it away and gives you a research project in
+  the state real projects are actually in.</p>
 
   <table>
     <tr><th style="width:22%">If your project is…</th><th>Start from</th></tr>
     <tr><td><strong>A research workflow exposed as a capability</strong></td><td>Demos 1&ndash;4 &mdash; define the inputs, ranges, outputs and permissions for one thing you already run.</td></tr>
     <tr><td><strong>A workflow plus a user-facing application</strong></td><td><strong>Demo 5</strong> &mdash; a form and a text box over the same server, and an explicit answer to which one each control should be.</td></tr>
-    <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered here yet. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting.</td></tr>
+    <tr><td><strong>Code you already have, not yet agent-ready</strong></td><td><strong>Demo 6</strong> &mdash; four prompts that take an existing script and produce the card, schema, server and agent instructions, on code nobody prepared for you.</td></tr>
+    <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered by a package. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting. Demo 6 says how to ask for that.</td></tr>
   </table>
 
   <div class="note">
@@ -69,7 +75,7 @@
 </section>
 
 <section id="demos">
-  <h2>The package</h2>
+  <h2>The packages</h2>
 
   <!-- ─────────────────────────── DEMO 5 ─────────────────────────── -->
   <div class="level">
@@ -111,6 +117,44 @@
           <figcaption>Path B in the running app &mdash; the request in plain English, and the
           command it turns into. Click to enlarge.</figcaption>
         </figure>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── DEMO 6 ───────────────────────── -->
+  <div class="level">
+    <div class="level-head">
+      <div class="level-num">6</div>
+      <div>
+        <h3>Bring your own project &mdash; from existing research code to an agent-ready capability</h3>
+        <p>An unprepared project in someone else&rsquo;s field, and four prompts that turn it into what Demo 2 handed you.</p>
+      </div>
+    </div>
+    <div class="level-body">
+      <div>
+        <h4>What you will do</h4>
+        <ul>
+          <li>Open a 1-D heat diffusion project you have never seen: one script that works, a README that is <strong>partly wrong</strong>, and a notes file.</li>
+          <li>Have Claude Code <strong>inspect it and change nothing</strong> &mdash; and catch the three places the documentation and the code disagree.</li>
+          <li>Design the contract before any code is written, and supply the one rule the repository does not contain.</li>
+          <li>Build the capability card, schema, MCP server and <code>CLAUDE.md</code> &mdash; <strong>wrapping the science, not rewriting it</strong>.</li>
+          <li>Ask for the ordinary optimisation &mdash; <em>&ldquo;same total time, ten times fewer steps&rdquo;</em> &mdash; and watch it pass a short test and fail a long one.</li>
+        </ul>
+        <h4>What it teaches</h4>
+        <ul>
+          <li>An agent can write the schema, the server and the docs. It cannot know that <code>r = &alpha;&middot;dt/dx&sup2;</code> must stay under 0.5 &mdash; that is not in the code. <strong>Someone with the expertise has to say so.</strong></li>
+          <li>An unstable run still exits 0 and still writes a tidy CSV. Validation before execution is worth more than a check afterwards.</li>
+          <li>A short test is not evidence: the bad configuration is off by 0.17&deg;C after 20 seconds and by 10<sup>26</sup> after 200.</li>
+          <li>Where Cowork is the better tool and where Claude Code is &mdash; and how to run the same four prompts on Python, R, MATLAB, a cluster job or a notebook.</li>
+        </ul>
+      </div>
+      <div class="demo-box">
+        <a class="btn" href="downloads/Demo6_bring_your_own_project.zip" target="_blank" rel="noopener">Download demo 6 &nbsp;&darr;</a>
+        <a class="btn btn-ghost" href="guides/demo6.html" target="_blank" rel="noopener">Open the guide</a>
+        <p class="muted">ZIP &middot; Python 3, standard library only. No Streamlit, no new installs.</p>
+        <p class="muted"><strong>Bring your own code instead.</strong> The four prompts in
+        <code>prompts/</code> are written to be copied onto your own project &mdash; the heat
+        equation is only there so everyone fails in the same, visible way first.</p>
       </div>
     </div>
   </div>

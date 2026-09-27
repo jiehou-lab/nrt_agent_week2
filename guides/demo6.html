@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 6 · Bring your own project — Agentic AI Week 2</title>
+<meta name="description" content="A research project that has not been prepared: one script, a README that is partly wrong, and a stability rule nobody wrote down. Four prompts turn it into what Demo 2 handed you.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>6</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../advanced.html">Advanced</a>
+      <a href="../index.html#setup">Setup</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 6 &middot; ADVANCED &mdash; FROM EXISTING RESEARCH CODE TO AN AGENT-READY PROJECT</p>
+    <h1>Bring your own project</h1>
+    <p class="lede">The first five demos handed you a package someone had already prepared. This one gives you an unprepared project in someone else&rsquo;s field &mdash; and four prompts that turn it into an agent-callable capability, the same way you will have to for your own code.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo6_bring_your_own_project.zip" target="_blank" rel="noopener">Download Demo 6 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo5.html">&larr; Demo 5</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<div class="note">
+  <p><strong>This demo assumes Demos 1&ndash;4.</strong> You need a terminal, Python 3, and Claude
+  Code signed in to the NRT organization, and you should have run at least Demo 2 so the MCP
+  pieces are familiar. Demo 5 is helpful but not required. If you are starting cold, begin with
+  <a href="../index.html#setup">the setup steps</a> and the
+  <a href="../index.html#demos">four core demos</a>.</p>
+</div>
+
+<p>Package:</p>
+<p><code>Demo6_bring_your_own_project.zip</code></p>
+<p>Demos 1 to 5 handed you a package that had already been prepared. Someone had
+already decided what the tool was called, what its arguments were, what counted
+as a legal value, and what the agent was allowed to do. That is the part of the
+work this course has been quietly doing for you.</p>
+<p>This demo takes it away. You get a research project in a field that is probably
+not yours, in the state real projects are actually in — one script that works, a
+README that is partly out of date, a notes file, and nothing else. No schema, no
+server, no agent instructions.</p>
+<p>In about forty minutes you will turn it into the thing Demo 2 handed you on a
+plate, using four prompts. Then you will do the same to your own code.</p>
+<hr />
+<h2>What you are given</h2>
+<pre><code class="language-text">heat1d/
+  simulate.py            the analysis that works
+  plot_profile.py        an older driver, superseded, still present
+  input/rod_initial.csv  101 nodes, a hot band in the middle, ends held at 20 C
+  output/                empty
+  README.md              written a while ago, partly wrong
+  notes.txt              a researcher's notes to themselves
+prompts/                 the four prompts, ready to paste
+reference/               one worked answer — open it AFTER yours
+docs/WALKTHROUGH.md      the short version of this page
+</code></pre>
+<p><code>simulate.py</code> solves the 1-D heat equation along a thin rod with an explicit
+finite-difference scheme: temperature at each node is updated from its two
+neighbours, one time step at a time.</p>
+<pre><code class="language-python">def step(T, r):
+    new = T[:]
+    for i in range(1, len(T) - 1):
+        new[i] = T[i] + r * (T[i + 1] - 2.0 * T[i] + T[i - 1])
+    return new
+</code></pre>
+<p>You do not need to know any of that physics to do this demo. You need to know
+one thing about it, and the whole demo is built so that you meet it the hard
+way.</p>
+<h3>The trap</h3>
+<p>The explicit scheme is only numerically stable when</p>
+<pre><code class="language-text">r = alpha * dt / dx^2  &lt;=  0.5
+</code></pre>
+<p>Push <code>r</code> above 0.5 and neighbouring nodes start oscillating against each other,
+and the oscillation grows every step until the numbers are meaningless.</p>
+<p><code>simulate.py</code> does not check this. It computes <code>r</code>, prints it, and carries on.
+The run finishes. The exit code is 0. A tidy two-column CSV appears in
+<code>output/</code>. Nothing anywhere says the contents are nonsense.</p>
+<p>This rule is not in the code and not in the README. It is <em>hinted at</em> in
+<code>notes.txt</code> — "dt cannot be too big or the numbers go crazy, there is a factor
+involving dx^2 — ask Wei" — and that is the point. <strong>An agent cannot infer this
+rule from the repository.</strong> A person who knows the method has to supply it.
+That is your job in this demo, and it is your job in your own project.</p>
+<div class="note">
+<p><strong>This is the fold-artifact slide again, in a different subject.</strong>
+In Demo 1 the classifier returned a confident answer on an image it should have
+refused. Here the simulation returns a well-formed file on a configuration it
+should have refused. In both cases the software is behaving exactly as written.
+The missing piece is a person stating what "valid" means, in a place the machine
+can check.</p>
+</div>
+
+<hr />
+<h2>Before you start</h2>
+<p>You need Python 3 and Claude Code, signed in, the same as Demo 2. Nothing else
+is installed — <code>simulate.py</code> is standard library only.</p>
+<pre><code class="language-bash">unzip Demo6_bring_your_own_project.zip
+cd Demo6_bring_your_own_project
+ls -R | head -40
+</code></pre>
+<p>Run the script once by hand so you have seen it work before an agent touches it:</p>
+<pre><code class="language-bash">cd heat1d
+python3 simulate.py --input input/rod_initial.csv \
+    --alpha 1.1e-4 --dt 0.05 --dx 0.01 --nsteps 400 \
+    --out output/profile.csv
+cd ..
+</code></pre>
+<pre><code class="language-text">wrote output/profile.csv
+  nodes      101
+  r          0.0550
+  T min/max  20.000 / 68.192
+</code></pre>
+<p>Now start Claude Code from the project root:</p>
+<pre><code class="language-bash">claude --permission-mode default
+</code></pre>
+<hr />
+<h2>Part 1 — Inspect, change nothing</h2>
+<p>Open <code>prompts/1_inspect.md</code> and paste it:</p>
+<blockquote>
+<p>Review this project and tell me:</p>
+<ol>
+<li>what the main analysis workflow actually is, and which file runs it</li>
+<li>the required inputs and their formats</li>
+<li>every parameter, what it means, and its units</li>
+<li>what the outputs are and where they go</li>
+<li>anything ambiguous, contradictory, or undocumented</li>
+</ol>
+<p>Do not change any files. Do not run anything yet. Where the README and the
+code disagree, say so and tell me which one you trust and why.</p>
+</blockquote>
+<p><strong>What to watch for.</strong> There are three planted disagreements. A good answer
+finds all three and says which source it trusts:</p>
+<table>
+<thead>
+<tr>
+<th>The disagreement</th>
+<th>What the README says</th>
+<th>What is true</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The flag name</td>
+<td><code>--steps</code></td>
+<td><code>simulate.py</code> takes <code>--nsteps</code></td>
+</tr>
+<tr>
+<td>The units of <code>alpha</code></td>
+<td>mm²/s, "copper is about 111"</td>
+<td>the input file is in metres, so <code>alpha</code> must be m²/s, ≈ 1.11e-4</td>
+</tr>
+<tr>
+<td>Which file runs it</td>
+<td><code>plot_profile.py</code></td>
+<td><code>simulate.py</code>; <code>notes.txt</code> says the driver was superseded</td>
+</tr>
+</tbody>
+</table>
+<p>A weaker answer paraphrases the README back to you. That is the failure mode
+worth naming out loud: the agent is <em>very</em> willing to believe documentation.</p>
+<p>Notice also what it should <strong>not</strong> find. Nothing in this repository states the
+stability condition. If the model volunteers it anyway — some will, from general
+knowledge of finite-difference methods — that is a bonus, not something you can
+rely on. Ask it: <em>"Is that rule written down anywhere in this project?"</em> The
+answer is no.</p>
+<hr />
+<h2>Part 2 — Propose a contract, do not build it yet</h2>
+<p><code>prompts/2_propose_contract.md</code>:</p>
+<blockquote>
+<p>Propose how to expose ONE stable workflow from this project as an
+agent-callable capability. Do not change the scientific computation.</p>
+<p>Give me:</p>
+<ul>
+<li>the capability's name and a one-sentence description</li>
+<li>required inputs and optional parameters, with types and units</li>
+<li>validation rules that should be checked BEFORE anything runs</li>
+<li>the structure of the result it should return</li>
+<li>what should stay under human control and not be exposed at all</li>
+</ul>
+<p>List anything you cannot decide without asking me.</p>
+</blockquote>
+<p>Separating the design from the build is deliberate. If you ask for code
+immediately you get code immediately, and you never see the decisions that were
+made on your behalf.</p>
+<p><strong>This is where you supply the physics.</strong> When the proposal comes back, add the
+rule the project does not contain:</p>
+<blockquote>
+<p>Add one more validation rule: the scheme is explicit, so it is only stable
+when <code>r = alpha*dt/dx^2 &lt;= 0.5</code>. The tool must compute r and refuse to run
+above 0.5, reporting the largest dt that would be legal. Always return r in
+the result, even when the run succeeds.</p>
+</blockquote>
+<p>Also ask for what makes a result readable six months later:</p>
+<blockquote>
+<p>Echo every input parameter back inside the result, so the output is
+self-describing.</p>
+</blockquote>
+<p>That last line matters more than it looks. <code>simulate.py</code> writes a bare
+two-column CSV. Next spring, nobody — including you — can tell which run
+produced it.</p>
+<hr />
+<h2>Part 3 — Build it</h2>
+<p><code>prompts/3_build.md</code>:</p>
+<blockquote>
+<p>Now build what we agreed:</p>
+<ul>
+<li><code>capability_card.md</code>, a human-readable description of the tool</li>
+<li><code>schema.json</code>, the machine-readable input contract</li>
+<li><code>server.py</code>, a minimal MCP server exposing the one capability, which
+  validates every argument against the schema before running anything</li>
+<li><code>CLAUDE.md</code>, telling an agent in this project which interface to prefer</li>
+<li><code>.mcp.json</code> so Claude Code can start the server</li>
+</ul>
+<p>Standard library only. Do not modify <code>simulate.py</code> — wrap it.</p>
+</blockquote>
+<p><strong>Wrap, do not rewrite.</strong> This is the single most important instruction in the
+demo. The science stays where the scientist left it; the interface is new. If
+the agent starts editing <code>simulate.py</code>, stop it. A wrapper you can delete is a
+much safer thing to have built than a rewrite you now have to re-validate.</p>
+<p>You should end up with roughly this:</p>
+<pre><code class="language-text">capability_card.md    what the tool is, for a human
+schema.json           types, units, ranges — for the machine
+server.py             stdio MCP server; validates, then shells out to simulate.py
+CLAUDE.md             &quot;prefer the MCP tool over running the script directly&quot;
+.mcp.json             how Claude Code starts the server
+</code></pre>
+<p>Sanity-check the server before trusting it, exactly as in Demo 2:</p>
+<pre><code class="language-bash">python3 server.py
+</code></pre>
+<p>It will sit there silently waiting for JSON-RPC on stdin. That is correct
+behaviour, not a hang. Press <code>Ctrl-C</code>.</p>
+<hr />
+<h2>Part 4 — Test it, then try to break it</h2>
+<p>Restart Claude Code so the new server is loaded. On first launch you will see
+<strong>"New MCP server found in this project"</strong> — choose <strong>"Use this MCP server"</strong>.
+(If you pick the other option by mistake, <code>claude mcp reset-project-choices</code>
+lets you answer again.)</p>
+<p><code>prompts/4_test_and_break.md</code>:</p>
+<blockquote>
+<ol>
+<li>Run the baseline: alpha 1.1e-4, dt 0.05, dx 0.01, nsteps 400.</li>
+<li>Now make it run faster: same total time, ten times fewer steps.</li>
+<li>Run that same faster configuration for 200 seconds of simulated time.</li>
+<li>Tell me which of those three results I can publish.</li>
+</ol>
+</blockquote>
+<p>Step 2 is the ordinary request a busy researcher makes, and it is the one that
+matters. "Same total time, ten times fewer steps" means <code>dt</code> goes from 0.05 to
+0.5 — which takes <code>r</code> from 0.055 to 0.55, just over the line.</p>
+<h3>What the raw script does, if you let it</h3>
+<p>Run these by hand and look at the last line of each:</p>
+<table>
+<thead>
+<tr>
+<th>Run</th>
+<th>dt</th>
+<th>nsteps</th>
+<th>Simulated time</th>
+<th>r</th>
+<th><code>T max</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>0.05</td>
+<td>400</td>
+<td>20 s</td>
+<td>0.055</td>
+<td><strong>68.192</strong></td>
+</tr>
+<tr>
+<td>"ten times faster"</td>
+<td>0.5</td>
+<td>40</td>
+<td>20 s</td>
+<td>0.55</td>
+<td><strong>68.019</strong> ← looks fine</td>
+</tr>
+<tr>
+<td>the same, run longer</td>
+<td>0.5</td>
+<td>400</td>
+<td>200 s</td>
+<td>0.55</td>
+<td><strong>1.0e+26</strong></td>
+</tr>
+<tr>
+<td>correct, run longer</td>
+<td>0.05</td>
+<td>4000</td>
+<td>200 s</td>
+<td>0.055</td>
+<td><strong>38.552</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Every one of those exits 0 and writes a CSV.</p>
+<p>Row 2 is the dangerous one. The unstable configuration <strong>passes a short test</strong>.
+The error is growing, but forty steps is not long enough for it to become
+visible — 68.019 against 68.192 looks like rounding. If your acceptance test is
+"run it and see if the answer is about right", this configuration passes, and
+you ship it.</p>
+<p>Row 3 is the same configuration, given time to show what it is. Look inside the
+file:</p>
+<pre><code class="language-bash">python3 - &lt;&lt;'EOF'
+import csv
+v = [float(r[&quot;T_C&quot;]) for r in csv.DictReader(open(&quot;heat1d/output/profile.csv&quot;))]
+print([&quot;%.1e&quot; % x for x in v[48:52]])
+EOF
+</code></pre>
+<pre><code class="language-text">['8.7e+25', '-8.6e+25', '8.6e+25', '-8.6e+25']
+</code></pre>
+<p>Alternating sign, node by node, at 10²⁵ degrees. That is the instability, and it
+is the only reason you can tell by eye. A subtler scheme would have given you
+plausible-looking garbage instead.</p>
+<h3>What your wrapper should do</h3>
+<p>If you added the rule in Part 2, the tool never gets that far:</p>
+<pre><code class="language-text">refused before running: this configuration is numerically unstable.
+  r = alpha*dt/dx^2 = 0.5500, and the explicit scheme requires r &lt;= 0.5.
+  With alpha=0.00011 and dx=0.01, the largest usable dt is 0.4545 s.
+  The simulation WOULD have run and written a CSV — of oscillating nonsense.
+</code></pre>
+<p>Note where the refusal comes from. Not from the model deciding to be careful —
+the model asked for exactly what you told it to ask for. The refusal comes from
+a rule a <strong>person</strong> wrote into the contract, enforced before any computation
+happened. This is the Demo 2 lesson, arrived at from the other direction: in
+Demo 2 you were handed a schema and shown that it holds; here you find out what
+it costs to write one, and what happens in the gap before you do.</p>
+<p>And the answer to question 4: only rows 1 and 4 are publishable, and only if
+someone has separately decided that 1-D, these boundary conditions, and this
+<code>alpha</code> describe the rod you actually care about. The tool checks arithmetic. It
+cannot check that you are simulating the right thing.</p>
+<hr />
+<h2>Compare with the reference</h2>
+<p>Now — and not before — open <code>reference/</code>.</p>
+<pre><code class="language-bash">cp reference/.mcp.json.example .mcp.json
+cp reference/CLAUDE.md .
+claude
+</code></pre>
+<p>There is no single right design, and comparing two real attempts teaches more
+than copying one. Three things are worth checking against your own:</p>
+<ol>
+<li><strong>Does your validation include the stability rule?</strong> If not, your wrapper is
+   a nicer interface to the same silent failure.</li>
+<li><strong>Does your result echo its own parameters?</strong> The reference returns <code>r</code>,
+   <code>stable</code>, <code>t_total_s</code>, <code>n_nodes</code>, <code>T_max</code>, <code>T_min</code>, <code>out</code>, and every input.</li>
+<li><strong>Did you wrap, or did you rewrite?</strong> <code>simulate.py</code> is untouched in the
+   reference.</li>
+</ol>
+<hr />
+<h2>Claude Code or Cowork?</h2>
+<p>Both can do this. They are good at different halves of it.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Claude Code (terminal)</th>
+<th>Cowork (desktop app)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Where your code is</td>
+<td>already there — it reads the folder you started it in</td>
+<td>you connect the folder, then it works in place</td>
+</tr>
+<tr>
+<td>Best at</td>
+<td>writing <code>server.py</code>, running it, iterating on failures, git</td>
+<td>reading the project and explaining it, drafting the card and schema, writing the documentation</td>
+</tr>
+<tr>
+<td>Running the MCP server you just built</td>
+<td>yes — <code>.mcp.json</code>, permissions, the whole Demo 2 mechanism</td>
+<td>not the same way; Cowork is not the client your server registers with</td>
+</tr>
+<tr>
+<td>Permission model</td>
+<td><code>.claude/settings.json</code>, the rules from Demo 3</td>
+<td>approvals per action, in the app</td>
+</tr>
+<tr>
+<td>Good for</td>
+<td>Parts 3 and 4</td>
+<td>Parts 1 and 2</td>
+</tr>
+</tbody>
+</table>
+<p>A reasonable division of labour: <strong>use Cowork to understand the project and
+agree the contract, and Claude Code to build and test it.</strong> Parts 1 and 2 are
+reading and judgement, and a chat interface with the folder connected is a
+comfortable place to do that — you can point at files, ask follow-ups, and keep
+the design discussion out of your terminal history. Parts 3 and 4 need a tool
+that can create files, run a server, and answer permission prompts, which is
+Claude Code's job.</p>
+<p>If you only want to learn one, learn Claude Code first. Everything in Demos 2
+to 5 assumes it.</p>
+<hr />
+<h2>Doing this to your own project</h2>
+<p>The four prompts are not about heat. Copy them and change the nouns.</p>
+<p>The only lines you must write yourself are the ones in Part 2 that state what
+"valid" means in your field. Nobody else can write them, and an agent reading
+your repository will not find them.</p>
+<p><strong>Python.</strong> Use the prompts as they are. Replace <code>simulate.py</code> with your entry
+point, and say so: <em>"the workflow I want to expose is the one in
+<code>analysis/run_fit.py</code>"</em>.</p>
+<p><strong>R.</strong> The wrapper is the same; only the call changes. Add to Part 3:</p>
+<blockquote>
+<p><code>server.py</code> should invoke the R script with <code>Rscript</code>, pass parameters as
+command-line arguments, and read the result back from the CSV it writes.
+Do not translate the R code into Python.</p>
+</blockquote>
+<p>If your script uses <code>optparse</code> or <code>argparse</code> in R, say so — the agent should
+match the flags you already have rather than inventing new ones.</p>
+<p><strong>MATLAB.</strong> Same shape, one extra constraint worth stating:</p>
+<blockquote>
+<p>Invoke MATLAB with <code>matlab -batch "funcname(args)"</code>, and treat startup cost as
+real — the tool should accept a list of cases and run them in one MATLAB
+session rather than starting MATLAB per call.</p>
+</blockquote>
+<p><strong>A cluster job.</strong> Do not make the tool wait. The shape is: one capability that
+submits and returns a job id immediately, and a second that reports status. Say
+that explicitly in Part 2, because the obvious design — block until done — will
+otherwise be what you get.</p>
+<p><strong>A notebook.</strong> Extract the one workflow into a script first, and be blunt about
+it: <em>"before anything else, extract the cells from <code>analysis.ipynb</code> that produce
+the final figure into a single script with explicit parameters, and change no
+logic."</em> A notebook's hidden execution order is exactly the kind of ambiguity
+that makes a tool contract impossible to write.</p>
+<h3>Validation rules, by way of example</h3>
+<p>Part 2 is where your expertise goes in. Some shapes it takes:</p>
+<ul>
+<li>a <strong>stability or convergence</strong> condition, like the one here</li>
+<li>a physical range: a rate that cannot be negative, a fraction that cannot
+  exceed 1, a temperature below absolute zero</li>
+<li><strong>units</strong> — the single most common silent error, and the reason the reference
+  card states units for every parameter</li>
+<li>a <strong>sample-size floor</strong> below which the statistic is not meaningful</li>
+<li>an input the tool should refuse rather than guess at: a file with the wrong
+  number of columns, a grid spacing that disagrees with the data</li>
+</ul>
+<p>Every one of these is something you know and your repository does not say.</p>
+<hr />
+<h2>What to take away</h2>
+<p>Demos 1 to 5 showed you a prepared system working. This one shows you the
+preparation, which is the part you will actually have to do.</p>
+<p>Three things survive the trip to your own project:</p>
+<ol>
+<li><strong>The agent is excellent at the mechanical half and blind to the scientific
+   half.</strong> It will read your code, find your contradictions, write a clean
+   schema and a working server in minutes. It will not tell you that <code>r</code> must
+   stay under 0.5, because nothing you gave it says so.</li>
+<li><strong>Validation before execution is worth more than a check afterwards.</strong> A run
+   that never happened costs nothing. A run that finished, wrote a file, and was
+   wrong costs however long it takes someone to notice.</li>
+<li><strong>A short test is not evidence.</strong> The unstable configuration passed the
+   twenty-second test. Whatever your field's equivalent of "run it longer" is,
+   that is the test that matters.</li>
+</ol>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo5.html">&larr; Demo 5</a>
+  <a class="btn btn-ghost" href="../index.html#demos">All four core demos</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">Demo packages are teaching artifacts. The simulation is a teaching example, not a validated solver.</p>
+  </div>
+</footer>
+
+</body>
+</html>
