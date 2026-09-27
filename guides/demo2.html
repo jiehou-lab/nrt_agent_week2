@@ -189,19 +189,12 @@ permission rules in Demo 3, and the name you will see in <code>/context</code>.<
 <li><strong>When you leave Claude Code, the process is stopped.</strong> Nothing keeps
 running.</li>
 </ol>
-<p>Notice what is <em>not</em> in that list: <code>server.py</code> never reads
-<code>.mcp.json</code>. It is not configuration for the server &mdash; it is configuration for the
-<strong>client</strong>. The protocol itself has no way to discover servers, so something has to
-say &ldquo;here is one, and this is how you start it.&rdquo; Two places can say it:</p>
-<table>
-<thead><tr><th style="width:30%">where you put it</th><th>how it gets there</th><th style="width:26%">who else gets it</th></tr></thead>
-<tbody>
-<tr><td><code>.mcp.json</code>, in the project</td><td>you write the file and commit it</td><td>everyone who opens the project, with no setup</td></tr>
-<tr><td>your user configuration</td><td>the <code>claude mcp add</code> command writes it</td><td>only you, on this machine</td></tr>
-</tbody>
-</table>
-<p>This package uses the first, which is why the server is already there before you have typed
-anything. You will practise the second in 8A.</p>
+<p>So <code>.mcp.json</code> is Claude Code&rsquo;s note to itself: <em>this project has a
+server, and here is the command that starts it</em>. <code>server.py</code> never opens the file
+&mdash; it does not need to know it exists.</p>
+<p>That note can live in two places. Here it is in the project, so it travels with the folder and
+anyone who opens it gets the same server. The <code>claude mcp add</code> command saves the same
+note in your personal settings instead, where only you have it. You will try that in 8A.</p>
 
 <div class="note">
   <p><strong>Where an agent&rsquo;s role is actually configured.</strong> Four files, and they
