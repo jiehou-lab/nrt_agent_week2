@@ -226,6 +226,24 @@ classify_tissue
 damage_threshold_fraction &isin; [0, 1]
 </code></pre>
 
+<div class="note">
+  <p><strong>Two programs, not two personalities.</strong> Everything below says
+  &ldquo;Claude&rdquo; and &ldquo;the server&rdquo;. They are two separate programs running on your
+  laptop, and it is worth fixing which is which before reading further.</p>
+  <pre><code class="language-text">  you ──► Claude ──► server.py ──► tools/analyze_tissue.py
+           │          │
+           │          └─ checks the arguments, then runs the script
+           └─ reads your English, picks a tool, fills in the values
+</code></pre>
+  <p><strong>Claude</strong> is the assistant in your terminal. It reads your request and decides
+  what to call and with what values. <strong>The server</strong> is <code>server.py</code> &mdash;
+  the program Claude Code started for you in step 7. It checks those values and runs the real
+  script.</p>
+  <p>They are different processes, and the only thing that passes between them is JSON. So when a
+  sentence below says &ldquo;Claude sees this&rdquo; or &ldquo;the server does that&rdquo;, it is
+  literal: either it crossed that arrow or it did not.</p>
+</div>
+
 <h3>What the file is made of &mdash; and how much of it you would have to change</h3>
 <p>The file has four parts. Some of them the protocol dictates and you should copy verbatim;
 the rest are this author&rsquo;s choices and are exactly what you would rewrite for your own
@@ -266,20 +284,26 @@ JSON Schema. <code>description</code> is optional in the specification and essen
 practice: it is not a comment, it is the text Claude reads when deciding whether this is the
 right tool and what to put in each field. &ldquo;a FRACTION between 0 and 1, never a
 percentage&rdquo; is written for a reader, and the reader is the model.</p>
-<p>Now look at the last two keys, <code>script</code> and <code>flags</code>.
-<strong>Claude is never shown these.</strong> They are notes the server keeps for itself: which
-script to run, and which command-line flag each argument turns into. Claude has no business
-knowing that <code>damage_threshold_fraction</code> becomes
-<code>--damage-threshold-fraction</code>; that is the server&rsquo;s job.</p>
-<p>The split happens in one line. When Claude asks what tools exist, <code>tools/list</code>
-copies out three keys and leaves the rest behind:</p>
+<p>Now the last two keys, <code>script</code> and <code>flags</code>. These two
+<strong>stay on the server&rsquo;s side of the arrow.</strong> They tell <code>server.py</code>
+which program to run and which command-line flag each argument becomes &mdash;
+<code>damage_threshold_fraction</code> turns into <code>--damage-threshold-fraction</code>. Claude
+has no use for that; writing the command line is the server&rsquo;s job.</p>
+<p>The split happens in one line. When Claude asks what tools are available, the server sends back
+three keys per tool and keeps the other two:</p>
 <pre><code class="language-python">{"tools": [{k: t[k] for k in ("name", "description", "inputSchema")} for t in TOOLS]}
 </code></pre>
-<p>So each entry is doing two jobs at once: <strong>the part Claude reads</strong>
-(<code>name</code>, <code>description</code>, <code>inputSchema</code>) and <strong>the part the
-server needs in order to actually run something</strong> (<code>script</code>,
-<code>flags</code>). <strong>This is the pattern worth copying:</strong> put whatever private
-fields your own server needs into the entry, and publish only those three.</p>
+<p>So one entry does two jobs at once:</p>
+<table>
+<thead><tr><th style="width:34%">keys</th><th style="width:20%">who uses them</th><th>for what</th></tr></thead>
+<tbody>
+<tr><td><code>name</code>, <code>description</code>, <code>inputSchema</code></td><td><strong>Claude</strong></td><td>choosing the right tool and filling in legal values</td></tr>
+<tr><td><code>script</code>, <code>flags</code></td><td><strong>the server</strong></td><td>building the command line that actually runs</td></tr>
+</tbody>
+</table>
+<p><strong>This is the pattern worth copying:</strong> put whatever private fields your own server
+needs into the entry &mdash; a working directory, a queue name, a container image &mdash; and send
+only those three across.</p>
 
 <details class="code">
 <summary>2. <code>validate()</code> &mdash; <em>nothing in MCP requires this.</em> Demo 1 is why it exists.</summary>
