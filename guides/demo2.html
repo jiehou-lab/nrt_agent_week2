@@ -170,14 +170,38 @@ fold artifact -&gt; plausible class + elevated artifact/edge behavior
 <tr><td><code>args</code></td><td>What to pass it. <code>server.py</code> is relative to the project folder.</td></tr>
 </tbody>
 </table>
-<p><strong>Is this file required to make MCP work?</strong> Not by the protocol.
-<code>server.py</code> never reads it, and would behave identically if you started it by hand.
-It is required by the <em>client</em>. MCP has no discovery mechanism: something has to tell
-Claude Code that this server exists and how to launch it, and <code>.mcp.json</code> is the
-project-scoped way to say so. Because it lives in the repository, everyone who opens the
-project gets the same server with no setup. The alternative is <code>claude mcp add</code>,
-which you will practise in 8A &mdash; that records the same three facts in your own user
-configuration instead, where your collaborators cannot see them.</p>
+<h3>How Claude Code will use this file</h3>
+<p>When you start <code>claude</code> in this folder in step 9, this file is the reason the two
+tools appear. In order:</p>
+<ol>
+<li><strong>It reads <code>.mcp.json</code>.</strong> Nothing scans your computer looking for
+servers. If this file is not here, Claude Code has no idea the server exists.</li>
+<li><strong>It asks you once whether to trust it</strong> &mdash; <em>&ldquo;New MCP server found
+in this project&rdquo;</em>. That is the prompt in step 9, and your answer is remembered for this
+project.</li>
+<li><strong>It runs <code>python3 server.py</code></strong> for you, as a background child
+process, and keeps it alive for the whole session.</li>
+<li><strong>It talks to that process</strong> through its standard input and output &mdash; the
+<code>initialize</code> handshake first, then <code>tools/list</code> to ask what it can do.</li>
+<li><strong>The tools appear in Claude&rsquo;s tool list</strong>, each prefixed with the server
+name: <code>mcp__tissue-analyzer__analyze_tissue</code>. That is the name you will write in
+permission rules in Demo 3, and the name you will see in <code>/context</code>.</li>
+<li><strong>When you leave Claude Code, the process is stopped.</strong> Nothing keeps
+running.</li>
+</ol>
+<p>Notice what is <em>not</em> in that list: <code>server.py</code> never reads
+<code>.mcp.json</code>. It is not configuration for the server &mdash; it is configuration for the
+<strong>client</strong>. The protocol itself has no way to discover servers, so something has to
+say &ldquo;here is one, and this is how you start it.&rdquo; Two places can say it:</p>
+<table>
+<thead><tr><th style="width:30%">where you put it</th><th>how it gets there</th><th style="width:26%">who else gets it</th></tr></thead>
+<tbody>
+<tr><td><code>.mcp.json</code>, in the project</td><td>you write the file and commit it</td><td>everyone who opens the project, with no setup</td></tr>
+<tr><td>your user configuration</td><td>the <code>claude mcp add</code> command writes it</td><td>only you, on this machine</td></tr>
+</tbody>
+</table>
+<p>This package uses the first, which is why the server is already there before you have typed
+anything. You will practise the second in 8A.</p>
 
 <div class="note">
   <p><strong>Where an agent&rsquo;s role is actually configured.</strong> Four files, and they
