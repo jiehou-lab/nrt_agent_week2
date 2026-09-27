@@ -100,9 +100,38 @@ start <code>server.py</code>, send <code>initialize</code>, send <code>tools/lis
 is no framework in between. You can import it from any Python program.</p>
 <pre><code class="language-bash">python3 mcp_client.py
 </code></pre>
-<p>Run on its own it lists the tools and analyses one slide — no Streamlit, no
-model, no agent. Worth seeing once: <strong>the MCP server is just a program that
-answers questions on stdin.</strong></p>
+<pre><code class="language-text">analyze_tissue - Measure damaged tissue on a slide. Run this FIRST. Reads the image loc
+classify_tissue - Label a slide normal / mild_injury / necrosis from analyze_tissue outp
+
+isError: False
+{
+  &quot;tool&quot;: &quot;analyze_tissue&quot;,
+  &quot;slide&quot;: &quot;data/case_mild_injury_histology.pgm&quot;,
+  &quot;magnification&quot;: 20,
+  &quot;damage_threshold_fraction&quot;: 0.45,
+  &quot;n_tiles_tissue&quot;: 576,
+  &quot;n_tiles_damaged&quot;: 127,
+  &quot;damage_fraction&quot;: 0.22,
+  &quot;hard_edge_rate&quot;: 0.042,
+  &quot;confidence&quot;: 0.95,
+  &quot;low_confidence&quot;: false,
+  &quot;usable&quot;: true,
+  &quot;notes&quot;: &quot;ok&quot;
+}
+</code></pre>
+<p>That is the whole conversation, and two details in it are worth a second:</p>
+<ul>
+<li>The tool descriptions stop mid-word because the demo block at the bottom of
+<code>mcp_client.py</code> prints only the first 70 characters. Nothing is truncated in the tool
+itself.</li>
+<li><code>isError</code> is MCP's own field on the reply, not a result of the analysis. It is how
+a client tells "the tool ran, here is the answer" from "the tool refused, here is why" — the
+<code>true</code> case is what you saw in Demo 2 when the schema rejected
+<code>damage_threshold_fraction = 50</code>.</li>
+</ul>
+<p>No Streamlit, no model, no agent. Worth seeing once: <strong>the MCP server is just a program
+that answers questions on stdin</strong>, and it cannot tell your seventy lines of Python from
+Claude Code.</p>
 <hr />
 <h2 class="partmark">Part A — The path with no model in it</h2>
 <h2>3. Run the analysis from the form</h2>
