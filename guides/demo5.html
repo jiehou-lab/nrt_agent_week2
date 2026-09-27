@@ -186,7 +186,29 @@ accepted them; a model can convert them. Press <strong>Send to Claude Code</stro
 <pre><code class="language-bash">cd /path/to/Demo5_streamlit_tissue_app
 claude -p &quot;Analyze data/...&quot; --output-format json
 </code></pre>
-<p>Two details make this work, and both are easy to get wrong:</p>
+<h3>Watch what it actually does</h3>
+<p>Leave <strong>"Show Claude's steps as they happen"</strong> ticked. Instead of a paragraph
+appearing after ten silent seconds, you get the trace as it happens:</p>
+<pre><code class="language-text">&gt; I'll measure the slide first, then classify it only if the measurement is usable.
+
+1. calls mcp__tissue-analyzer__analyze_tissue
+   { "slide": "data/case_fold_artifact_histology.pgm", "magnification": 20, ... }
+   ↳ gets back  { "damage_fraction": 0.234, "low_confidence": true, ... }
+
+2. calls mcp__tissue-analyzer__classify_tissue
+   ↳ gets back  { "label": "mild_injury", "probability": 0.7 }
+</code></pre>
+<p>That comes from <code>--output-format stream-json --verbose</code>, which emits one JSON event
+per line; <code>stream_parse.py</code> turns those events into the steps you see.</p>
+<p><strong>This panel is the point of the whole demo.</strong> The prose is what Claude <em>says</em>
+it did. The tool calls are what it <em>did</em>. Ask for <code>20x</code> and a <code>45%</code>
+threshold and you can see, in the arguments, that they became <code>20</code> and
+<code>0.45</code> — or see that they did not.</p>
+<p>If your version of Claude Code does not support <code>stream-json</code>, the app says so and
+you can untick the box to fall back to plain JSON. Either way there is a <strong>Replay a saved
+trace</strong> expander that renders a recorded run of the fold-artifact slide, so you can see the
+shape of a trace without spending anything.</p>
+<p>Two details make the run work at all, and both are easy to get wrong:</p>
 <ul>
 <li><strong><code>cwd</code> is the project folder.</strong> That is how Claude Code finds <code>.mcp.json</code>,
   <code>CLAUDE.md</code> and the tool schemas. Start it anywhere else and it has no tools.</li>
