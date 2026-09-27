@@ -245,11 +245,20 @@ difference in what happened.</p>
 Path B   handles wording the form never anticipated; can chain steps;
          slower; costs tokens; may differ between runs
 </code></pre>
-<p>Run Path B twice with the same sentence. Compare the wording of the two answers,
-then compare the numbers. The prose moves; the measurements do not. That is
-exactly what you want, and it is worth saying out loud: <strong>the model is varying
-the explanation, not the result</strong> — because the result comes from a tool with a
-schema, not from the model.</p>
+<p>The two panels show the <strong>same four fields</strong>, one dug out of the direct call
+and one dug out of Path B's trace, so they can be read side by side:</p>
+<pre><code class="language-text">Path A                          Path B
+damage_fraction   0.234         damage_fraction   0.234
+hard_edge_rate    0.17          hard_edge_rate    0.17
+confidence        0.55          confidence        0.55
+usable            true          usable            true
+</code></pre>
+<p>When they agree the app says so. When they do not, it reads the arguments out of the trace and
+tells you which one differed — usually because the sidebar was left on a different slide than the
+sentence named.</p>
+<p>Run Path B twice with the same sentence. The wording of the two answers moves; these four
+numbers do not. That is worth saying out loud: <strong>the model is varying the explanation, not
+the result</strong> — because the result comes from a tool with a schema, not from the model.</p>
 <h2>9. The question this demo is really asking</h2>
 <p>Every control in an interface decides <strong>who interprets the request</strong>.</p>
 <pre><code class="language-text">a button    you already decided, at design time
