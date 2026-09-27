@@ -289,6 +289,31 @@ percentage&rdquo; is written for a reader, and the reader is the model.</p>
 which program to run and which command-line flag each argument becomes &mdash;
 <code>damage_threshold_fraction</code> turns into <code>--damage-threshold-fraction</code>. Claude
 has no use for that; writing the command line is the server&rsquo;s job.</p>
+<div class="note">
+  <p><strong>&ldquo;But doesn&rsquo;t the model write the command?&rdquo;</strong> In Demo 1 it did.
+  That <em>was</em> Demo 1: Claude read your sentence and typed a command line, and whatever it
+  typed is what ran.</p>
+  <pre><code class="language-bash"># Demo 1 - this whole line is text the model produced
+python3 tools/analyze_tissue.py --slide data/case_003.pgm \
+    --magnification 20 --damage-threshold-fraction 45
+</code></pre>
+  <p>In Demo 2 it does not. Claude sends <strong>values</strong>, not a command:</p>
+  <pre><code class="language-json">{"name": "analyze_tissue",
+ "arguments": {"slide": "data/case_003.pgm",
+               "magnification": 20,
+               "damage_threshold_fraction": 0.45}}
+</code></pre>
+  <p>That JSON is everything the model contributes. The server checks each value against the
+  schema, and only then assembles the command line itself &mdash; from <code>script</code> and
+  <code>flags</code>, the same way every time. <strong>Nothing the model wrote is executed as a
+  command.</strong></p>
+  <p>This is the whole difference between the two demos. In Demo 1 the command line <em>was</em>
+  model output, so an invented flag, a mistyped path, or <code>45</code> where <code>0.45</code>
+  was meant all became a real command that ran and produced a confident number. In Demo 2 the
+  model&rsquo;s output is a small object of values that has to survive <code>validate()</code>
+  before a command line exists at all.</p>
+</div>
+
 <p>The split happens in one line. When Claude asks what tools are available, the server sends back
 three keys per tool and keeps the other two:</p>
 <pre><code class="language-python">{"tools": [{k: t[k] for k in ("name", "description", "inputSchema")} for t in TOOLS]}
