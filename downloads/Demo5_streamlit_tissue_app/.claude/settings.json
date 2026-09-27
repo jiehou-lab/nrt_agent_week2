@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__tissue-analyzer__analyze_tissue",
+      "mcp__tissue-analyzer__classify_tissue",
+      "Read(./data/**)",
+      "Read(./docs/**)",
+      "Write(./results/**)"
+    ],
+    "deny": [
+      "Bash"
+    ]
+  },
+  "enabledMcpjsonServers": ["tissue-analyzer"]
+}

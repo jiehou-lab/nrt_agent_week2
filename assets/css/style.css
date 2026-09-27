@@ -160,3 +160,10 @@ pre{width:100%;box-sizing:border-box}
   .masthead-inner{flex-wrap:wrap;gap:.4rem}
   .masthead nav{margin-left:0;width:100%;gap:1.1rem;flex-wrap:wrap}
 }
+
+/* screenshots */
+.shot{margin:1.1rem 0 0}
+.shot a{display:block;line-height:0}
+.shot img{width:100%;height:auto;display:block;border:1px solid var(--rule);border-radius:var(--radius)}
+.shot figcaption{margin-top:.45rem;color:var(--ink-soft);font-size:.85rem;line-height:1.45}
+.guide .shot{margin:1.4rem 0}
