@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Advanced demos — Agentic AI Week 2</title>
-<meta name="description" content="Two optional demos for later weeks: a Streamlit research app over the MCP server, and a scheduled batch agent whose jobs outlive the conversation.">
+<meta name="description" content="An optional demo for later weeks: a Streamlit research app over the MCP server, reaching the same analysis by button and by free text.">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>A</text></svg>">
 </head>
@@ -35,9 +35,9 @@
   <div class="wrap">
     <p class="eyebrow">Optional · for later weeks</p>
     <h1>Advanced demos</h1>
-    <p class="lede">Two more packages, for anyone who wants to go past the four core demos. They
-    are not part of a session &mdash; they are worked examples of the two harder shapes a final
-    project can take.</p>
+    <p class="lede">An extra package, for anyone who wants to go past the four core demos. It is not
+    part of a session &mdash; it is a worked example of what a final project looks like once it
+    has a user interface on the front.</p>
     <p class="hero-cta" style="margin-top:1.3rem">
       <a class="btn btn-ghost" href="index.html#demos">← The four core demos</a>
     </p>
@@ -47,17 +47,17 @@
 <main class="wrap">
 
 <section id="why">
-  <h2>What these are for</h2>
-  <p>Demos 1&ndash;4 turn one analysis package into an agent-ready system. These two take the
-  same package somewhere your own research might need to go: behind a user interface, and onto a
-  queue. Both still run the identical tissue analysis on the identical slides, so anything that
-  changes is the packaging and not the science.</p>
+  <h2>What this is for</h2>
+  <p>Demos 1&ndash;4 turn one analysis package into an agent-ready system. This one takes the same
+  package somewhere your own research might need to go: behind a user interface. It still runs the
+  identical tissue analysis on the identical slides, so anything that changes is the packaging and
+  not the science.</p>
 
   <table>
     <tr><th style="width:22%">If your project is…</th><th>Start from</th></tr>
     <tr><td><strong>A research workflow exposed as a capability</strong></td><td>Demos 1&ndash;4 &mdash; define the inputs, ranges, outputs and permissions for one thing you already run.</td></tr>
     <tr><td><strong>A workflow plus a user-facing application</strong></td><td><strong>Demo 5</strong> &mdash; a form and a text box over the same server, and an explicit answer to which one each control should be.</td></tr>
-    <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td><strong>Demo 6</strong> &mdash; submit, walk away, come back with a job id. No cluster needed to practise it.</td></tr>
+    <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered here yet. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting.</td></tr>
   </table>
 
   <div class="note">
@@ -69,7 +69,7 @@
 </section>
 
 <section id="demos">
-  <h2>The two packages</h2>
+  <h2>The package</h2>
 
   <!-- ─────────────────────────── DEMO 5 ─────────────────────────── -->
   <div class="level">
@@ -115,50 +115,6 @@
     </div>
   </div>
 
-  <!-- ─────────────────────────── DEMO 6 ─────────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">6</div>
-      <div>
-        <h3>Scheduled batch agent — a job that outlives the conversation</h3>
-        <p>Four tools, no shell: submit, check status, collect results. The work happens somewhere nobody is waiting.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Submit eight slides and get an id back in under a second &mdash; before anything has been analyzed.</li>
-          <li>Ask an unrelated question while it runs, then <code>/exit</code>, start a fresh session, and collect the job by id.</li>
-          <li>Read the report, then <strong>count what its summary did not mention</strong>.</li>
-          <li>Fix the fifteen-line function that decided what the reader is told.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li>An agent that waits is an agent that dies with a closed laptop; state belongs outside the conversation.</li>
-          <li>A job id is a handle a human can carry between sessions; a context window is not.</li>
-          <li>Demo 4's missing warning, at batch scale &mdash; three of eight slides flagged, none of them in the summary.</li>
-          <li>Denying <code>Bash</code> stops being a teaching exercise once a real queue is on the other side.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo6_scheduler_tissue_agent.zip" target="_blank" rel="noopener">Download demo 6 &nbsp;↓</a>
-        <a class="btn btn-ghost" href="guides/demo6.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP · Python 3, standard library only. Runs on a laptop; one variable switches it to Slurm.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="note">
-  <h2>A caution about the cluster path</h2>
-  <p>Demo 6's local simulator is exercised and works. Its Slurm backend is written but
-  <strong>has not been run on a cluster by the course staff</strong> &mdash; partitions, modules,
-  filesystem layout and accounting policy differ at every site. Read
-  <code>scheduler/backend.py</code> and <code>slurm/job_template.sbatch</code> before you use
-  them, and test with one slide before you submit eight hundred.</p>
-  <p class="muted">The pattern is the lesson. Slurm is an implementation detail, and so is
-  whatever replaces it.</p>
 </section>
 
 </main>
