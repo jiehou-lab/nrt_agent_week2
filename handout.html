@@ -58,6 +58,16 @@
     margin-top:auto; border-top:3px solid var(--green); padding-top:5px;
     display:flex; justify-content:space-between; color:#555; font-size:8.6pt;
   }
+  /* on a phone the two-column cards do not fit; stack them (screen only) */
+  @media screen and (max-width:700px){
+    body{ font-size:12pt; }
+    .page{ min-height:auto; padding:0 2px; }
+    .grid2{ grid-template-columns:1fr; }
+    .flow{ flex-wrap:wrap; }
+    .flow .box{ flex:1 1 40%; }
+    table{ font-size:11pt; }
+    td, th{ word-break:break-word; }
+  }
 </style>
 </head>
 <body>
