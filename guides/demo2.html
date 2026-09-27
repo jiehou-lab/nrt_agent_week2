@@ -417,19 +417,68 @@ step 16.</p>
             print(json.dumps({"jsonrpc": "2.0", "id": mid, "result": res}), flush=True)
 </code></pre>
 </details>
-<p>One JSON message per line in on standard input, one JSON reply per line out on standard
-output. Three methods carry everything: <code>initialize</code> is the handshake (the client
-offers a protocol version, the server echoes one back with its capabilities and its name),
-then <code>tools/list</code> and <code>tools/call</code>.</p>
-<p>Two details that look like bugs and are not:</p>
-<ul>
-<li>A message with no <code>id</code> is a <strong>notification</strong> and must not be
-answered. The client sends <code>notifications/initialized</code> right after the handshake;
-<code>elif mid is None: continue</code> is what ignores it politely.</li>
-<li>Nothing is ever printed to standard output except JSON-RPC. <strong>One stray
-<code>print()</code> in an stdio server corrupts the stream</strong>, and the symptom is a server
-that appears to hang for no reason. Debug output goes to <code>stderr</code>.</li>
-</ul>
+<p><code>main()</code> is a reception desk. It reads one line at a time from standard input;
+each line is one JSON message. It looks at the <code>method</code> field to see which of three
+questions is being asked, works out the answer, and prints it back as one line of JSON carrying
+the same <code>id</code> &mdash; so the client knows which question this answers. Then it waits
+for the next line. That is the entire program.</p>
+<p>Here is a real session with this server. Every line below came out of running
+<code>server.py</code> and feeding it messages. <code>in &lt;-</code> is what the client sent;
+<code>out -&gt;</code> is what the server printed back.</p>
+<pre><code class="language-text">in  &lt;- {"jsonrpc":"2.0","id":1,"method":"initialize",
+        "params":{"protocolVersion":"2024-11-05",
+                  "clientInfo":{"name":"claude-code","version":"1.0"}}}
+
+out -&gt; {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05",
+        "capabilities":{"tools":{}},
+        "serverInfo":{"name":"tissue-analyzer","version":"2.0.0"}}}
+
+
+in  &lt;- {"jsonrpc":"2.0","method":"notifications/initialized"}
+
+out -&gt; (nothing at all)
+
+
+in  &lt;- {"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
+
+out -&gt; {"jsonrpc":"2.0","id":2,"result":{"tools":[
+          {"name":"analyze_tissue",
+           "description":"Measure damaged tissue on a slide. Run this FIRST...",
+           "inputSchema":{...}},
+          {"name":"classify_tissue",
+           "description":"Label a slide normal / mild_injury / necrosis...",
+           "inputSchema":{...}}]}}
+
+
+in  &lt;- {"jsonrpc":"2.0","id":3,"method":"tools/call",
+        "params":{"name":"analyze_tissue",
+                  "arguments":{"slide":"data/case_necrosis_histology.pgm",
+                               "magnification":20,
+                               "damage_threshold_fraction":0.45,
+                               "out":"results/necrosis_mcp_analysis.json"}}}
+
+out -&gt; {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":
+          "{ \"damage_fraction\": 0.476, \"hard_edge_rate\": 0.076,
+             \"confidence\": 0.95, \"usable\": true, ... }"}],
+        "isError":false}}
+</code></pre>
+<p class="muted">Line breaks added here for reading &mdash; on the wire each message is a single
+line.</p>
+<p>Now read it against the code. Each incoming <code>method</code> picks one branch:</p>
+<table>
+<thead><tr><th style="width:26%">what came in</th><th style="width:30%">the branch it takes</th><th>what went back</th></tr></thead>
+<tbody>
+<tr><td><code>initialize</code></td><td><code>if method == "initialize"</code></td><td>the same protocol version the client offered, plus the server&rsquo;s own name. That is the whole handshake &mdash; the client says which version it speaks, the server agrees and identifies itself. Nothing is negotiated beyond that.</td></tr>
+<tr><td><code>notifications/initialized</code></td><td><code>elif mid is None: continue</code></td><td>nothing. This message has no <code>id</code>, which is how a client says &ldquo;no reply needed&rdquo;. Answering it would be a protocol error.</td></tr>
+<tr><td><code>tools/list</code></td><td><code>elif method == "tools/list"</code></td><td>the two tools, three keys each &mdash; the line you read a moment ago.</td></tr>
+<tr><td><code>tools/call</code></td><td><code>elif method == "tools/call"</code></td><td>whatever <code>call()</code> returned, wrapped as <code>content</code> with an <code>isError</code> flag.</td></tr>
+</tbody>
+</table>
+<p>Anything else gets <code>-32601 no such method</code>, and the loop goes back to waiting.</p>
+<p>One practical consequence, worth knowing before you write your own: <strong>the only thing that
+may ever appear on standard output is one of these replies.</strong> A stray <code>print()</code>
+puts a line into the stream that the client cannot parse, and the symptom is a server that seems
+to hang for no reason. Send debug output to <code>stderr</code> instead.</p>
 
 <h4>So how much would you change for your own project?</h4>
 <table>
