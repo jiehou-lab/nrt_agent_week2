@@ -1,1 +1,20 @@
+# Virtual environments created by running the demo apps
+.demo_venv/
+venv/
+.venv/
+
+# Python noise
+__pycache__/
+*.pyc
+
+# macOS / archive noise
 .DS_Store
+__MACOSX/
+
+# Unpacked demo folders: the site ships the .zip files, not the contents.
+# Keep the archives and the slide/handout files, ignore everything else here.
+downloads/*
+!downloads/*.zip
+!downloads/*.pdf
+!downloads/*.pptx
+!downloads/*.docx

@@ -1,9 +1,0 @@
-{
-  "_comment": "STAGE 1 - a reasonable first attempt. It has a hole. Find it.",
-  "permissions": {
-    "deny": [
-      "Read(./data/**)",
-      "Edit(./data/**)"
-    ]
-  }
-}
