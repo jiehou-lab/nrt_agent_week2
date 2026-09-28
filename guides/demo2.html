@@ -538,7 +538,23 @@ out -&gt; {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":
 </code></pre>
 <p class="muted">Line breaks added here for reading &mdash; on the wire each message is a single
 line.</p>
-<p>Now read it against the code. Each incoming <code>method</code> picks one branch:</p>
+<p><strong>Nothing in this package defines <code>id</code> or <code>method</code>.</strong> They
+are fields of the message the client sent, and <code>msg.get(...)</code> simply reads them out.
+Take the first line above:</p>
+<pre><code class="language-text">the line that arrived on standard input:
+  {"jsonrpc":"2.0", "id":1, "method":"initialize", "params":{...}}
+
+what main() pulls out of it:
+  msg    = json.loads(line)   →  that whole message, as a Python dict
+  mid    = msg.get("id")      →  1
+  method = msg.get("method")  →  "initialize"
+</code></pre>
+<p>That envelope &mdash; <code>jsonrpc</code>, <code>id</code>, <code>method</code> and
+<code>params</code> going in, <code>id</code> and <code>result</code> coming back &mdash; is
+<strong>JSON-RPC 2.0</strong>, the message format MCP is built on. The <code>id</code> exists so
+that replies can be matched to requests when several are in flight, which is why the server copies
+it into its answer unchanged rather than inventing one.</p>
+<p>Now read the session against the code. Each incoming <code>method</code> picks one branch:</p>
 <table>
 <thead><tr><th style="width:26%">what came in</th><th style="width:30%">the branch it takes</th><th>what went back</th></tr></thead>
 <tbody>
