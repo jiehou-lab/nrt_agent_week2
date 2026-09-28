@@ -377,6 +377,18 @@ field instead of the label.</p>
 <pre><code class="language-bash">cp docs/subagent_versions/v2_checks_confidence.md .claude/agents/tissue-analyst.md
 </code></pre>
 <p>The original is kept as <code>docs/subagent_versions/v1_has_a_gap.md</code>.</p>
+<p>Before you copy it, here is what that version changes &mdash; three places, and none of
+them touch the <code>tools:</code> list:</p>
+<table>
+<thead><tr><th style="width:26%">where</th><th>v1 &rarr; v2</th></tr></thead>
+<tbody>
+<tr><td><code>description:</code></td><td>gains a sentence: <em>&ldquo;Reports the measurement&rsquo;s confidence before reporting any label.&rdquo;</em> The description is what the router reads, so the job changes there first.</td></tr>
+<tr><td>the workflow</td><td>one check becomes two, in a stated order: <code>usable</code> false &rarr; stop; <code>low_confidence</code> true &rarr; continue, but carry <code>notes</code> forward and treat everything after it as provisional.</td></tr>
+<tr><td>a new <strong>Reporting</strong> section</td><td>says what to say in each case &mdash; lead with the confidence, not the label; on low confidence, open with <em>&ldquo;This result should not be recorded as a finding&rdquo;</em>; never round a probability into words like &ldquo;almost certainly&rdquo;.</td></tr>
+</tbody>
+</table>
+<p>The gap was never in the permissions. It was in the instructions &mdash; the subagent did
+exactly what it was told, and it was told to check one field.</p>
 <blockquote>
 <p>Version 1 was not carelessly written. It checks a field that <em>sounds</em> like the
 right one. The gap is between a rule that sounds correct and a rule that covers

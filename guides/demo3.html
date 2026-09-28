@@ -193,6 +193,17 @@ never protected — only two of the several routes to it were.</p>
 <p>Copy the second stage over the policy:</p>
 <pre><code class="language-bash">cp docs/permission_stages/stage2_enumerate.json .claude/settings.json
 </code></pre>
+<p>The copy just saves typing &mdash; you can equally open <code>.claude/settings.json</code> and make the change yourself. Three command patterns are added to the deny list:</p>
+<pre><code class="language-diff">  "permissions": {
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
++     "Bash(cat:*)",
++     "Bash(head:*)",
++     "Bash(less:*)"
+    ]
+  }
+</code></pre>
 <p>Restart Claude Code (permission changes are read at startup), then:</p>
 <pre><code class="language-text">/permissions
 </code></pre>
@@ -206,6 +217,18 @@ data/case_mild_injury_histology.pgm — you may use any tool available.
 <code>python3 -c</code>, <code>grep .</code>. Enumerating the bad ones is a game you lose.</p>
 <h2>9. Close it properly</h2>
 <pre><code class="language-bash">cp docs/permission_stages/stage3_closed.json .claude/settings.json
+</code></pre>
+<p>The copy just saves typing &mdash; you can equally open <code>.claude/settings.json</code> and make the change yourself. The three command patterns come out again, and the capability itself goes in:</p>
+<pre><code class="language-diff">  "permissions": {
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
+-     "Bash(cat:*)",
+-     "Bash(head:*)",
+-     "Bash(less:*)"
++     "Bash"
+    ]
+  }
 </code></pre>
 <p>Restart Claude Code and try step 7 again. Now it is refused.</p>
 <p>The difference between stage 2 and stage 3 is the difference between <strong>blocking
@@ -244,6 +267,22 @@ takes effect silently, and nothing warns you what it allowed. Removing rules
 deserves the same care as removing a safety check in code.</p>
 <h2>13. Use <code>ask</code> rather than <code>deny</code></h2>
 <pre><code class="language-bash">cp docs/permission_stages/stage4_ask_and_allow.json .claude/settings.json
+</code></pre>
+<p>The copy just saves typing &mdash; you can equally open <code>.claude/settings.json</code> and make the change yourself. The deny list is untouched; <code>allow</code> and <code>ask</code> are added above it:</p>
+<pre><code class="language-diff">  "permissions": {
++   "allow": [
++     "Read(./previews/**)",
++     "Read(./docs/**)"
++   ],
++   "ask": [
++     "Write(./results/**)"
++   ],
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
+      "Bash"
+    ]
+  }
 </code></pre>
 <p>Restart, then:</p>
 <pre><code class="language-text">Use analyze_tissue on data/case_necrosis_histology.pgm at magnification 20
