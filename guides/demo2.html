@@ -418,8 +418,8 @@ where any value is checked at all.</p>
     return (p.stdout or "") + (("\n[stderr]\n" + p.stderr) if p.stderr else ""), p.returncode != 0
 </code></pre>
 </details>
-<p>Yes &mdash; this is the function that actually does the work. It runs five steps, in this
-order:</p>
+<p><code>call()</code> is the step that actually runs the analysis. It does five things, in
+this order:</p>
 <ol>
 <li><strong>Find the tool</strong> by the name that came in. An unrecognised name stops here.</li>
 <li><strong>Validate the arguments</strong>, using the schema from that tool&rsquo;s entry.</li>
@@ -428,18 +428,31 @@ without running anything.</li>
 <li><strong>Build the command and run it</strong>, capturing whatever the script prints.</li>
 <li><strong>Hand back that text</strong>, plus a true/false flag saying whether it failed.</li>
 </ol>
-<p>Steps 2 and 3 are the whole security model, and it is only an ordering: <strong>the check comes
-before the work.</strong> A version of this function that ran the script first and validated
-afterwards would be useless, even with the identical <code>validate()</code>.</p>
+<p><strong>The order is what protects you</strong>, not the presence of a check. If steps 2 and
+3 came after step 4, then a request with <code>magnification 25</code> would run the analysis
+first and report the problem afterwards &mdash; by which point the wrong numbers exist and
+somebody may already have read them. Here, a bad value produces no run at all.</p>
 <p>Step 4 is the part you would rewrite for your own project. This one shells out to a Python
 script because that is what the tissue analyzer is; an R project would call <code>Rscript</code>,
 a server wrapping a library would just import it and call a function, and a cluster job would
 submit and return an id.</p>
-<p>Step 5 is where the protocol has an opinion. The reply carries the text <em>and</em> an
-<code>isError</code> flag, and a failure is sent as a <strong>normal, successful reply that
-happens to contain a failure message</strong> &mdash; not as a crash. That matters, because it
-means Claude <strong>reads</strong> the refusal and can fix its own arguments and try again. You
-will watch it do exactly that in step 16.</p>
+<p>Step 5 is worth looking at directly, because a refusal and a result come back in the
+<strong>same shape</strong>. Here are both, as the server really sends them:</p>
+<pre><code class="language-json">it worked:
+{"content": [{"type": "text",
+              "text": "{ \"damage_fraction\": 0.476, \"confidence\": 0.95, ... }"}],
+ "isError": false}
+
+it was refused:
+{"content": [{"type": "text",
+              "text": "argument validation failed (nothing was run):
+                       - 'magnification' must be one of [10, 20, 40], got 25"}],
+ "isError": true}
+</code></pre>
+<p>The refusal is not a crash. It is a reply, carrying <strong>text that Claude reads</strong>,
+exactly the way it reads a result &mdash; so Claude can see what was wrong, change 25 to 20, and
+call again on its own. That is what you will watch happen in step 16. Had the failure been sent as
+a protocol-level error instead, Claude would know only that something went wrong, not what.</p>
 
 <details class="code">
 <summary>4. <code>main()</code> &mdash; <em>the protocol.</em> Copy this part verbatim.</summary>
