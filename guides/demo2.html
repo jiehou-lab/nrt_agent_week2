@@ -170,7 +170,8 @@ fold artifact -&gt; plausible class + elevated artifact/edge behavior
 <tr><td><code>args</code></td><td>What to pass it. <code>server.py</code> is relative to the project folder.</td></tr>
 </tbody>
 </table>
-<h3>How Claude Code will use this file</h3>
+<details class="code prose">
+<summary>How Claude Code will use this file</summary>
 <p>When you start <code>claude</code> in this folder in step 9, this file is the reason the two
 tools appear. In order:</p>
 <ol>
@@ -192,6 +193,7 @@ running.</li>
 <p>So <code>.mcp.json</code> is Claude Code&rsquo;s note to itself: <em>this project has a
 server, and here is the command that starts it</em>. <code>server.py</code> never opens the file
 &mdash; it does not need to know it exists.</p>
+</details>
 
 <div class="note">
   <p><strong>Where an agent&rsquo;s role is actually configured.</strong> Four files, and they

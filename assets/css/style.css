@@ -180,3 +180,8 @@ details.code>summary code{font-size:.9em}
 details.code>summary::after{content:" \2014 show the code";color:var(--ink-soft);font-size:.86em}
 details.code[open]>summary::after{content:" \2014 hide"}
 details.code pre{margin:0;border:0;border-top:1px solid var(--rule);border-radius:0 0 var(--radius) var(--radius)}
+details.code.prose>summary::after{content:" \2014 read the walkthrough"}
+details.code.prose[open]>summary::after{content:" \2014 hide"}
+details.code.prose>div,details.code.prose>p,details.code.prose>ol,details.code.prose>ul{margin-left:.95rem;margin-right:.95rem}
+details.code.prose>ol,details.code.prose>ul{padding-left:2.2rem}
+details.code.prose>*:last-child{margin-bottom:1rem}
