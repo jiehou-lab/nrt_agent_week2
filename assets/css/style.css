@@ -190,3 +190,7 @@ details.code.prose.anatomy[open]>summary::after{content:" \2014 hide"}
 details.code.prose>details.code{margin-left:.95rem;margin-right:.95rem}
 details.code.prose>table,details.code.prose>pre,details.code.prose>h4,details.code.prose>figure{margin-left:.95rem;margin-right:.95rem}
 details.code.prose>table{width:calc(100% - 1.9rem)}
+details.code.prose.optional>summary::after{content:" \2014 show the commands"}
+details.code.prose.optional[open]>summary::after{content:" \2014 hide"}
+details.code.prose.optional>summary{font-size:1rem}
+details.code.prose>h3{margin-left:.95rem;margin-right:.95rem}

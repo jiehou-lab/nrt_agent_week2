@@ -544,7 +544,9 @@ out -&gt; {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":
 expect a working server out of it.</p>
 </details>
 <hr />
-<h2>8A. Practice Claude Code MCP management commands</h2>
+<details class="code prose optional">
+<summary><strong>8A. Practice the <code>claude mcp</code> commands</strong> &mdash; optional, and not needed for the demo</summary>
+<p class="muted">Everything the demo needs is already set up by <code>.mcp.json</code>. These are the commands you would use on a project where it is not, or when a server will not connect. Skip straight to step 9 if you would rather stay in Claude Code.</p>
 <p>Before starting the interactive session, work through the MCP-management commands
 from a normal terminal. Do these <strong>in order</strong> — each one sets up the next.</p>
 <h3>1. Look before you touch</h3>
@@ -654,6 +656,7 @@ current session actually has.</p>
 <h3>The lifecycle you just walked through</h3>
 <pre><code class="language-text">inspect -&gt; add (refused, already there) -&gt; remove -&gt; add (works) -&gt; connect -&gt; use tools
 </code></pre>
+</details>
 <hr />
 <h2 class="partmark">Part B — Test inside Claude Code</h2>
 <h2>9. Start Claude Code from the project root</h2>
