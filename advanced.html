@@ -35,10 +35,11 @@
   <div class="wrap">
     <p class="eyebrow">Optional · for later weeks</p>
     <h1>Advanced demos</h1>
-    <p class="lede">Two extra packages, for anyone who wants to go past the four core demos. Neither is
+    <p class="lede">Extra packages for anyone who wants to go past the four core demos. None of them is
     part of a session. <strong>Demo 5</strong> is a worked example of what a final project looks like once
     it has a user interface on the front. <strong>Demo 6</strong> takes the preparation away and hands you
-    an unprepared project &mdash; the situation your own code is in.</p>
+    an unprepared project &mdash; the situation your own code is in. <strong>Demos 7 and 8 are being
+    written</strong> and are described below so you can see where this goes.</p>
     <p class="hero-cta" style="margin-top:1.3rem">
       <a class="btn btn-ghost" href="index.html#demos">← The four core demos</a>
       <a class="btn btn-ghost" href="guides/memory.html">Memory and sessions</a>
@@ -160,6 +161,89 @@
     </div>
   </div>
 
+  <!-- ───────────────────────── DEMO 7 (planned) ───────────────────── -->
+  <div class="level pending">
+    <div class="level-head">
+      <div class="level-num">7</div>
+      <div>
+        <h3>Two agents &mdash; an analyst and a verifier <span class="muted">&middot; in preparation</span></h3>
+        <p>A second subagent whose only job is to disbelieve the first one &mdash; and the discovery that most checkers do not.</p>
+      </div>
+    </div>
+    <div class="level-body">
+      <div>
+        <h4>What you will do</h4>
+        <ul>
+          <li>Add a <code>tissue-verifier</code> subagent beside Demo 4's analyst, and give it the analyst&rsquo;s report to check.</li>
+          <li>Run the fold-artifact slide and watch the verifier <strong>confirm the wrong answer</strong>, confidently.</li>
+          <li>Work out why: it re-asked the model instead of checking the measurement.</li>
+          <li>Rewrite it to check the report&rsquo;s claims against the JSON on disk &mdash; and watch the same slide get caught.</li>
+          <li>Watch the analyst &rarr; verifier hand-off appear in the Demo 5 app&rsquo;s trace panel.</li>
+        </ul>
+        <h4>What it teaches</h4>
+        <ul>
+          <li><strong>Subagents do not talk to each other.</strong> The main agent passes an artifact between them &mdash; which is the real reason results are written to disk.</li>
+          <li>A checker that shares the worker&rsquo;s blind spot returns &ldquo;confirmed&rdquo;. <strong>Voting reduces variance, not bias.</strong></li>
+          <li>A check only helps if it can fail differently from the thing it checks &mdash; so the strong model belongs on the check, not only on the work.</li>
+          <li>Verifier, referee and vote are three different instruments, and they are not interchangeable.</li>
+        </ul>
+      </div>
+      <div class="demo-box">
+        <p class="muted"><strong>Not built yet.</strong> This card describes what is coming, so the
+        design can be argued with before the package exists.</p>
+        <p class="muted">It will build on <a href="guides/demo4.html">Demo 4</a> (subagents) and
+        <a href="guides/demo5.html">Demo 5</a> (the app).</p>
+        <p class="muted">Prompted by a question from Prof. Myryam about how to check accuracy, and by
+        Michael Murillo&rsquo;s suggestion of an adversarial checker.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── DEMO 8 (planned) ───────────────────── -->
+  <div class="level pending">
+    <div class="level-head">
+      <div class="level-num">8</div>
+      <div>
+        <h3>Agentic design patterns <span class="muted">&middot; in preparation</span></h3>
+        <p>The named shapes &mdash; chaining, routing, parallelisation, orchestrator-workers, evaluator-optimiser &mdash; taught against code you have already run.</p>
+      </div>
+    </div>
+    <div class="level-body">
+      <div>
+        <h4>What you will do</h4>
+        <ul>
+          <li>Put each pattern next to a demo you already have: Demo 1&rarr;2 is <em>prompt chaining</em>, Demo 4 is <em>orchestrator-workers</em>, Demo 7 is <em>evaluator-optimiser</em>.</li>
+          <li>Decide, for your own project, whether you need an <strong>agent</strong> at all or a <strong>workflow</strong> &mdash; a fixed sequence of steps with a model inside it.</li>
+          <li>Work through where each pattern fails, and what it costs in latency and tokens.</li>
+        </ul>
+        <h4>What it teaches</h4>
+        <ul>
+          <li>Most research work wants a workflow, not an agent. Patterns are for deciding which, not for collecting.</li>
+          <li>Elaboration usually arrives in the wrong place: more agents doing the work, still nobody checking it.</li>
+          <li>A vocabulary for describing your design to a collaborator &mdash; and for reading other people&rsquo;s.</li>
+        </ul>
+      </div>
+      <div class="demo-box">
+        <p class="muted"><strong>Not built yet.</strong> Likely a reference page rather than a package,
+        because the patterns land better against code you recognise than as new downloads.</p>
+        <p class="muted">Built on:<br>
+        <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building effective agents</a> (Anthropic)<br>
+        <a href="https://learn.deeplearning.ai/courses/agentic-ai/lesson/rm9bg7/agentic-design-patterns" target="_blank" rel="noopener">Agentic design patterns</a> (DeepLearning.AI)</p>
+        <p class="muted">The eight design questions in <a href="guides/demo4.html">Demo 4 &sect;2A</a> are a first pass at this.</p>
+      </div>
+    </div>
+  </div>
+
+</section>
+<section id="reference">
+  <h2>Reference</h2>
+  <div class="note">
+    <p><strong>Memory and sessions.</strong> The most common question after a first week with Claude
+    Code is why it &ldquo;forgets everything&rdquo; on exit. Three different systems get called memory
+    &mdash; the conversation, <code>CLAUDE.md</code>, and auto memory &mdash; and only one of them is
+    the one you usually want.</p>
+    <p><a href="guides/memory.html">Memory and sessions &rarr;</a></p>
+  </div>
 </section>
 
 </main>
