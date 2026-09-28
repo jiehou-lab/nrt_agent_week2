@@ -345,7 +345,7 @@ needs into the entry &mdash; a working directory, a queue name, a container imag
 only those three across.</p>
 
 <details class="code">
-<summary>2. <code>validate()</code> &mdash; <em>nothing in MCP requires this.</em> Demo 1 is why it exists.</summary>
+<summary>2. <code>validate()</code> &mdash; <em>the gatekeeper.</em> Every argument is checked here before anything runs.</summary>
 <pre><code class="language-python">def validate(schema, args):
     errs, props = [], schema.get("properties", {})
     for k in schema.get("required", []):
@@ -368,16 +368,37 @@ only those three across.</p>
     return errs
 </code></pre>
 </details>
-<p>There is no validation step in MCP. <code>inputSchema</code> is published to the client as a
-<em>description</em>; a good client uses it to steer the model, but nothing guarantees that the
-arguments which actually arrive satisfy it. A different client, a different model, or a raw
-JSON-RPC call &mdash; you will send one by hand in step 15 &mdash; can pass whatever it likes.</p>
-<p>So the refusals you are about to see in steps 16 and 17 are not &ldquo;MCP working&rdquo;.
-They are <em>these thirty lines</em> working. Delete <code>validate()</code> and the server still
-speaks perfect MCP; it simply accepts <code>magnification 25</code> and
-<code>damage_threshold_fraction 45</code>, runs, and returns a confident number &mdash; which is
-Demo 1 again, with more ceremony. <strong>If you carry one function from this file into your own
-project, carry this one.</strong></p>
+<p><code>validate()</code> takes the arguments that arrived and the tool&rsquo;s own
+<code>inputSchema</code>, and returns a list of everything wrong with them. If that list is not
+empty, <code>call()</code> stops and nothing is run. It checks four things: that every required
+argument is present, that there are no argument names it does not recognise, that each value is
+the right type, and that each value is inside the allowed set or range.</p>
+<p>These are its real answers &mdash; the exact strings Claude gets back:</p>
+<table>
+<thead><tr><th style="width:38%">what arrives</th><th>what <code>validate()</code> returns</th></tr></thead>
+<tbody>
+<tr><td><code>magnification: 25</code></td><td><code>'magnification' must be one of [10, 20, 40], got 25</code></td></tr>
+<tr><td><code>damage_threshold_fraction: 45</code></td><td><code>'damage_threshold_fraction' must be &lt;= 1, got 45 (did you mean 0.45?)</code></td></tr>
+<tr><td>no <code>slide</code> at all</td><td><code>missing required argument 'slide'</code></td></tr>
+<tr><td><code>threshold: 0.4</code></td><td><code>unknown argument 'threshold' (allowed: slide, magnification, damage_threshold_fraction, out)</code></td></tr>
+</tbody>
+</table>
+<p>Notice the second one. The server does not quietly fix <code>45</code> into <code>0.45</code>
+&mdash; it refuses, and says what it suspects you meant. Guessing is how Demo 1 produced a
+confident wrong answer.</p>
+<h4>Why check again, when the schema was already published?</h4>
+<p>Because publishing a schema and enforcing one are different acts. <code>inputSchema</code> goes
+out to Claude as a <em>description</em> &mdash; it is what lets Claude fill the fields in
+correctly, and most of the time it does. But it is a description, not a lock on the door. The
+arguments that actually arrive at the server could come from a different model, a different
+client, or a person typing JSON by hand, which is exactly what you will do in step 15. Validation
+is the check on <strong>the values that really turned up</strong>, and the server is the only
+place that check can be made.</p>
+<p>So the refusals in steps 16 and 17 are not &ldquo;MCP working&rdquo; &mdash; they are
+<em>this function</em> working. Delete it and the server still speaks perfect MCP; it just accepts
+<code>magnification 25</code>, runs, and returns a confident number, which is Demo 1 again with
+more ceremony. <strong>If you carry one function from this file into your own project, carry this
+one.</strong></p>
 
 <details class="code">
 <summary>3. <code>call()</code> &mdash; <em>yours</em>, except the shape of what it returns.</summary>
