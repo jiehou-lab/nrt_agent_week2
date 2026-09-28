@@ -527,7 +527,6 @@ out -&gt; {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":
         "isError":false}}
 </code></pre>
 <p class="muted">Line breaks added for reading &mdash; on the wire each message is one line. The second message has no <code>id</code>, which is how a client says &ldquo;no reply needed&rdquo;, so it gets none.</p>
-<p>One practical consequence, worth knowing before you write your own: <strong>the only thing that may ever appear on standard output is one of these replies.</strong> A stray <code>print()</code> puts a line into the stream that the client cannot parse, and the symptom is a server that seems to hang for no reason. Send debug output to <code>stderr</code> instead.</p>
 
 <h4>So how much would you change for your own project?</h4>
 <table>
