@@ -185,3 +185,8 @@ details.code.prose[open]>summary::after{content:" \2014 hide"}
 details.code.prose>div,details.code.prose>p,details.code.prose>ol,details.code.prose>ul{margin-left:.95rem;margin-right:.95rem}
 details.code.prose>ol,details.code.prose>ul{padding-left:2.2rem}
 details.code.prose>*:last-child{margin-bottom:1rem}
+details.code.prose.anatomy>summary::after{content:" \2014 read the anatomy"}
+details.code.prose.anatomy[open]>summary::after{content:" \2014 hide"}
+details.code.prose>details.code{margin-left:.95rem;margin-right:.95rem}
+details.code.prose>table,details.code.prose>pre,details.code.prose>h4,details.code.prose>figure{margin-left:.95rem;margin-right:.95rem}
+details.code.prose>table{width:calc(100% - 1.9rem)}
