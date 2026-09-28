@@ -280,13 +280,24 @@ being afraid to touch it.</p>
 ]
 </code></pre>
 </details>
-<p>The <em>name</em> <code>TOOLS</code> means nothing to MCP &mdash; it is an ordinary Python
-variable. What the protocol fixes is the JSON that <code>tools/list</code> hands back: every
-entry needs a <code>name</code> and an <code>inputSchema</code>, and the schema must be
-JSON Schema. <code>description</code> is optional in the specification and essential in
-practice: it is not a comment, it is the text Claude reads when deciding whether this is the
-right tool and what to put in each field. &ldquo;a FRACTION between 0 and 1, never a
-percentage&rdquo; is written for a reader, and the reader is the model.</p>
+<p><code>TOOLS</code> is <strong>where this server keeps the schema for each of its
+tools</strong> &mdash; one entry per tool, holding its name, its description, and its
+<code>inputSchema</code>. When Claude asks what tools exist, the server walks this list and sends
+back what it finds.</p>
+<p>Keeping them in a Python list called <code>TOOLS</code> is just this file&rsquo;s way of
+storing them, and a literal is the easiest thing to read. <strong>You could keep exactly the same
+entries in a JSON file</strong> beside the server and load them at startup:</p>
+<pre><code class="language-python">TOOLS = json.loads((ROOT / "tools.json").read_text())
+</code></pre>
+<p>Nothing downstream would change &mdash; and on a larger project that is often the better
+arrangement, because the contract becomes a file your collaborators can read and review without
+opening any Python. What the protocol fixes is the JSON that goes <em>out</em>, not where you kept
+it: each published entry needs a <code>name</code> and an <code>inputSchema</code>, and the schema
+must be real JSON Schema.</p>
+<p><code>description</code> is optional in the specification and essential in practice: it is not
+a comment, it is the text Claude reads when deciding whether this is the right tool and what to put
+in each field. &ldquo;a FRACTION between 0 and 1, never a percentage&rdquo; is written for a
+reader, and the reader is the model.</p>
 <p>Now the last two keys, <code>script</code> and <code>flags</code>. These two
 <strong>stay on the server&rsquo;s side of the arrow.</strong> They tell <code>server.py</code>
 which program to run and which command-line flag each argument becomes &mdash;
