@@ -485,6 +485,17 @@ each line is one JSON message. It looks at the <code>method</code> field to see 
 questions is being asked, works out the answer, and prints it back as one line of JSON carrying
 the same <code>id</code> &mdash; so the client knows which question this answers. Then it waits
 for the next line. That is the entire program.</p>
+<p><strong>Where do those three names come from?</strong> <code>initialize</code>,
+<code>tools/list</code> and <code>tools/call</code> are fixed by the MCP specification &mdash; the
+shared vocabulary every MCP client and every MCP server use to talk to each other. Claude Code
+sends them down the pipe on its own; <strong>you never type them anywhere.</strong>
+<code>server.py</code> handles exactly those three names because the specification says a tool
+server must. Had the specification called them <code>hello</code>, <code>list_tools</code> and
+<code>run_tool</code>, this code would say that instead.</p>
+<p>They are not commands. <code>claude mcp list</code> and the other <code>claude mcp</code>
+commands are things <em>you</em> type, to manage which servers are registered; these three are
+messages passed between two running programs. The one time you will type them yourself is step 15,
+where you play the client by hand.</p>
 <p>Here is a real session with this server. Every line below came out of running
 <code>server.py</code> and feeding it messages. <code>in &lt;-</code> is what the client sent;
 <code>out -&gt;</code> is what the server printed back.</p>
