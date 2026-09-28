@@ -1,0 +1,17 @@
+{
+  "_comment": "STAGE 4 - all three modes. deny beats ask beats allow.",
+  "permissions": {
+    "allow": [
+      "Read(./previews/**)",
+      "Read(./docs/**)"
+    ],
+    "ask": [
+      "Write(./results/**)"
+    ],
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
+      "Bash"
+    ]
+  }
+}

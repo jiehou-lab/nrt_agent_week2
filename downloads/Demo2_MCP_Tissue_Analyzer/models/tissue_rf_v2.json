@@ -1,0 +1,9 @@
+{
+  "name": "tissue_rf_v2",
+  "trained": "2026-03-14",
+  "n_training_slides": 1200,
+  "classes": ["normal", "mild_injury", "necrosis"],
+  "decision_boundaries": {"normal_max": 0.15, "mild_max": 0.35},
+  "calibration": {"slope": 0.30, "intercept": 0.80, "cap": 0.97},
+  "training_notes": "clean slides only; folds, tears and pen marks excluded"
+}

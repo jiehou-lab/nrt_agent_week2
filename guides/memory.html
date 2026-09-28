@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memory and sessions — Agentic AI Week 2</title>
+<meta name="description" content="What Claude Code remembers when you quit, what it does not, and the three different things people mean by memory.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>M</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">REFERENCE &mdash; NOT PART OF A DEMO</p>
+    <h1>Memory and sessions</h1>
+    <p class="lede">&ldquo;Claude Code forgets everything when I quit.&rdquo; It does not, quite &mdash;
+    but what it keeps is not the thing most people expect. Three different systems get called
+    &ldquo;memory&rdquo;, and knowing which one you want is the whole answer.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn btn-ghost" href="../index.html#demos">The four core demos</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../index.html">&larr; Back to the course page</a>
+
+<h2>Three things people call memory</h2>
+<table>
+<thead><tr><th style="width:24%">what</th><th style="width:20%">who writes it</th><th>how long it lasts</th></tr></thead>
+<tbody>
+<tr><td><strong>The conversation</strong><br><span class="muted">context</span></td><td>the session</td><td>Until you quit. It is <em>saved</em>, and you can reopen it &mdash; but it is not carried into a new session automatically.</td></tr>
+<tr><td><strong><code>CLAUDE.md</code></strong><br><span class="muted">project memory</span></td><td><strong>you</strong></td><td>Forever. Read at the start of every session in that project. This is the one to use when you want something remembered on purpose.</td></tr>
+<tr><td><strong>Auto memory</strong></td><td><strong>Claude</strong></td><td>Across sessions in that project, on that machine. On by default. Claude writes notes to itself from corrections and patterns it notices.</td></tr>
+</tbody>
+</table>
+<p>The complaint &mdash; &ldquo;it forgot&rdquo; &mdash; is almost always about the first row. The fix is
+usually the second.</p>
+
+<hr />
+
+<h2>Picking up where you left off</h2>
+<p>From the folder you were working in:</p>
+<pre><code class="language-bash">claude --continue        # reopen the most recent conversation in this directory
+claude --resume          # open a picker of this project's conversations
+claude --resume &lt;name&gt;   # or by session name / id, from anywhere
+</code></pre>
+<p>Inside a running session, <code>/resume</code> opens the same picker and switches conversations.</p>
+<p>Transcripts live in <code>~/.claude/projects/&lt;project&gt;/&lt;session-id&gt;.jsonl</code>, keyed to the
+project directory &mdash; which is why <code>--continue</code> in a different folder does not find the
+session you want. All worktrees of one repository share a directory.</p>
+
+<details class="code prose">
+<summary>What a resumed session brings back &mdash; and what it does not</summary>
+<table>
+<thead><tr><th style="width:50%">comes back</th><th>does not</th></tr></thead>
+<tbody>
+<tr><td>The conversation history, including tool calls and their results</td><td><strong>The context.</strong> The transcript is there, but files are not re-read for you &mdash; Claude fetches them again when it needs them</td></tr>
+<tr><td>The model, and the agent if you started with <code>--agent</code></td><td><strong>&ldquo;Allow for this session&rdquo; permission grants.</strong> You approve them again, unless you wrote them into a settings file</td></tr>
+<tr><td><code>CLAUDE.md</code> and auto memory</td><td><strong>MCP trust choices</strong> &mdash; the &ldquo;New MCP server found in this project&rdquo; answer</td></tr>
+<tr><td>Unexpired scheduled tasks</td><td>Flags you passed on the command line: <code>--mcp-config</code>, <code>--settings</code>, <code>--add-dir</code></td></tr>
+</tbody>
+</table>
+<p class="muted">Sessions started with <code>claude -p</code> are hidden from the picker and from
+<code>--continue</code>, but can still be resumed by session id.</p>
+</details>
+
+<hr />
+
+<h2>The memory you write: <code>CLAUDE.md</code></h2>
+<p>A plain markdown file, read into context at the start of every session. If you find yourself
+telling Claude the same thing every morning &mdash; which script is the real entry point, what the
+units are, which directory never to touch &mdash; that sentence belongs here instead.</p>
+<p><code>/memory</code> lists every memory file in play and opens them for editing.</p>
+
+<details class="code prose">
+<summary>The four places a <code>CLAUDE.md</code> can live</summary>
+<table>
+<thead><tr><th style="width:34%">file</th><th style="width:22%">who sees it</th><th>use it for</th></tr></thead>
+<tbody>
+<tr><td>managed policy<br><span class="muted">(set by your organisation)</span></td><td>everyone in the org</td><td>rules you do not control</td></tr>
+<tr><td><code>~/.claude/CLAUDE.md</code></td><td>you, in every project</td><td>personal habits &mdash; how you like things explained</td></tr>
+<tr><td><code>./CLAUDE.md</code><br><span class="muted">or <code>./.claude/CLAUDE.md</code></span></td><td>the whole team, through git</td><td><strong>the project's facts.</strong> This is the useful one</td></tr>
+<tr><td><code>./CLAUDE.local.md</code></td><td>you, in this project</td><td>your own notes, not committed</td></tr>
+</tbody>
+</table>
+<p>They <strong>combine</strong> rather than override &mdash; all of them are loaded, broadest first, so
+the most specific file is read last. A <code>CLAUDE.md</code> in a subdirectory loads only when Claude
+opens a file there.</p>
+</details>
+
+<hr />
+
+<h2>The memory Claude writes: auto memory</h2>
+<p>Separate from <code>CLAUDE.md</code>, on by default, and the reason a new session sometimes
+<em>does</em> seem to know things. Claude keeps notes to itself &mdash; corrections you made, how you
+work, what the project is about &mdash; in
+<code>~/.claude/projects/&lt;project&gt;/memory/</code>, and reads an index of them at startup.</p>
+<div class="note">
+  <p>Three properties worth knowing before you rely on it:</p>
+  <ul>
+    <li><strong>It is machine-local.</strong> It does not travel with the repository and your
+    collaborators do not have it. Anything the team needs belongs in <code>CLAUDE.md</code>.</li>
+    <li><strong>Subagents do not get it.</strong> A subagent starts without the main conversation's
+    auto memory &mdash; see <a href="demo4.html">Demo 4</a>.</li>
+    <li><strong>You can turn it off</strong> from <code>/memory</code>, which is what you want before
+    measuring anything.</li>
+  </ul>
+</div>
+
+<hr />
+
+<h2>Context is not memory</h2>
+<p><code>/compact</code> replaces the conversation so far with a summary, to buy room. It changes what
+you are <em>carrying</em>; it does not touch what is <em>written down</em>. <code>CLAUDE.md</code> is
+re-read from disk afterwards and auto memory is untouched &mdash; but an instruction you only ever
+said out loud in the conversation may not survive.</p>
+<blockquote>
+<p>If it matters after a compaction, it belongs in a file.</p>
+</blockquote>
+
+<hr />
+
+<h2>What to do, by what you actually want</h2>
+<table>
+<thead><tr><th style="width:44%">you want</th><th>do this</th></tr></thead>
+<tbody>
+<tr><td>To carry on this afternoon from this morning</td><td><code>claude --continue</code>, from the same folder</td></tr>
+<tr><td>A particular conversation from last week</td><td><code>claude --resume</code> and pick it</td></tr>
+<tr><td>Claude to always know something about this project</td><td>Write it in <code>./CLAUDE.md</code> and commit it</td></tr>
+<tr><td>To stop re-explaining a personal preference</td><td><code>~/.claude/CLAUDE.md</code></td></tr>
+<tr><td>To see what is being remembered at all</td><td><code>/memory</code></td></tr>
+<tr><td>A clean room &mdash; no memory, no history</td><td>A new session in a fresh directory, with auto memory off</td></tr>
+</tbody>
+</table>
+
+<hr />
+
+<h2>Cowork and Claude Code are not doing the same thing</h2>
+<p>Cowork keeps a <strong>session</strong> alive: one long conversation with its own workspace, which
+is why it feels continuous. Claude Code keeps a <strong>project</strong>: conversations are saved per
+folder and reopened on request, and the things meant to persist are files in the repository that
+your collaborators also get.</p>
+<p>That is a real design difference, not a missing feature. Cowork remembers what happened; Claude
+Code remembers what you wrote down. The second is the one that survives a new laptop, a new team
+member, and six months.</p>
+
+<div class="note">
+  <p><strong>For the demos on this site.</strong> If you are comparing token counts between Demo 1
+  and Demo 2, or checking whether a refusal came from the schema rather than from something Claude
+  remembered, start from a clean room &mdash; a fresh directory, auto memory off. Memory is a
+  feature everywhere except in a measurement.</p>
+</div>
+
+<nav class="guidenav">
+  <a class="btn" href="../index.html#demos">The four core demos</a>
+  <a class="btn btn-ghost" href="demo2.html">Demo 2</a>
+  <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">Behaviour described here was checked against the Claude Code documentation in
+    September 2026. Commands change; <code>/memory</code> and <code>--help</code> are the truth for
+    your version.</p>
+  </div>
+</footer>
+
+</body>
+</html>

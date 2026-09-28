@@ -1,0 +1,10 @@
+{
+  "_comment": "STAGE 3 - stop enumerating. Remove the capability instead.",
+  "permissions": {
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
+      "Bash"
+    ]
+  }
+}
