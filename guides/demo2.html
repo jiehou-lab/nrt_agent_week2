@@ -394,11 +394,13 @@ arguments that actually arrive at the server could come from a different model, 
 client, or a person typing JSON by hand, which is exactly what you will do in step 15. Validation
 is the check on <strong>the values that really turned up</strong>, and the server is the only
 place that check can be made.</p>
-<p>So the refusals in steps 16 and 17 are not &ldquo;MCP working&rdquo; &mdash; they are
-<em>this function</em> working. Delete it and the server still speaks perfect MCP; it just accepts
-<code>magnification 25</code>, runs, and returns a confident number, which is Demo 1 again with
-more ceremony. <strong>If you carry one function from this file into your own project, carry this
-one.</strong></p>
+<p><strong>A way to see how much rests on it: imagine deleting it.</strong> The server would
+still start, still connect, still list its two tools &mdash; nothing would look broken. It would
+simply accept <code>magnification 25</code>, run the script, and hand back a confident number.
+Nothing else in the chain would have stopped it, because these thirty lines are the only place
+where any value is checked at all.</p>
+<p>That is the difference between Demo 1 and Demo 2, and it is thirty lines wide.
+<strong>If you carry one function from this file into your own project, carry this one.</strong></p>
 
 <details class="code">
 <summary>3. <code>call()</code> &mdash; <em>yours</em>, except the shape of what it returns.</summary>
