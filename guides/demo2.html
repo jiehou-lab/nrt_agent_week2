@@ -403,7 +403,7 @@ where any value is checked at all.</p>
 <strong>If you carry one function from this file into your own project, carry this one.</strong></p>
 
 <details class="code">
-<summary>3. <code>call()</code> &mdash; <em>yours</em>, except the shape of what it returns.</summary>
+<summary>3. <code>call()</code> &mdash; <em>the one that actually runs the work.</em></summary>
 <pre><code class="language-python">def call(name, args):
     spec = BY_NAME.get(name)
     if not spec:
@@ -418,15 +418,28 @@ where any value is checked at all.</p>
     return (p.stdout or "") + (("\n[stderr]\n" + p.stderr) if p.stderr else ""), p.returncode != 0
 </code></pre>
 </details>
-<p>Validate first, and <strong>return before anything runs</strong> if validation failed &mdash;
-that ordering is the entire security model. After that it builds a command line and shells out,
-but nothing about <em>that</em> is MCP: an R project would call <code>Rscript</code>, and a server
-wrapping a library would import it and call a function directly.</p>
-<p>What the protocol does fix is the reply. <code>tools/call</code> returns content as a list of
-typed blocks, and a failure is reported with <code>isError: true</code> <em>inside a normal
-result</em> rather than as a JSON-RPC error. That is deliberate: it means the model <strong>sees
-the failure text</strong> and can correct itself, which is exactly what you will watch happen in
-step 16.</p>
+<p>Yes &mdash; this is the function that actually does the work. It runs five steps, in this
+order:</p>
+<ol>
+<li><strong>Find the tool</strong> by the name that came in. An unrecognised name stops here.</li>
+<li><strong>Validate the arguments</strong>, using the schema from that tool&rsquo;s entry.</li>
+<li><strong>If validation failed, return now</strong> &mdash; with the list of problems, and
+without running anything.</li>
+<li><strong>Build the command and run it</strong>, capturing whatever the script prints.</li>
+<li><strong>Hand back that text</strong>, plus a true/false flag saying whether it failed.</li>
+</ol>
+<p>Steps 2 and 3 are the whole security model, and it is only an ordering: <strong>the check comes
+before the work.</strong> A version of this function that ran the script first and validated
+afterwards would be useless, even with the identical <code>validate()</code>.</p>
+<p>Step 4 is the part you would rewrite for your own project. This one shells out to a Python
+script because that is what the tissue analyzer is; an R project would call <code>Rscript</code>,
+a server wrapping a library would just import it and call a function, and a cluster job would
+submit and return an id.</p>
+<p>Step 5 is where the protocol has an opinion. The reply carries the text <em>and</em> an
+<code>isError</code> flag, and a failure is sent as a <strong>normal, successful reply that
+happens to contain a failure message</strong> &mdash; not as a crash. That matters, because it
+means Claude <strong>reads</strong> the refusal and can fix its own arguments and try again. You
+will watch it do exactly that in step 16.</p>
 
 <details class="code">
 <summary>4. <code>main()</code> &mdash; <em>the protocol.</em> Copy this part verbatim.</summary>
