@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 7 · Analyst and verifier — Agentic AI Week 2</title>
+<meta name="description" content="Two scoped subagents: one measures, one checks. The careful verifier confirms a wrong answer; the narrower one rejects it. A check only helps if it can fail differently.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>7</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 7 &middot; ADVANCED &mdash; A CHECK THAT CAN FAIL DIFFERENTLY</p>
+    <h1>Analyst and verifier</h1>
+    <p class="lede">One agent does the work, another decides whether it may be recorded. The rigorous version of the checker confirms a confidently wrong answer &mdash; and the version that can do less catches it.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo7_two_agent_verifier.zip" target="_blank" rel="noopener">Download Demo 7 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo6.html">&larr; Demo 6</a>
+      <a class="btn btn-ghost" href="demo8.html">Demo 8 &nbsp;&rarr;</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<p>Package:</p>
+<p><code>Demo7_two_agent_verifier.zip</code></p>
+<p>This is Demo 5's app and server with two scoped subagents added. One does the
+work; the other decides whether the work may be recorded.</p>
+<pre><code class="language-text">main agent  ──►  tissue-analyst    measures, labels, writes a report
+            ──►  tissue-verifier   says whether that report may be recorded
+</code></pre>
+<p>The subagents never speak to each other. The main agent runs the first, takes
+its report, and hands that report to the second — which is the only way two
+agents ever communicate, and the reason results are written to files.</p>
+<div class="note">
+<p><strong>This demo assumes Demos 2, 4 and 5.</strong> You need the MCP server
+from Demo 2, the subagent file format from Demo 4, and the app from Demo 5. If
+any of that is unfamiliar, those three first.</p>
+</div>
+
+<hr />
+<h2>1. Unzip and look at who is in the room</h2>
+<pre><code class="language-bash">unzip Demo7_two_agent_verifier.zip
+cd Demo7_two_agent_verifier
+ls .claude/agents/
+</code></pre>
+<pre><code class="language-text">tissue-analyst.md
+tissue-verifier.md
+</code></pre>
+<p>Two agent files, and a third MCP tool the server did not have before:</p>
+<pre><code class="language-bash">grep '&quot;name&quot;' server.py
+</code></pre>
+<pre><code class="language-text">analyze_tissue
+classify_tissue
+check_report        &lt;- new
+</code></pre>
+<hr />
+<h2>2. Run the case that matters</h2>
+<p>Start Claude Code and ask for both agents by name:</p>
+<pre><code class="language-bash">claude
+</code></pre>
+<pre><code class="language-text">Use the tissue-analyst subagent to analyze
+data/case_fold_artifact_histology.pgm at 20x magnification with
+damage_threshold_fraction 0.45.
+Then use the tissue-verifier subagent to check the analyst's report
+before I record it as a finding.
+</code></pre>
+<p>This is the fold-artifact slide from Demo 1 — the one where a photographic
+defect gets a confident clinical label. Watch both agents run.</p>
+<p><strong>Expect the verifier to confirm it.</strong></p>
+<pre><code class="language-text">analyst   mild_injury, probability 0.70
+verifier  CONFIRMED - independent re-run agrees: mild_injury, 0.70
+</code></pre>
+<hr />
+<h2>3. Read what the verifier actually did</h2>
+<p>Ask the main agent:</p>
+<pre><code class="language-text">What tools did the verifier call, and with what arguments?
+</code></pre>
+<p>It called <code>analyze_tissue</code> and <code>classify_tissue</code> — <strong>the same two tools, with
+the same arguments, as the analyst.</strong> It re-ran the work and got the same
+answer, which it reported as independent agreement.</p>
+<p>Open the file and see why that was inevitable:</p>
+<pre><code class="language-bash">cat .claude/agents/tissue-verifier.md
+</code></pre>
+<p>Its <code>tools:</code> list is the analyst's list. Its instructions say <em>"run the analysis
+yourself and compare."</em> It is careful, rigorous, and does exactly what it was
+told. It is also structurally incapable of disagreeing, because it asks the same
+classifier the same question — and that classifier is confidently wrong about
+this slide every single time.</p>
+<blockquote>
+<p>A checker that can redo the work will usually agree with the work.
+Voting reduces variance. It does nothing about bias.</p>
+</blockquote>
+<p>Notice what the verifier never looked at: <strong>what the report actually said.</strong> It
+compared its own answer to the analyst's answer. Nobody checked whether the
+report disclosed that <code>low_confidence</code> was true.</p>
+<hr />
+<h2>4. Install the other verifier</h2>
+<pre><code class="language-bash">cp docs/verifier_versions/v2_checks_the_file.md .claude/agents/tissue-verifier.md
+</code></pre>
+<p>Restart Claude Code and run step 2 again, unchanged.</p>
+<pre><code class="language-text">verifier  REJECTED - failed: confidence_disclosed_first, inside_classifier_domain
+</code></pre>
+<p>Same slide, same analyst, same report. Different checker.</p>
+<hr />
+<h2>5. What changed</h2>
+<p>The two verifiers differ in one line of frontmatter and the instructions that
+follow from it.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>v1</th>
+<th>v2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tools:</code></td>
+<td><code>analyze_tissue</code>, <code>classify_tissue</code></td>
+<td><code>check_report</code>, and nothing else</td>
+</tr>
+<tr>
+<td>can it run the analysis?</td>
+<td>yes</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>what it compares</td>
+<td>its answer vs the analyst's answer</td>
+<td>the report's claims vs the files on disk</td>
+</tr>
+<tr>
+<td>on the fold slide</td>
+<td>confirmed</td>
+<td>rejected</td>
+</tr>
+</tbody>
+</table>
+<p>v2 cannot form an opinion. It has one tool, and that tool does arithmetic:</p>
+<pre><code class="language-text">label_matches_file          the label in the report is the label in the file
+probability_matches_file    the probability matches, to 0.005
+measurement_was_usable      an unusable measurement gets no label at all
+confidence_disclosed_first  low_confidence true -&gt; the report must say so first
+inside_classifier_domain    low_confidence true -&gt; the model card excludes this slide
+</code></pre>
+<p><code>check_report</code> has no model in it and cannot be persuaded. That is the point of
+moving the check into a tool rather than into a prompt.</p>
+<hr />
+<h2>6. The check that cannot be worded around</h2>
+<p>Run the analyst again and tell it to lead with the caveat this time:</p>
+<pre><code class="language-text">Use the tissue-analyst subagent on the same slide, and have it state the
+confidence problem before the label. Then verify it again.
+</code></pre>
+<p><code>confidence_disclosed_first</code> now passes. <code>inside_classifier_domain</code> still fails.</p>
+<p>That is not a bug. The classifier's own model card says <strong>clean slides only;
+folds, tears and pen marks excluded</strong>. A label on this slide is outside what the
+model was trained on, however carefully the sentence is phrased. The honest
+report is that this slide cannot be classified by this model — not a
+well-hedged label.</p>
+<blockquote>
+<p>Better wording does not move a case back inside a model's domain.</p>
+</blockquote>
+<hr />
+<h2>7. See it in the app</h2>
+<pre><code class="language-bash">python3 -m venv .demo_venv
+source .demo_venv/bin/activate
+pip install -r requirements.txt
+./run.sh
+</code></pre>
+<p>Open the <strong>Path C — analyst + verifier</strong> tab. It shows which verifier is
+currently installed, runs both agents, and splits the trace into lanes:</p>
+<pre><code class="language-text">main agent        2 tool calls     started the two subagents
+tissue-analyst    2 tool calls     analyze_tissue, classify_tissue
+tissue-verifier   2 tool calls     analyze_tissue, classify_tissue   &lt;- v1
+</code></pre>
+<p>With v1 installed, the two lower lanes are identical. That picture is the whole
+demo.</p>
+<p>The lanes come from one field. In <code>--output-format stream-json</code>, every message a
+subagent produces carries <code>parent_tool_use_id</code> — the id of the Agent call that
+started it; main-conversation messages carry <code>null</code>. <code>stream_parse.agent_lanes()</code>
+groups on exactly that.</p>
+<p><strong>Replay a recorded run (no model)</strong> renders a saved trace with real tool
+numbers, so the demo works with no Claude Code and no tokens — useful in a
+lecture.</p>
+<hr />
+<h2>8. Design questions for your own project</h2>
+<table>
+<thead>
+<tr>
+<th>question</th>
+<th>what Demo 7 answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Where should the check live?</td>
+<td>In a tool, if it can be arithmetic. A prompt that says "be rigorous" is not a check.</td>
+</tr>
+<tr>
+<td>What should the checker be allowed to see?</td>
+<td>Something <strong>different</strong> from what the worker saw. v2 is weaker than v1 in capability and stronger as a check, because its narrower tool list is what forces it to look at the report.</td>
+</tr>
+<tr>
+<td>Verifier, referee or vote?</td>
+<td>A verifier compares a claim to a source. A referee decides between two disagreeing agents. A vote takes n samples. Only the first one catches a systematic error.</td>
+</tr>
+<tr>
+<td>Which model for the checker?</td>
+<td>The strongest one you have. The check is exactly where you are paying for accuracy — and note that v2 barely needs a model at all, because the judgement is in the tool.</td>
+</tr>
+<tr>
+<td>How do agents share data?</td>
+<td>They do not. The main agent passes an artifact — here, two file paths — which is why the analyst writes <code>out</code> files rather than describing its numbers in prose.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>9. What to take away</h2>
+<ol>
+<li><strong>"Independent" is not the same as "different".</strong> v1 was genuinely
+   independent — its own context, its own tool calls, no sight of the analyst's
+   work — and still agreed, because independence of <em>process</em> does not help when
+   the error is in the <em>model</em>.</li>
+<li><strong>A narrower agent can be a stronger check.</strong> v2 can do less than v1 by every
+   measure, and catches what v1 misses.</li>
+<li><strong>Put the rule where it cannot be talked out of.</strong> <code>check_report</code> is thirty
+   lines of comparison. It is the same lesson as Demo 2's <code>validate()</code>, one level
+   up: the model proposes, and something that is not a model disposes.</li>
+</ol>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo5.html">&larr; Demo 5</a>
+  <a class="btn btn-ghost" href="demo8.html">Next: Demo 8 &mdash; design patterns &rarr;</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">These are synthetic teaching images, not patient data. The classifier is a
+    stand-in and is not suitable for any clinical or research use.</p>
+  </div>
+</footer>
+
+</body>
+</html>

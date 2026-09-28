@@ -38,8 +38,9 @@
     <p class="lede">Extra packages for anyone who wants to go past the four core demos. None of them is
     part of a session. <strong>Demo 5</strong> is a worked example of what a final project looks like once
     it has a user interface on the front. <strong>Demo 6</strong> takes the preparation away and hands you
-    an unprepared project &mdash; the situation your own code is in. <strong>Demos 7 and 8 are being
-    written</strong> and are described below so you can see where this goes.</p>
+    an unprepared project &mdash; the situation your own code is in. <strong>Demo 7</strong> adds a second
+    agent whose only job is to disbelieve the first one. <strong>Demo 8</strong> is a map rather than
+    a download: the named patterns, against the demos you have already run.</p>
     <p class="hero-cta" style="margin-top:1.3rem">
       <a class="btn btn-ghost" href="index.html#demos">← The four core demos</a>
       <a class="btn btn-ghost" href="guides/memory.html">Memory and sessions</a>
@@ -65,6 +66,8 @@
     <tr><td><strong>A research workflow exposed as a capability</strong></td><td>Demos 1&ndash;4 &mdash; define the inputs, ranges, outputs and permissions for one thing you already run.</td></tr>
     <tr><td><strong>A workflow plus a user-facing application</strong></td><td><strong>Demo 5</strong> &mdash; a form and a text box over the same server, and an explicit answer to which one each control should be.</td></tr>
     <tr><td><strong>Code you already have, not yet agent-ready</strong></td><td><strong>Demo 6</strong> &mdash; four prompts that take an existing script and produce the card, schema, server and agent instructions, on code nobody prepared for you.</td></tr>
+    <tr><td><strong>A result somebody will act on</strong></td><td><strong>Demo 7</strong> &mdash; what a checking agent must be allowed to see, and why the careful version of it confirms a wrong answer.</td></tr>
+    <tr><td><strong>Still deciding the shape</strong></td><td><strong>Demo 8</strong> &mdash; workflow or agent, and where each named pattern fails.</td></tr>
     <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered by a package. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting. Demo 6 says how to ask for that.</td></tr>
   </table>
 
@@ -162,11 +165,11 @@
   </div>
 
   <!-- ───────────────────────── DEMO 7 (planned) ───────────────────── -->
-  <div class="level pending">
+  <div class="level">
     <div class="level-head">
       <div class="level-num">7</div>
       <div>
-        <h3>Two agents &mdash; an analyst and a verifier <span class="muted">&middot; in preparation</span></h3>
+        <h3>Two agents &mdash; an analyst and a verifier</h3>
         <p>A second subagent whose only job is to disbelieve the first one &mdash; and the discovery that most checkers do not.</p>
       </div>
     </div>
@@ -178,7 +181,7 @@
           <li>Run the fold-artifact slide and watch the verifier <strong>confirm the wrong answer</strong>, confidently.</li>
           <li>Work out why: it re-asked the model instead of checking the measurement.</li>
           <li>Rewrite it to check the report&rsquo;s claims against the JSON on disk &mdash; and watch the same slide get caught.</li>
-          <li>Watch the analyst &rarr; verifier hand-off appear in the Demo 5 app&rsquo;s trace panel.</li>
+          <li>See the trace split into lanes &mdash; main agent, analyst, verifier &mdash; in the app&rsquo;s Path C tab.</li>
         </ul>
         <h4>What it teaches</h4>
         <ul>
@@ -189,10 +192,13 @@
         </ul>
       </div>
       <div class="demo-box">
-        <p class="muted"><strong>Not built yet.</strong> This card describes what is coming, so the
-        design can be argued with before the package exists.</p>
-        <p class="muted">It will build on <a href="guides/demo4.html">Demo 4</a> (subagents) and
-        <a href="guides/demo5.html">Demo 5</a> (the app).</p>
+        <a class="btn" href="downloads/Demo7_two_agent_verifier.zip" target="_blank" rel="noopener">Download demo 7 &nbsp;&darr;</a>
+        <a class="btn btn-ghost" href="guides/demo7.html" target="_blank" rel="noopener">Open the guide</a>
+        <p class="muted">ZIP &middot; Python 3 &middot; Streamlit optional. Demo 5&rsquo;s app and server,
+        plus two subagents and a third MCP tool.</p>
+        <p class="muted"><strong>Runs without Claude Code.</strong> The app&rsquo;s Path C tab has a
+        <em>Replay</em> button that renders a recorded two-agent run with real tool numbers &mdash;
+        no tokens, useful in a lecture.</p>
         <p class="muted">Prompted by a question from Prof. Myryam about how to check accuracy, and by
         Michael Murillo&rsquo;s suggestion of an adversarial checker.</p>
       </div>
@@ -200,11 +206,11 @@
   </div>
 
   <!-- ───────────────────────── DEMO 8 (planned) ───────────────────── -->
-  <div class="level pending">
+  <div class="level">
     <div class="level-head">
       <div class="level-num">8</div>
       <div>
-        <h3>Agentic design patterns <span class="muted">&middot; in preparation</span></h3>
+        <h3>Agentic design patterns</h3>
         <p>The named shapes &mdash; chaining, routing, parallelisation, orchestrator-workers, evaluator-optimiser &mdash; taught against code you have already run.</p>
       </div>
     </div>
@@ -224,8 +230,9 @@
         </ul>
       </div>
       <div class="demo-box">
-        <p class="muted"><strong>Not built yet.</strong> Likely a reference page rather than a package,
-        because the patterns land better against code you recognise than as new downloads.</p>
+        <a class="btn" href="guides/demo8.html" target="_blank" rel="noopener">Read demo 8</a>
+        <p class="muted"><strong>A page, not a download.</strong> The patterns land better against
+        code you recognise than as another package.</p>
         <p class="muted">Built on:<br>
         <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building effective agents</a> (Anthropic)<br>
         <a href="https://learn.deeplearning.ai/courses/agentic-ai/lesson/rm9bg7/agentic-design-patterns" target="_blank" rel="noopener">Agentic design patterns</a> (DeepLearning.AI)</p>

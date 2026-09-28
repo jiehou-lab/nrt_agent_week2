@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 8 · Agentic design patterns — Agentic AI Week 2</title>
+<meta name="description" content="The named shapes - chaining, routing, parallelisation, orchestrator-workers, evaluator-optimiser - mapped onto the demos you have already run.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>7</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 8 &middot; ADVANCED &mdash; A MAP, NOT A DOWNLOAD</p>
+    <h1>Agentic design patterns</h1>
+    <p class="lede">You have already built six of these. This page gives them their names, says where each one fails, and puts the workflow-versus-agent question before all of them.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn btn-ghost" href="demo7.html">&larr; Demo 7</a>
+      <a class="btn btn-ghost" href="../index.html#demos">The four core demos</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<p>Demo 8 is not a download. It is a map.</p>
+<p>By now you have built six things. Each of them is a named pattern that the
+agent-engineering literature already has a word for, and the words are worth
+having — not to collect, but so you can say what you are building and hear when
+someone else's design does not fit their problem.</p>
+<p>Two sources are doing the naming: Anthropic's
+<a href="https://www.anthropic.com/engineering/building-effective-agents">Building effective agents</a>
+and DeepLearning.AI's
+<a href="https://learn.deeplearning.ai/courses/agentic-ai/lesson/rm9bg7/agentic-design-patterns">Agentic design patterns</a>.
+This page puts their vocabulary next to code you have already run.</p>
+<hr />
+<h2>The distinction that comes before the patterns</h2>
+<blockquote>
+<p><strong>Workflow</strong>: the steps are decided in advance, in code. A model runs inside
+some of them.</p>
+<p><strong>Agent</strong>: the model decides what to do next, and keeps deciding until it is
+finished.</p>
+</blockquote>
+<p>Almost everything on this site is a workflow. Demo 2's server is a workflow —
+<code>analyze_tissue</code>, then <code>classify_tissue</code>, in that order, because a person wrote
+that order down. Demo 4 hands one bounded job to a subagent, which is a small
+agent inside a workflow.</p>
+<p>Workflows are predictable, cheap, and testable. Agents handle cases you could
+not enumerate. <strong>Most research software wants a workflow,</strong> and the common
+failure is reaching for an agent because it is the more interesting thing to
+build.</p>
+<p>A question that settles it: <em>can I write down the steps?</em> If yes, write them
+down. A model that re-derives your procedure on every run is a model that can
+get it wrong on any run.</p>
+<hr />
+<h2>Five shapes, and where you have already met them</h2>
+<h3>1. Prompt chaining</h3>
+<p>One step's output is the next step's input, with a fixed sequence.</p>
+<pre><code class="language-text">analyze_tissue  ──►  classify_tissue
+   measurement         label
+</code></pre>
+<p><strong>You built it in:</strong> Demos 1 and 2. The chain is the same in both — what changed
+was whether the hand-off was checked. In Demo 1 the model carried numbers between
+steps in prose; in Demo 2 it passed a file path and a schema stood at each end.</p>
+<p><strong>Where it fails:</strong> silently, when a step's output is not what the next step
+assumes. A chain is only as good as the contract between links, which is why the
+schema mattered more than the sequence.</p>
+<p><strong>Add a gate between steps</strong> when a step can produce something the next one
+should refuse to touch. Demo 7's <code>usable</code> check is exactly that.</p>
+<hr />
+<h3>2. Routing</h3>
+<p>Classify the request first, then send it to the handler built for it.</p>
+<p><strong>You built it in:</strong> Demo 4, without noticing. A subagent's <code>description:</code> line
+<em>is</em> a router — the main agent reads the descriptions and picks. That is why a
+vague description misroutes, and why the field is worth writing first.</p>
+<p><strong>Where it fails:</strong> when categories overlap, or when there is no honest default.
+A router with no "I don't know" branch will always pick something.</p>
+<hr />
+<h3>3. Parallelisation</h3>
+<p>Run several things at once, then combine. Two different reasons to do it:</p>
+<ul>
+<li><strong>Sectioning</strong> — independent pieces of one job, done side by side. Twelve
+  slides, twelve analyses, no interaction.</li>
+<li><strong>Voting</strong> — the <em>same</em> job done several times, majority wins.</li>
+</ul>
+<p><strong>Where voting fails:</strong> when the error is systematic rather than noisy. The
+fold-artifact slide from Demo 1 returns <code>mild_injury</code> at p=0.70 every single
+time. Five votes give five identical wrong answers and a false sense of
+agreement. <strong>Voting narrows variance; it cannot touch bias.</strong></p>
+<p>Use sectioning freely. Use voting only when you have reason to believe the
+failures are independent — and say out loud what that reason is.</p>
+<hr />
+<h3>4. Orchestrator–workers</h3>
+<p>A central agent breaks a job into pieces, hands each to a worker, and assembles
+the results.</p>
+<p><strong>You built it in:</strong> Demos 4 and 7. In Demo 7 the main agent is the orchestrator:
+it runs the analyst, takes the report, hands it to the verifier. The workers
+never talk to each other — the orchestrator passes artifacts between them, which
+is why results go to files.</p>
+<p><strong>Where it fails:</strong> when the orchestrator has to understand the domain to split
+the work sensibly. Splitting is a judgement call, and a bad split produces
+confident work on the wrong pieces.</p>
+<p><strong>It earns its place</strong> when steps must be sequenced or results combined and
+judged. Running N independent jobs and collecting the output is a loop, not an
+orchestrator — and a loop has no opinions to get wrong.</p>
+<hr />
+<h3>5. Evaluator–optimiser</h3>
+<p>One component produces; another critiques; repeat until the critique is
+satisfied.</p>
+<p><strong>You built it in:</strong> Demo 7 — and you also built the version of it that does not
+work. A critic that can redo the work usually agrees with the work. Demo 7's v1
+verifier re-ran the analysis and confirmed a wrong answer; v2 could only compare
+the report against the files on disk, and rejected it.</p>
+<p><strong>The rule that makes this pattern work:</strong></p>
+<blockquote>
+<p>The evaluator must be able to fail differently from the producer.</p>
+</blockquote>
+<p>Ask it of any reviewer agent you add: <em>what can this see that the worker could
+not?</em> If the answer is "nothing, it just looks again more carefully", you have
+added cost and a rubber stamp.</p>
+<p><strong>Where it fails:</strong> loops that never converge, and critics that are too agreeable
+to be useful — which is most of them, by default.</p>
+<hr />
+<h2>Three instruments people confuse</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>what it does</th>
+<th>catches</th>
+<th>misses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Verifier</strong></td>
+<td>compares a claim against a source of truth</td>
+<td>systematic error, wrong claims, undisclosed caveats</td>
+<td>anything the source of truth is also wrong about</td>
+</tr>
+<tr>
+<td><strong>Referee</strong></td>
+<td>decides between two components that disagree</td>
+<td>cases where disagreement itself is the signal</td>
+<td>errors both components share — silently</td>
+</tr>
+<tr>
+<td><strong>Vote</strong></td>
+<td>runs n times, keeps the majority</td>
+<td>random variation</td>
+<td>bias, completely</td>
+</tr>
+</tbody>
+</table>
+<p>All three get called "adding a check". Only one of them catches a model that is
+confidently wrong the same way every time.</p>
+<hr />
+<h2>Choosing</h2>
+<p>Put these in order and most designs answer themselves.</p>
+<ol>
+<li><strong>Can I write the steps down?</strong> Yes → workflow. Stop here most of the time.</li>
+<li><strong>Does one step need a model?</strong> Give it a schema, not a paragraph. (Demo 2.)</li>
+<li><strong>Would a step flood my context, or need fewer tools than I have?</strong> Subagent.
+   (Demo 4.)</li>
+<li><strong>Would a wrong answer be quietly believed?</strong> Add a check — and decide <em>what
+   it may look at</em> before you decide what model runs it. (Demo 7.)</li>
+<li><strong>How will I know any of this is better?</strong> Repeated runs, an interval, and a
+   comparison against the simpler thing you are replacing. If you skip this, you
+   have a demo rather than a result. (Week 3.)</li>
+</ol>
+<hr />
+<h2>The failure mode worth naming</h2>
+<p>Agent designs get elaborate in the wrong place. More agents doing the work, more
+delegation, more orchestration — and still nothing that could have caught the
+answer being wrong.</p>
+<blockquote>
+<p>The simplest arrangement that makes the failure visible.</p>
+</blockquote>
+<p>Demo 7 is the smallest useful example: two agents, one of which does less than
+the other, and is the one that works.</p>
+<hr />
+<h2>Sources</h2>
+<ul>
+<li><a href="https://www.anthropic.com/engineering/building-effective-agents">Building effective agents</a>
+  — Anthropic. The workflow/agent distinction and the five shapes above.</li>
+<li><a href="https://learn.deeplearning.ai/courses/agentic-ai/lesson/rm9bg7/agentic-design-patterns">Agentic design patterns</a>
+  — DeepLearning.AI.</li>
+<li>The eight design questions in <a href="demo4.html">Demo 4 §2A</a> are the short version of
+  this page, aimed at someone about to write their first subagent file.</li>
+</ul>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo7.html">&larr; Demo 7</a>
+  <a class="btn btn-ghost" href="demo4.html">Demo 4 &sect;2A &mdash; the short version</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">Pattern names follow Anthropic&rsquo;s <em>Building effective agents</em> and
+    DeepLearning.AI&rsquo;s <em>Agentic design patterns</em>; the mapping onto these demos, and the
+    opinions about where each shape fails, are this course&rsquo;s.</p>
+  </div>
+</footer>
+
+</body>
+</html>
