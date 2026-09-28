@@ -118,6 +118,103 @@ that in mind — it is the whole of Part B.</p>
 <p>Confirm <code>tissue-analyzer</code> is connected with two tools. If your version has an
 <code>/agents</code> command, run it and confirm <code>tissue-analyst</code> is listed.</p>
 <hr />
+<hr />
+<h2>2A. What defines a subagent</h2>
+<p>Step 1 was the quick look. This is the reference version &mdash; worth reading once before you
+write one of these for your own project.</p>
+<details class="code">
+<summary>The whole file &mdash; <code>.claude/agents/tissue-analyst.md</code></summary>
+<pre><code class="language-markdown">---
+name: tissue-analyst
+description: Analyze and classify a tissue image only through the tissue-analyzer MCP server.
+tools:
+  - mcp__tissue-analyzer__analyze_tissue
+  - mcp__tissue-analyzer__classify_tissue
+---
+
+You are a scoped tissue-analysis subagent.
+
+You may use only the two MCP tools listed above.
+
+## Workflow
+
+1. Call `analyze_tissue`.
+2. Always provide:
+   - `slide`
+   - `magnification`
+   - `damage_threshold_fraction`
+   - `out`
+3. Save the measurement result as:
+   `results/&lt;case&gt;_analyze.json`
+4. Read only the MCP result returned by the tool.
+5. If `usable` is false, stop and report the warning.
+6. If the result is usable, call `classify_tissue` with:
+   - `features = results/&lt;case&gt;_analyze.json`
+   - `out = results/&lt;case&gt;_classify.json`
+7. Return the structured measurement, confidence/usability information, class,
+   and probability exactly as provided by the MCP tools.
+
+## Restrictions
+
+- Do not ask for Bash.
+- Do not ask for direct file-reading access.
+- Do not open `.pgm` files yourself.
+- Do not invent values that are not returned by the MCP tools.
+</code></pre>
+</details>
+<p>Two halves, read by two different readers:</p>
+<pre><code class="language-text">frontmatter   between the --- lines   read by Claude Code: which model, which
+                                      tools, and when to route work here
+body          everything after        read by the model: how to do the job
+</code></pre>
+
+<h3>The frontmatter fields</h3>
+<table>
+<thead><tr><th style="width:18%">field</th><th style="width:12%"></th><th>what it decides</th></tr></thead>
+<tbody>
+<tr><td><code>name</code></td><td class="muted">required</td><td>What you call it. Keep it the same as the filename.</td></tr>
+<tr><td><code>description</code></td><td class="muted">required</td><td><strong>The router.</strong> The main agent reads this to decide whether to hand a task over. It is the field people write last and should write first — a vague description means the subagent is never picked, or picked for the wrong job.</td></tr>
+<tr><td><code>tools</code></td><td class="muted">optional</td><td>The allowlist. <strong>Leave it out and the subagent inherits every tool available to it</strong> — so writing this list is the act of scoping, and an empty line here is not a safe default.</td></tr>
+<tr><td><code>model</code></td><td class="muted">optional</td><td>Which model runs it: <code>sonnet</code>, <code>opus</code>, <code>haiku</code>, <code>fable</code>, or a full model id. Omitted, it follows the main session.</td></tr>
+</tbody>
+</table>
+<p class="muted">Others exist when you need them &mdash; <code>disallowedTools</code>,
+<code>permissionMode</code>, <code>maxTurns</code>, <code>skills</code>, <code>mcpServers</code>,
+<code>memory</code>, <code>background</code>, <code>isolation</code>, <code>color</code>. The four
+above are the ones that decide what the subagent <em>is</em>.</p>
+
+<h3>Two behaviours to know before you design one</h3>
+<p><strong>It has its own context.</strong> The subagent does not see your conversation. It starts
+with its own instructions, the task it was handed, and <code>CLAUDE.md</code> &mdash; nothing else.
+If your main session just read ten files, the subagent begins blind to all of them. You will prove
+this in step 10.</p>
+<p><strong>Only its summary comes back.</strong> The tool calls it made and everything it read stay
+in its own context; what reaches the main agent is its final report. That is the real argument for
+delegating a long, noisy job &mdash; not tidiness, but that your main context survives it.</p>
+<p>What the <code>tools:</code> list does <em>not</em> do is restrict anyone else. The main agent
+keeps everything it had. That is Part B, and it is the part people get wrong.</p>
+
+<details class="code prose">
+<summary>Designing an agent team &mdash; eight questions worth answering first</summary>
+<p>Demo 4 builds one small subagent. Your own project may want several, and the interesting
+decisions happen before any file is written.</p>
+<table>
+<thead><tr><th style="width:26%">question</th><th>how to think about it</th></tr></thead>
+<tbody>
+<tr><td><strong>Do I need a subagent at all?</strong></td><td>Three reasons justify one: the job would <strong>flood your main context</strong> with output you do not need to see; it should run with a <strong>narrower set of tools</strong> than you have; or it is a <strong>repeatable procedure</strong> you want reviewed as a unit. If none of those apply, a well-written prompt is cheaper to build and far easier to debug.</td></tr>
+<tr><td><strong>One agent, or a team?</strong></td><td>Start with one. Add a second when its job has a different <em>contract</em> — different inputs, different refusals, different report — not merely a different topic. Two agents that would accept the same inputs and produce the same shape of answer are one agent with an argument.</td></tr>
+<tr><td><strong>Do I need an orchestrator?</strong></td><td>An orchestrator earns its place when steps must be <strong>sequenced</strong>, or when results must be <strong>combined and judged</strong>. Running N independent jobs and collecting the outputs is not orchestration; that is a loop, and a loop has no opinions to get wrong.</td></tr>
+<tr><td><strong>Which model goes where?</strong></td><td>Fast and cheap for mechanical, high-volume work — extracting, searching, reformatting, first passes. The strongest model for judgement, and <strong>for the checker</strong>. A cheap verifier auditing an expensive worker is a false economy: the check is exactly where you are paying for accuracy.</td></tr>
+<tr><td><strong>Where does a check belong?</strong></td><td>Anywhere a wrong answer would be quietly believed. Three shapes, and they are not interchangeable: a <strong>verifier</strong> independently re-derives the result or checks it against the source; a <strong>referee</strong> decides when two agents disagree; a <strong>vote</strong> takes n samples and keeps the majority, which only works when the answer is short and discrete.</td></tr>
+<tr><td><strong>When is voting the wrong check?</strong></td><td><strong>When the failure is systematic.</strong> Demo 1's classifier is confidently wrong on the fold artifact <em>every single time</em> — five votes return five identical wrong answers, with the reassurance of unanimity. Voting reduces variance; it does nothing about bias. A check only helps if it can fail differently from the thing it is checking.</td></tr>
+<tr><td><strong>Is a cheap-then-expensive pass worth it?</strong></td><td>Often — a fast model over everything, the strong one over the cases that matter. The hard part is not the plumbing, it is <strong>writing down what &ldquo;matters&rdquo; means</strong>: low confidence, near a decision boundary, two cheap runs disagreeing. That rule is yours to supply, and no agent can infer it from your code — which is the whole of <a href="demo6.html">Demo 6</a>.</td></tr>
+<tr><td><strong>How will I know the team is actually better?</strong></td><td>Not from one good demonstration. Repeated runs on the same inputs, an interval around the number, and a designed comparison against the simpler thing you are replacing. This is Week 3's subject, and it is the part most published agent work skips.</td></tr>
+</tbody>
+</table>
+<p>A useful default: <strong>the simplest arrangement that makes the failure visible.</strong> Most
+agent designs get elaborate in the wrong place &mdash; more agents doing the work, and still nobody
+checking it.</p>
+</details>
 <h2 class="partmark">Part A — Watch delegation happen</h2>
 <h2>3. Delegate one slide</h2>
 <pre><code class="language-text">Use the tissue-analyst subagent to analyze
