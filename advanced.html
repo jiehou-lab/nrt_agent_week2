@@ -67,6 +67,7 @@
     <tr><td><strong>A workflow plus a user-facing application</strong></td><td><strong>Demo 5</strong> &mdash; a form and a text box over the same server, and an explicit answer to which one each control should be.</td></tr>
     <tr><td><strong>Code you already have, not yet agent-ready</strong></td><td><strong>Demo 6</strong> &mdash; four prompts that take an existing script and produce the card, schema, server and agent instructions, on code nobody prepared for you.</td></tr>
     <tr><td><strong>A result somebody will act on</strong></td><td><strong>Demo 7</strong> &mdash; what a checking agent must be allowed to see, and why the careful version of it confirms a wrong answer.</td></tr>
+    <tr><td><strong>A field with a real oracle</strong></td><td><strong>Demo 9</strong> &mdash; formal proof: what an unarguable checker does and does not settle.</td></tr>
     <tr><td><strong>Still deciding the shape</strong></td><td><strong>Demo 8</strong> &mdash; workflow or agent, and where each named pattern fails.</td></tr>
     <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered by a package. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting. Demo 6 says how to ask for that.</td></tr>
   </table>
@@ -244,6 +245,44 @@
         <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building effective agents</a> (Anthropic)<br>
         <a href="https://learn.deeplearning.ai/courses/agentic-ai/lesson/rm9bg7/agentic-design-patterns" target="_blank" rel="noopener">Agentic design patterns</a> (DeepLearning.AI)</p>
         <p class="muted">The eight design questions in <a href="guides/demo4.html">Demo 4 &sect;2A</a> are a first pass at this.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── DEMO 9 ───────────────────────── -->
+  <div class="level">
+    <div class="level-head">
+      <div class="level-num">9</div>
+      <div>
+        <h3>Lean proof agent &mdash; an oracle, and what it cannot tell you</h3>
+        <p>A checker that cannot be argued with, paired with one that can &mdash; because the first one still will not tell you the proof wandered.</p>
+      </div>
+    </div>
+    <div class="level-body">
+      <div>
+        <h4>What you will do</h4>
+        <ul>
+          <li>Read three proofs of one theorem: the route a mathematician chose, a skeleton with <code>sorry</code> holes, and a <strong>valid proof that took fifteen steps instead of three</strong>.</li>
+          <li>Run a shape checker &mdash; no Lean, no model, no tokens &mdash; and watch the detour score <strong>5.0&times;</strong> its budget.</li>
+          <li>Find the failure that matters: the intermediate statement the mathematician cared about has vanished from a proof Lean accepts.</li>
+          <li>Give an agent one hole at a time, so it fills the argument rather than choosing it.</li>
+          <li>Run the evaluator&ndash;optimiser loop in the one setting where it genuinely converges.</li>
+        </ul>
+        <h4>What it teaches</h4>
+        <ul>
+          <li><strong>Two checkers, two jobs.</strong> <code>lake build</code> answers <em>is it a proof?</em>; a contract you wrote answers <em>is it THE proof?</em> Neither replaces the other.</li>
+          <li>Mathematics gets an oracle almost no other field has &mdash; and <strong>still needs the weak, hand-written check</strong> to get the answer it wanted.</li>
+          <li>You cannot prompt your way out of a search problem. Constrain the route, then measure the shape.</li>
+          <li>A detour is sometimes information: the direct step may want a lemma that does not exist yet.</li>
+        </ul>
+      </div>
+      <div class="demo-box">
+        <a class="btn" href="downloads/Demo9_lean_proof_agent.zip" target="_blank" rel="noopener">Download demo 9 &nbsp;&darr;</a>
+        <a class="btn btn-ghost" href="guides/demo9.html" target="_blank" rel="noopener">Open the guide</a>
+        <p class="muted">ZIP &middot; Python 3 &middot; Lean 4, core only (no Mathlib). Streamlit optional.</p>
+        <p class="muted"><strong>The shape checker needs no Lean at all</strong> &mdash; it is pure Python, so the main result is reproducible before anyone installs a toolchain.</p>
+        <p class="muted"><strong>The Lean half is unverified.</strong> It was written without a Lean toolchain available; <code>lake build</code> has not been run. Please report what breaks.</p>
+        <p class="muted">Lean is reached through <a href="https://github.com/oOo0oOo/lean-lsp-mcp" target="_blank" rel="noopener">lean-lsp-mcp</a>, a separate project. Prompted by a question from a mathematics attendee about proofs that take the wrong route.</p>
       </div>
     </div>
   </div>

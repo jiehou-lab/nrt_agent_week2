@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 9 · Lean proof agent — Agentic AI Week 2</title>
+<meta name="description" content="A checker that cannot be argued with - and what it still cannot tell you. Lean accepts a proof that wandered; a hand-written shape contract is what catches it.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>7</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#materials">Slides</a>
+      <a href="../index.html#lecture">Lecture</a>
+      <a href="../index.html#schedule">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 9 &middot; ADVANCED &mdash; AN ORACLE, AND WHAT IT CANNOT TELL YOU</p>
+    <h1>Lean proof agent</h1>
+    <p class="lede">Mathematics gets something almost no other field has: a checker that cannot be wrong. This demo is about what that still does not buy you &mdash; and about the mathematician&rsquo;s real complaint, that a correct proof can take the wrong route.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo9_lean_proof_agent.zip" target="_blank" rel="noopener">Download Demo 9 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo8.html">&larr; Demo 8</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<p>Package:</p>
+<p><code>Demo9_lean_proof_agent.zip</code></p>
+<div class="note">
+<p><strong>Read this before you start.</strong> The Python half of this package
+&mdash; the shape checker, the MCP server, the app &mdash; was built and tested.
+<strong>The Lean half has not been run.</strong> No Lean toolchain was available
+on the machine that assembled it. The Lean files are short and use core Lean 4
+with no Mathlib, so they should build in seconds, but treat <code>lake build</code>
+as unconfirmed and report what breaks.</p>
+</div>
+
+<p>Every other demo on this site ends with a check that is really a judgement: a
+schema someone wrote, a threshold someone chose, a comparison someone
+implemented. Mathematics has something almost nothing else has — <strong>a checker
+that cannot be wrong and cannot be persuaded.</strong> Lean's kernel either accepts a
+proof term or it does not.</p>
+<p>This demo is about what that does <em>not</em> buy you.</p>
+<hr />
+<h2>The problem this exists for</h2>
+<p>A mathematician knows the argument runs step 1 → step 2. The model produces
+step 1 → a → b → c → step 2. It compiles. Lean is satisfied. The mathematician
+is not: the proof is correct and no longer shows the argument they cared about.</p>
+<p>That is not a failure of the prover. Lean's verdict is binary, so a three-line
+proof and a fifteen-line wander are <strong>equally correct to the kernel</strong>. Nothing
+in the objective rewards brevity or your route.</p>
+<p>Which means you cannot prompt your way out of it. <em>"Be concise"</em> does not
+constrain a search process. The fix has to be structural, and it has two halves:
+<strong>take the route decision away from the model</strong>, and <strong>measure the shape of what
+comes back.</strong></p>
+<hr />
+<h2>1. Look at the three proofs</h2>
+<pre><code class="language-bash">unzip Demo9_lean_proof_agent.zip
+cd Demo9_lean_proof_agent
+ls lean/Demo/
+</code></pre>
+<pre><code class="language-text">Skeleton.lean    the route a person chose, with `sorry` holes
+Direct.lean      the proof they had in mind        (3 steps)
+Detour.lean      a valid proof that wandered      (15 steps)
+</code></pre>
+<p>The skeleton is the important idea:</p>
+<pre><code class="language-lean">theorem sum_bound (a b n : Nat) (ha : a ≤ n) (hb : b ≤ n) :
+    a + b ≤ 2 * n := by
+  have h1 : a + b ≤ n + n := by sorry
+  have h2 : n + n = 2 * n := by sorry
+  sorry
+</code></pre>
+<p>The <code>have</code> statements are the argument, written by the human. The <code>sorry</code> holes
+are the work. <strong>An agent may fill holes; it may not rewrite the steps around
+them.</strong> Detours can still happen inside a hole — but a hole is small, and the
+statements on either side of it are fixed.</p>
+<hr />
+<h2>2. Run the shape checker — no Lean, no model, no tokens</h2>
+<pre><code class="language-bash">python3 tools/proof_shape.py \
+    --proof lean/Demo/Detour.lean \
+    --contract contracts/sum_bound.json
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>steps</th>
+<th>detour ratio</th>
+<th>verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Direct.lean</code></td>
+<td>3</td>
+<td>1.0</td>
+<td><code>accepted</code></td>
+</tr>
+<tr>
+<td><code>Detour.lean</code></td>
+<td><strong>15</strong></td>
+<td><strong>5.0</strong></td>
+<td><code>rejected</code></td>
+</tr>
+<tr>
+<td><code>Skeleton.lean</code></td>
+<td>3</td>
+<td>1.0</td>
+<td><code>rejected</code> — holes</td>
+</tr>
+</tbody>
+</table>
+<p>The failed check that matters is not the step count:</p>
+<pre><code class="language-text">required_steps_present:
+  missing intermediate statement(s): n + n = 2 * n
+</code></pre>
+<p><code>Detour.lean</code> is a correct proof. Lean accepts it. <strong>And the step the
+mathematician wanted to see is gone.</strong> No amount of kernel-checking would tell
+you that, because it is not a question about correctness.</p>
+<p>Note the skeleton row too: it is short, and it is rejected. <em>An unfinished proof
+is not a short proof</em> — <code>sorry</code> is caught by its own check before length is even
+considered.</p>
+<hr />
+<h2>3. Two checkers, two jobs</h2>
+<pre><code class="language-text">lake build          exact, semantic      -&gt; is it a proof?
+check_proof_shape   heuristic, textual   -&gt; is it THE proof you wanted?
+</code></pre>
+<p>Be clear about the second one: it reads text and counts. It can be fooled by
+unusual formatting. It is a <strong>guide rail you tune</strong>, not a guarantee — the
+guarantee is the kernel, and the two are not interchangeable.</p>
+<p>That honesty is the transferable lesson. In the tissue demos, the schema and
+<code>check_report</code> were the <em>only</em> checks available; there was no oracle underneath
+them. Here you can see both layers at once, and see that <strong>even with a perfect
+oracle you still had to write the weak, hand-tuned, subjective check yourself</strong>
+to get the answer you actually wanted.</p>
+<hr />
+<h2>4. The contract</h2>
+<pre><code class="language-json">{
+  &quot;theorem&quot;: &quot;sum_bound&quot;,
+  &quot;max_steps&quot;: 3,
+  &quot;max_depth&quot;: 0,
+  &quot;required_haves&quot;: [&quot;a + b ≤ n + n&quot;, &quot;n + n = 2 * n&quot;],
+  &quot;allowed_tactics&quot;: [&quot;have&quot;, &quot;exact&quot;, &quot;omega&quot;, &quot;apply&quot;, &quot;intro&quot;, &quot;rfl&quot;],
+  &quot;forbidden_tactics&quot;: [&quot;sorry&quot;, &quot;admit&quot;, &quot;native_decide&quot;]
+}
+</code></pre>
+<p>This is the mathematician's intent, in a form a script can check. <code>CLAUDE.md</code>
+tells the agent not to edit it — loosening a contract to make a check pass is
+the one move that defeats the whole exercise.</p>
+<hr />
+<h2>5. The two subagents</h2>
+<pre><code class="language-text">hole-filler     tools: lean_goal, lean_run_code, lean_build
+                fills ONE hole. May not touch neighbouring lines.
+
+shape-referee   tools: check_proof_shape
+                cannot run Lean at all. Reports the verdict, does not overrule it.
+</code></pre>
+<p>The scoping is the design, exactly as in Demo 7. <code>shape-referee</code> has one tool
+and no ability to form an opinion about the mathematics; <code>hole-filler</code> can run
+Lean but is handed one hole at a time, so it cannot negotiate the route.</p>
+<p>Prompts to paste are in <code>prompts/</code>:</p>
+<ol>
+<li><code>1_fill_holes.md</code> — close the holes, one at a time</li>
+<li><code>2_check_the_shape.md</code> — is it the proof I asked for?</li>
+<li><code>3_shorten_it.md</code> — the loop below</li>
+</ol>
+<hr />
+<h2>6. The loop that actually converges</h2>
+<pre><code class="language-text">generate -&gt; lake build -&gt; check_proof_shape -&gt; &quot;shorter, still compiling&quot; -&gt; repeat
+</code></pre>
+<p>This is the evaluator–optimiser pattern from <a href="demo8.html">Demo 8</a>, and this is
+the rare setting where it genuinely works. In most domains the evaluator is
+another model, so "it got better" is an opinion. Here the acceptance test is
+exact: <em>it still compiles and it is now four steps instead of fifteen</em> is a
+fact. Iteration converges because the ground truth is free.</p>
+<hr />
+<h2>7. The app</h2>
+<pre><code class="language-bash">python3 -m venv .demo_venv &amp;&amp; source .demo_venv/bin/activate
+pip install -r requirements.txt
+./run.sh
+</code></pre>
+<p>Three tabs: the <strong>shape check</strong> against the contract, a <strong>side by side</strong> of the
+skeleton and the candidate, and <strong>does it compile?</strong> — which disables itself
+with an explanation if no Lean toolchain is on PATH, since the rest of the app
+never needed one.</p>
+<hr />
+<h2>8. What to take back to a non-mathematical project</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>in Lean</th>
+<th>in your field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Is it valid?</td>
+<td>the kernel. free, exact, unarguable</td>
+<td>usually nothing. you write it</td>
+</tr>
+<tr>
+<td>Is it what I asked for?</td>
+<td>you write it</td>
+<td>you write it</td>
+</tr>
+<tr>
+<td>Can the checker fail differently from the generator?</td>
+<td><strong>yes</strong> — it is not a model</td>
+<td>rarely. that is Demo 7's whole problem</td>
+</tr>
+</tbody>
+</table>
+<p>The uncomfortable conclusion: mathematics gets the oracle, and <strong>still needs the
+hand-written check.</strong> If your field has no oracle, you need the hand-written
+check even more — and you should be honest that it is the only thing standing
+between you and a confident wrong answer.</p>
+<hr />
+<h2>9. Answering the original question</h2>
+<p><em>"Sometimes I know the proof runs step 1 → step 2, but the AI routes through
+a → b → c. How should the agent be designed?"</em></p>
+<ol>
+<li><strong>Write the skeleton yourself.</strong> The model fills holes; it does not choose
+   the route. This is most of the answer and it needs no new technology.</li>
+<li><strong>Make shape a measured property.</strong> A step budget, the <code>have</code> statements that
+   must survive, an allowed toolbox. Now "too long" is a verdict, not a
+   complaint.</li>
+<li><strong>Let the loop optimise.</strong> Because the kernel is exact, "shorter and still
+   compiling" converges.</li>
+<li><strong>Split the skeleton across workers.</strong> Each hole is an independent
+   subproblem with a perfect acceptance test — orchestrator–workers, with
+   failures that localise to "hole 3" rather than "the proof".</li>
+</ol>
+<p>And one thing worth not fixing: <strong>a detour is sometimes information.</strong> If the
+direct step cannot be closed and a → b → c can, that occasionally means the
+direct step wants a lemma that does not exist yet. Log those rather than
+discarding them.</p>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo7.html">&larr; Demo 7 &mdash; analyst and verifier</a>
+  <a class="btn btn-ghost" href="demo8.html">Demo 8 &mdash; design patterns</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">The Lean half of this package is <strong>unverified</strong> &mdash; it was
+    written without a Lean toolchain available. Lean is reached through
+    <a href="https://github.com/oOo0oOo/lean-lsp-mcp" target="_blank" rel="noopener">lean-lsp-mcp</a>,
+    a separate project; follow its own README for installation.</p>
+  </div>
+</footer>
+
+</body>
+</html>
