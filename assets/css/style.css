@@ -194,3 +194,19 @@ details.code.prose.optional>summary::after{content:" \2014 show the commands"}
 details.code.prose.optional[open]>summary::after{content:" \2014 hide"}
 details.code.prose.optional>summary{font-size:1rem}
 details.code.prose>h3{margin-left:.95rem;margin-right:.95rem}
+
+/* collapsible week panels (index) */
+details.wk{border:1px solid var(--rule);border-radius:var(--radius);margin:.85rem 0;background:#fff}
+details.wk[open]{box-shadow:var(--shadow)}
+details.wk>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:.65rem;padding:.95rem 1.1rem;font-weight:650;font-size:1.02rem;color:var(--ink)}
+details.wk>summary::-webkit-details-marker{display:none}
+details.wk>summary::before{content:"+";flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--green-300);color:var(--green);font-size:.95rem;font-weight:700;line-height:1}
+details.wk[open]>summary::before{content:"\2212"}
+details.wk>summary:hover{background:var(--bg-soft)}
+details.wk>summary:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+details.wk>summary .sum-note{margin-left:auto;font-weight:450;font-size:.84rem;color:var(--ink-soft);text-align:right}
+details.wk>.wk-body{padding:.2rem 1.1rem 1.2rem;border-top:1px solid var(--rule)}
+details.wk>.wk-body>h3:first-child{margin-top:1.1rem}
+.opennote{color:var(--ink-soft);font-size:.95rem;margin-top:.9rem}
+.opennote strong{color:var(--ink)}
+@media(max-width:620px){details.wk>summary{font-size:.97rem}details.wk>summary .sum-note{display:none}}

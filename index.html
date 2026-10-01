@@ -25,6 +25,7 @@
       <a href="#materials">Slides</a>
       <a href="#lecture">Lecture</a>
       <a href="#schedule">Schedule</a>
+      <a href="#week3">Week 3</a>
       <a href="#demos">Demos</a>
       <a href="#setup">Setup</a>
       <a href="advanced.html">Advanced</a>
@@ -49,9 +50,9 @@
       MCP, hands-on practice, project brainstorm.</p>
 
     <p class="session-line">
-      <strong>Oct 2 &middot; Week 3.</strong> Permissions and scoped subagents, then you design one
-      research capability of your own &mdash; <strong>30 min introduction + 90 min hands-on
-      workshop</strong>, with project brainstorm.</p>
+      <strong>Oct 2 &middot; Week 3.</strong> A hands-on workshop: Claude and Claude Code,
+      Markdown and terminal basics, the course project, the practice demos &mdash; then you
+      design <strong>one research capability of your own</strong>.</p>
 
     <div class="hero-facts">
       <div><strong>Sep 25 &amp; Oct 2, 2026</strong><span>Fridays · 2:30 – 4:30 PM</span></div>
@@ -64,80 +65,193 @@
 
 <main class="wrap">
 
-<section id="materials">
-  <h2>Slides and handout <span class="muted" style="font-weight:500">(Sep 25)</span></h2>
-  <p>The deck and a two-page reference sheet. The handout is the one to print or keep open
-  during the demos &mdash; it carries the framework the four levels are built on.</p>
+<section id="week2">
+  <h2>Sep 25 &middot; Week 2 materials</h2>
+  <p>Everything from the first session &mdash; slides, handout, what was covered, and how the
+  two hours ran.</p>
+  <p class="opennote"><strong>These panels are closed.</strong> Click a heading to open it.</p>
 
-  <div class="files">
-    <a class="filecard" href="downloads/NRT_week2_AI_models_slides.pdf" target="_blank" rel="noopener">
-      <span class="ft">PDF · 3.0 MB</span>
-      <strong>Lecture slides</strong>
-      <span class="fd">47 slides. How models generate, why plausible answers can still be wrong,
-      and the four demo levels.</span>
-    </a>
-    <a class="filecard" href="downloads/NRT_week2_handout.pdf" target="_blank" rel="noopener">
-      <span class="ft">PDF · 370 KB</span>
-      <strong>Two-page handout</strong>
-      <span class="fd">Model / workflow / tool, why repository-as-context fails, MCP, permissions,
-      scoped subagents, and the four-demo table. Printable.</span>
-    </a>
-    <a class="filecard" href="handout.html" target="_blank" rel="noopener">
-      <span class="ft">Web page</span>
-      <strong>Handout, in the browser</strong>
-      <span class="fd">The same two pages, readable on a laptop or phone without downloading
-      anything.</span>
-    </a>
-  </div>
+  <details class="wk" id="materials">
+    <summary>Slides and handout <span class="sum-note">deck &middot; printable handout &middot; web version</span></summary>
+    <div class="wk-body">
+      <p>The deck and a two-page reference sheet. The handout is the one to print or keep open
+      during the demos &mdash; it carries the framework the four levels are built on.</p>
+
+      <div class="files">
+        <a class="filecard" href="downloads/NRT_week2_AI_models_slides.pdf" target="_blank" rel="noopener">
+          <span class="ft">PDF · 3.0 MB</span>
+          <strong>Lecture slides</strong>
+          <span class="fd">47 slides. How models generate, why plausible answers can still be wrong,
+          and the four demo levels.</span>
+        </a>
+        <a class="filecard" href="downloads/NRT_week2_handout.pdf" target="_blank" rel="noopener">
+          <span class="ft">PDF · 370 KB</span>
+          <strong>Two-page handout</strong>
+          <span class="fd">Model / workflow / tool, why repository-as-context fails, MCP, permissions,
+          scoped subagents, and the four-demo table. Printable.</span>
+        </a>
+        <a class="filecard" href="handout.html" target="_blank" rel="noopener">
+          <span class="ft">Web page</span>
+          <strong>Handout, in the browser</strong>
+          <span class="fd">The same two pages, readable on a laptop or phone without downloading
+          anything.</span>
+        </a>
+      </div>
+    </div>
+  </details>
+
+  <details class="wk" id="lecture">
+    <summary>What the lecture covers <span class="sum-note">eight parts</span></summary>
+    <div class="wk-body">
+      <p>The first half explains how AI models generate outputs and why plausible answers can still
+      be wrong. The second half shows how to build more reliable agent workflows with structured tool
+      interfaces, MCP, permissions, and scoped subagents — ending with four hands-on demos.</p>
+
+      <table>
+        <tr><th style="width:28%">Part</th><th>What it covers</th></tr>
+        <tr><td><strong>Models and scientific workflows</strong></td><td>What models do, how they differ from algorithms and workflows, and where they appear in research.</td></tr>
+        <tr><td><strong>How LLMs generate</strong></td><td>Tokens, next-token prediction, context, learned priors, and why plausible output is not always correct.</td></tr>
+        <tr><td><strong>Attention and Transformers</strong></td><td>How attention evolved into self-attention and enabled modern long-context language models.</td></tr>
+        <tr><td><strong>Why coding agents fail</strong></td><td>Context dilution, competing examples, ambiguous parameters, and silent software errors.</td></tr>
+        <tr><td><strong>Structured tool interfaces</strong></td><td>Capability descriptions, schemas, validation, and structured inputs and outputs.</td></tr>
+        <tr><td><strong>Model Context Protocol</strong></td><td>How MCP exposes selected research capabilities through a common interface.</td></tr>
+        <tr><td><strong>Permissions and scoped subagents</strong></td><td>Restricting direct access, narrowing tool sets, and delegating work to scoped subagents.</td></tr>
+        <tr><td><strong>Live tissue-analysis demos</strong></td><td>Progressing from a raw repository to MCP, permissions, and scoped subagent delegation.</td></tr>
+      </table>
+
+      <div class="callout">
+        <p><strong>Central message.</strong> Using an agent means asking an AI system to help do the
+        work — <em>"here is my project, please figure out how it works and analyse my data."</em></p>
+        <p><strong>Designing</strong> an agent means deciding what the AI should and should not have
+        to figure out. Instead of asking it to rediscover everything from source code, we define the
+        workflow explicitly: inputs, allowed parameters, outputs, validation rules, and permissions.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="wk" id="schedule">
+    <summary>How the session runs <span class="sum-note">Sep 25 timetable</span></summary>
+    <div class="wk-body">
+      <p>Two hours: about 70 minutes of lecture and live demos, then 50 minutes of setup, group work
+      and close.</p>
+
+      <table>
+        <tr><th style="width:14%">Time</th><th>What happens</th></tr>
+        <tr><td><strong>2:30</strong></td><td>Open</td></tr>
+        <tr><td><strong>2:35</strong></td><td>AI models &mdash; how they generate, and why a plausible answer can still be wrong</td></tr>
+        <tr><td><strong>3:15</strong></td><td>Break, and a setup check: run <code>claude</code>, then <code>/status</code> should show the NRT organization</td></tr>
+        <tr><td><strong>3:25</strong></td><td>Structured tool interfaces, MCP, permissions, and scoped subagents</td></tr>
+        <tr><td><strong>3:35</strong></td><td>Four demo moments, live &mdash; one from each level</td></tr>
+        <tr><td><strong>3:50</strong></td><td>Group work &mdash; setup if you still need it, otherwise Demo 1 then Demo 2</td></tr>
+        <tr><td><strong>4:20</strong></td><td>Close</td></tr>
+        <tr><td><strong>4:30</strong></td><td>End</td></tr>
+      </table>
+
+      <p class="muted" style="margin-top:10px">You are not expected to finish all four demos in the
+      room. Demos 3 and 4 are yours to work through afterwards &mdash; every guide on this page is
+      written to be followed on your own.</p>
+    </div>
+  </details>
 </section>
 
-<section id="lecture">
-  <h2>What the lecture covers</h2>
-  <p>The first half explains how AI models generate outputs and why plausible answers can still
-  be wrong. The second half shows how to build more reliable agent workflows with structured tool
-  interfaces, MCP, permissions, and scoped subagents — ending with four hands-on demos.</p>
-
-  <table>
-    <tr><th style="width:28%">Part</th><th>What it covers</th></tr>
-    <tr><td><strong>Models and scientific workflows</strong></td><td>What models do, how they differ from algorithms and workflows, and where they appear in research.</td></tr>
-    <tr><td><strong>How LLMs generate</strong></td><td>Tokens, next-token prediction, context, learned priors, and why plausible output is not always correct.</td></tr>
-    <tr><td><strong>Attention and Transformers</strong></td><td>How attention evolved into self-attention and enabled modern long-context language models.</td></tr>
-    <tr><td><strong>Why coding agents fail</strong></td><td>Context dilution, competing examples, ambiguous parameters, and silent software errors.</td></tr>
-    <tr><td><strong>Structured tool interfaces</strong></td><td>Capability descriptions, schemas, validation, and structured inputs and outputs.</td></tr>
-    <tr><td><strong>Model Context Protocol</strong></td><td>How MCP exposes selected research capabilities through a common interface.</td></tr>
-    <tr><td><strong>Permissions and scoped subagents</strong></td><td>Restricting direct access, narrowing tool sets, and delegating work to scoped subagents.</td></tr>
-    <tr><td><strong>Live tissue-analysis demos</strong></td><td>Progressing from a raw repository to MCP, permissions, and scoped subagent delegation.</td></tr>
-  </table>
+<section id="week3">
+  <h2>Oct 2 &middot; Week 3 materials</h2>
+  <p>A hands-on session: Claude and Claude Code side by side, Markdown and the handful of terminal
+  commands you need, the course project, the practice demos, and a project brainstorm. The goal is
+  to leave with a working setup and <strong>one project idea of your own</strong>.</p>
 
   <div class="callout">
-    <p><strong>Central message.</strong> Using an agent means asking an AI system to help do the
-    work — <em>"here is my project, please figure out how it works and analyse my data."</em></p>
-    <p><strong>Designing</strong> an agent means deciding what the AI should and should not have
-    to figure out. Instead of asking it to rediscover everything from source code, we define the
-    workflow explicitly: inputs, allowed parameters, outputs, validation rules, and permissions.</p>
+    <p><strong>Please finish setup before Friday.</strong> Work through
+    <a href="#setup">Before you arrive</a> on this page. The session moves as a group, and
+    installing software in the room is the one thing that pulls people out of it.</p>
+    <p><strong>Do not buy a plan.</strong> Create a Claude account only &mdash; the AIDMM NRT
+    provides a Claude Team seat. Send the email address you want registered to
+    <a href="mailto:mayanrui@msu.edu">Yanrui Ma</a>. If you already have a working Pro-level
+    Claude Code account, skip the account and license steps.</p>
   </div>
-</section>
 
-<section id="schedule">
-  <h2>How the session runs</h2>
-  <p>Two hours: about 70 minutes of lecture and live demos, then 50 minutes of setup, group work
-  and close.</p>
+  <p class="opennote"><strong>These panels are closed.</strong> Click a heading to open it.</p>
 
-  <table>
-    <tr><th style="width:14%">Time</th><th>What happens</th></tr>
-    <tr><td><strong>2:30</strong></td><td>Open</td></tr>
-    <tr><td><strong>2:35</strong></td><td>AI models &mdash; how they generate, and why a plausible answer can still be wrong</td></tr>
-    <tr><td><strong>3:15</strong></td><td>Break, and a setup check: run <code>claude</code>, then <code>/status</code> should show the NRT organization</td></tr>
-    <tr><td><strong>3:25</strong></td><td>Structured tool interfaces, MCP, permissions, and scoped subagents</td></tr>
-    <tr><td><strong>3:35</strong></td><td>Four demo moments, live &mdash; one from each level</td></tr>
-    <tr><td><strong>3:50</strong></td><td>Group work &mdash; setup if you still need it, otherwise Demo 1 then Demo 2</td></tr>
-    <tr><td><strong>4:20</strong></td><td>Close</td></tr>
-    <tr><td><strong>4:30</strong></td><td>End</td></tr>
-  </table>
+  <details class="wk" id="w3-before">
+    <summary>Before class &mdash; the checklist <span class="sum-note">do this first</span></summary>
+    <div class="wk-body">
+      <p>Five things, in order. The first three are the ones that matter.</p>
+      <ol class="steps">
+        <li><strong>Create a Claude account &mdash; no plan.</strong> Then email
+        <a href="mailto:mayanrui@msu.edu">mayanrui@msu.edu</a> the address to register for the
+        NRT Team seat.</li>
+        <li><strong>Set up a terminal.</strong> Field Guide <strong>Part 4</strong>
+        (slides 28&ndash;34), or use VS Code &mdash; see
+        <a href="#setup">Choose a setup path</a> below.</li>
+        <li><strong>Install Claude Code and log in.</strong> Field Guide <strong>Part 8</strong>
+        (slides 62&ndash;65), through <em>First run and login</em>. Then run <code>claude</code> and
+        type <code>/status</code> &mdash; it should show the NRT organization once your seat is
+        active. Stop there.</li>
+        <li><strong>Read Parts 1&ndash;3 of the Field Guide.</strong> What an agent is, how access
+        and limits work, and Markdown &mdash; the format every agent instruction file is written in.</li>
+        <li><strong>Optional.</strong> Try <em>Your first ten minutes</em> (slide 68) against the
+        practice project; unzip <code>survey-study.zip</code> first.</li>
+      </ol>
+      <p class="muted">If something fails, come anyway &mdash; bring the error message. Nothing in
+      Friday's session is lost by watching the first half from a neighbour's screen.</p>
+    </div>
+  </details>
 
-  <p class="muted" style="margin-top:10px">You are not expected to finish all four demos in the
-  room. Demos 3 and 4 are yours to work through afterwards &mdash; every guide on this page is
-  written to be followed on your own.</p>
+  <details class="wk" id="w3-schedule">
+    <summary>How the session runs <span class="sum-note">Oct 2 timetable</span></summary>
+    <div class="wk-body">
+      <p>Two hours, almost all of it hands-on. Each block is demonstrated first, then you follow
+      along.</p>
+
+      <table>
+        <tr><th style="width:15%">Time</th><th style="width:26%">Activity</th><th>What you should get out of it</th></tr>
+        <tr><td><strong>2:30&ndash;2:45</strong></td><td><strong>Claude basics</strong><br><span class="muted">Instructor-led + follow along</span></td>
+          <td>Claude vs. Claude Code &mdash; what each environment is for. Open or install as needed, sign in, and learn how to talk to Claude and respond to approval prompts.</td></tr>
+        <tr><td><strong>2:45&ndash;3:05</strong></td><td><strong>Markdown + terminal basics</strong><br><span class="muted">Demo + group</span></td>
+          <td>Read a Markdown file. Open a terminal and practise only what class needs: <code>pwd</code>, <code>ls</code>, <code>cd</code>, <code>cd ..</code>, and moving around paths.</td></tr>
+        <tr><td><strong>3:05&ndash;3:20</strong></td><td><strong>Open the course project</strong><br><span class="muted">Demo + group</span></td>
+          <td>Navigate to the course folder, launch Claude Code, confirm it can see the project files, and get one simple prompt to work end to end.</td></tr>
+        <tr><td><strong>3:20&ndash;4:00</strong></td><td><strong>Practice demos</strong><br><span class="muted">Demo + group</span></td>
+          <td>Repository-as-context against MCP: how the agent infers, how permission-aware tools behave, and how to define a scoped agent.</td></tr>
+        <tr><td><strong>4:00&ndash;4:30</strong></td><td><strong>Brainstorm project ideas</strong><br><span class="muted">Group</span></td>
+          <td>Find one workflow you already run that could become an agent-callable capability, and sketch it.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details class="wk" id="w3-advice">
+    <summary>Advice &mdash; how to get the most out of Friday <span class="sum-note">read this</span></summary>
+    <div class="wk-body">
+      <p><strong>Come with a candidate workflow in mind.</strong> The last half hour is the part
+      that outlasts the workshop. The best candidate is something you have run more than three
+      times, where the inputs are files and the output is a number, a table or a figure &mdash;
+      and where you already know what a wrong answer looks like. Bring that last part especially;
+      it is what turns a script into a capability worth exposing.</p>
+
+      <p><strong>Leave the approval prompts on.</strong> Claude Code asks before it edits or runs
+      things, and <code>shift+tab</code> cycles to modes that stop asking. Leave it alone on
+      Friday. One of the demos is entirely about watching permissions refuse something &mdash; in
+      a bypass mode, nothing refuses and the point disappears.</p>
+
+      <p><strong>Read what the agent proposes before you approve it.</strong> That habit is the
+      single transferable skill from this session, and it is easiest to build while the stakes are
+      a synthetic tissue slide.</p>
+
+      <p><strong>Keep the <a href="handout.html">handout</a> open in a second tab.</strong> The
+      vocabulary &mdash; model, workflow, tool, schema, permission, scoped subagent &mdash; is
+      doing real work in every demo.</p>
+
+      <p><strong>Expect not to finish, and do not let that stall you.</strong> Every guide on this
+      site is written to be followed alone afterwards. If you fall behind during a block, stop
+      typing and watch; the files are all still there on Saturday.</p>
+
+      <p><strong>Pair up if your setup breaks.</strong> Two people on one working laptop learn more
+      than one person debugging an install for forty minutes.</p>
+
+      <p class="muted">Course materials are also mirrored in the
+      <a href="https://drive.google.com/drive/folders/1tvhNFZ5lxELaZO_MIg9PaBsUNvC9KOLY?usp=drive_link" target="_blank" rel="noopener">shared Google Drive folder</a>.</p>
+    </div>
+  </details>
 </section>
 
 <section id="demos">
@@ -436,6 +550,27 @@ pip install -r requirements.txt</code></pre>
     classifier is a stand-in; neither is suitable for any clinical or research use.</p>
   </div>
 </footer>
+
+<script>
+(function(){
+  function openTarget(){
+    var id = decodeURIComponent((location.hash || '').slice(1));
+    if(!id) return;
+    var el = document.getElementById(id);
+    if(!el) return;
+    for(var n = el; n; n = n.parentElement){
+      if(n.tagName === 'DETAILS') n.open = true;
+    }
+    el.scrollIntoView();
+  }
+  window.addEventListener('hashchange', openTarget);
+  if(document.readyState === 'loading'){
+    window.addEventListener('DOMContentLoaded', openTarget);
+  } else {
+    openTarget();
+  }
+})();
+</script>
 
 </body>
 </html>
