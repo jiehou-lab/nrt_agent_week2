@@ -41,7 +41,7 @@
     agent whose only job is to disbelieve the first one. <strong>Demo 8</strong> is a map rather than
     a download: the named patterns, against the demos you have already run. <strong>Demo 10</strong> leaves the course
     folder entirely and points an agent at a vault of your own papers and notes;
-    <strong>Demo 11</strong> does the same for a Zotero library and the bibliography you build from it.</p>
+    <strong>Demo 11</strong> does the same for a Zotero library and the bibliography you build from it; <strong>Demo 12</strong> joins the two and asks whether they still agree.</p>
     <p class="hero-cta" style="margin-top:1.3rem">
       <a class="btn btn-ghost" href="index.html#demos">← The four core demos</a>
       <a class="btn btn-ghost" href="guides/memory.html">Memory and sessions</a>
@@ -71,6 +71,7 @@
     <tr><td><strong>A field with a real oracle</strong></td><td><strong>Demo 9</strong> &mdash; formal proof: what an unarguable checker does and does not settle.</td></tr>
     <tr><td><strong>Reading, notes and your own documents</strong></td><td><strong>Demo 10</strong> &mdash; a vault of papers, clips and a spreadsheet, and what stops the notes an agent writes from being wrong.</td></tr>
     <tr><td><strong>A literature review or a reference library</strong></td><td><strong>Demo 11</strong> &mdash; a Zotero library whose three views disagree, and a bibliography checked claim by claim against the PDFs.</td></tr>
+    <tr><td><strong>A reference manager and a note system that have drifted apart</strong></td><td><strong>Demo 12</strong> &mdash; the one field that joins Zotero to Obsidian, and the five ways ten months of ordinary use breaks it.</td></tr>
     <tr><td><strong>Still deciding the shape</strong></td><td><strong>Demo 8</strong> &mdash; workflow or agent, and where each named pattern fails.</td></tr>
     <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered by a package. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting. Demo 6 says how to ask for that.</td></tr>
   </table>
@@ -368,6 +369,44 @@
         <p class="muted"><strong>Zotero is not required.</strong> The library ships as exports on disk &mdash; no account, no API key, no MCP, offline. The live route is an appendix for afterwards.</p>
         <p class="muted"><strong>Pairs with Demo 10</strong>, same literature. Demo 10 is the notes; this is the library.</p>
         <p class="muted"><strong>The library is synthetic</strong> and the agent&rsquo;s behaviour is unmeasured &mdash; the defects were verified mechanically, the expectations were not. Report what your run does.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── DEMO 12 ───────────────────────── -->
+  <div class="level">
+    <div class="level-head">
+      <div class="level-num">12</div>
+      <div>
+        <h3>Zotero + Obsidian + Claude Code &mdash; the join</h3>
+        <p>Both halves are folders, so the setup takes one <code>cd</code>. Keeping them in step over ten months is the part no workflow post covers.</p>
+      </div>
+    </div>
+    <div class="level-body">
+      <div>
+        <h4>What you will do</h4>
+        <ul>
+          <li>Connect a Zotero library and an Obsidian vault with <strong>no MCP server, no API key, no plugin</strong> &mdash; they are two folders side by side.</li>
+          <li>Check seven notes written between Nov 2025 and Aug 2026 against a library that moved underneath them. <strong>Two of the seven keys still resolve.</strong></li>
+          <li>Repair the join with <code>linker</code>, which may change <strong>one field</strong> &mdash; and watch it <em>refuse</em> the one note where two library items share a DOI.</li>
+          <li>Run <code>drift</code> (<strong>no <code>Write</code> tool</strong>) in both directions: dead keys, wrong records, stale metadata, notes that cannot be verified, orphans, and two notes about one paper that contradict each other.</li>
+          <li>Find the note holding the best evidence in the workspace &mdash; and work out why it <strong>can never be cited</strong>.</li>
+        </ul>
+        <h4>What it teaches</h4>
+        <ul>
+          <li><strong>One field is the whole integration:</strong> <code>zotero_key</code>. Not the title, which gets retyped; not the cite key, which Better BibTeX regenerates when you fix metadata; not the filename, which carries a year that may be wrong.</li>
+          <li><strong>A key that resolves is not a key that is right.</strong> The nastiest defect here points at a real record &mdash; the wrong one &mdash; so every naive check passes it.</li>
+          <li>The attachment outranks the library, and the library outranks the note. Three copies of a fact in three places, and only one of them is the paper.</li>
+          <li><strong>Nothing here was anyone's mistake.</strong> This is just what ordinary use does to two systems with no shared identifier.</li>
+        </ul>
+      </div>
+      <div class="demo-box">
+        <a class="btn" href="downloads/Demo12_zotero_obsidian_claude.zip" target="_blank" rel="noopener">Download demo 12 &nbsp;&darr;</a>
+        <a class="btn btn-ghost" href="guides/demo12.html" target="_blank" rel="noopener">Open the guide</a>
+        <p class="muted">ZIP &middot; 550&nbsp;KB &middot; 30&ndash;40 min. <code>pdftotext</code> recommended.</p>
+        <p class="muted"><strong>Neither Zotero nor Obsidian is required.</strong> Both halves ship as folders on disk &mdash; no account, no key, no plugin, offline.</p>
+        <p class="muted"><strong>The capstone for Demos 10 and 11.</strong> Demo 10 asks whether the notes are right; Demo 11 whether you can cite what you have; this one whether the two still agree.</p>
+        <p class="muted"><strong>Synthetic, and the agent's behaviour is unmeasured</strong> &mdash; the divergences were verified mechanically, the expectations were not.</p>
       </div>
     </div>
   </div>

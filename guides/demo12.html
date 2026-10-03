@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 12 · Zotero + Obsidian + Claude Code — Agentic AI Week 2</title>
+<meta name="description" content="Both halves are folders, so there is nothing to connect. The hard part is keeping them in step: seven notes written over ten months, and a library that moved underneath them.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='46' font-family='Georgia,serif' fill='%23fff'>12</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 12 &middot; ADVANCED &mdash; THE JOIN</p>
+    <h1>Zotero + Obsidian + Claude Code</h1>
+    <p class="lede">Both halves are folders, so the setup takes one <code>cd</code>. <strong>Keeping them in step is the hard part</strong> &mdash; and it is the part no workflow post covers.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo12_zotero_obsidian_claude.zip" target="_blank" rel="noopener">Download Demo 12 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo11.html">&larr; Demo 11</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<p>Package:</p>
+<p><code>Demo12_zotero_obsidian_claude.zip</code> &middot; 550&nbsp;KB &middot; 30&ndash;40 minutes</p>
+
+<div class="note">
+<p><strong>There is nothing to connect.</strong> A Zotero library on disk is a
+<code>.bib</code> export, a <code>.csv</code> export and a <code>storage/</code>
+folder. An Obsidian vault is a folder of Markdown. Put them side by side,
+<code>cd</code> to the parent, run <code>claude</code>. That is the integration
+&mdash; no MCP server, no API key, no Local REST API plugin, no
+<code>.mcp.json</code>.</p>
+<p>Every guide to this subject spends its first ten minutes on setup you do not
+need, and none of them spends any time on what actually breaks.</p>
+</div>
+
+<h2>What actually breaks</h2>
+
+<p>Seven notes in <code>vault/papers/</code>, written between November 2025 and
+August 2026. Nine items in the library. <strong>Every note was correct the day
+it was written.</strong></p>
+
+<p>Since then: the library was corrected, a duplicate was typed in by hand, an
+attachment was replaced with the published version, and a PDF appeared in
+<code>storage/</code> that no item claims. None of the notes know any of this.</p>
+
+<p>The one field holding the two systems together:</p>
+
+<pre><code>zotero_key: 4J8KQW2M</code></pre>
+
+<p>Eight characters, stable, and the only thing in either system that is.
+<strong>Not the title</strong>, which gets retyped. <strong>Not the cite
+key</strong>, which Better BibTeX regenerates whenever you fix metadata.
+<strong>Not the filename</strong>, which carries a year that may turn out to be
+wrong.</p>
+
+<p>In this workspace, <strong>two of the seven notes have a
+<code>zotero_key</code> that resolves.</strong></p>
+
+<h2>The five ways they came apart</h2>
+
+<ul>
+<li><strong>A dead key.</strong> Points at nothing. The paper is in the library
+under a different key, matchable by DOI. The easy one.</li>
+<li><strong>No key at all.</strong> Written before the convention existed. Shows
+up from the other side as <em>&ldquo;this library item has no note&rdquo;</em>
+&mdash; one problem, two symptoms, and an agent checking one direction reports
+it twice.</li>
+<li><strong>The wrong record of the right paper.</strong> The key
+<em>resolves</em>, so a naive check passes it &mdash; but it resolves to a
+hand-typed duplicate with the same DOI, the wrong year and no attachment.
+<code>linker</code> should <strong>refuse to fix this silently</strong>: two
+items share one DOI, and quietly picking one buries a library problem you needed
+to see.</li>
+<li><strong>Stale metadata that already left the building.</strong> A note says
+2024 / bioRxiv; the library says the same; <strong>the attached PDF says 2025,
+Methods in Protein Science, different DOI.</strong> The library&rsquo;s own
+<code>Extra</code> field admits it: <em>"replaced attachment with published
+version."</em> Three artefacts now carry the wrong year &mdash; the frontmatter,
+the filename, and a line reading <em>"cited in the group slides as Lindqvist
+2024 preprint."</em></li>
+<li><strong>Two notes, one paper, opposite conclusions.</strong> March: 23%
+improvement, from the abstract. July: 7.5%, from the table, plus <em>"my earlier
+note on this paper is wrong."</em> They point at <strong>different
+keys</strong>, so the join does not reveal they are the same paper. The Zotero
+duplicate has propagated into the vault, and the vault no longer knows it is
+contradicting itself.</li>
+</ul>
+
+<h2>Two owners, one folder</h2>
+
+<table>
+<tr><th style="width:26%">Path</th><th style="width:22%">Owner</th><th>The agent may</th></tr>
+<tr><td><code>zotero/</code></td><td>Zotero</td><td><strong>read only</strong></td></tr>
+<tr><td><code>vault/papers/</code></td><td>me, with help</td><td>read, write</td></tr>
+<tr><td><code>vault/topics/</code></td><td><strong>me</strong></td><td>read, link &mdash; <strong>never write</strong></td></tr>
+<tr><td><code>vault/proposals/</code></td><td>the agent</td><td>write</td></tr>
+</table>
+
+<p>Both <code>Edit</code> and <code>Write</code> are denied on
+<code>zotero/</code> and on <code>vault/topics/</code>. The first protects the
+system of record; the second protects your own thinking.
+<code>Bash(mv:./zotero/**)</code> is denied too &mdash; one plausible
+&ldquo;tidy up&rdquo; and every attachment path stops resolving.</p>
+
+<p>And <code>linker</code> may change <strong>one field</strong>:
+<code>zotero_key</code>. Not the prose, not the claims, not the years &mdash;
+even the ones that are wrong. Those belong to <code>drift</code>, which has
+<strong>no <code>Write</code> tool at all</strong>.</p>
+
+<h2>The note you cannot cite</h2>
+
+<p>One note holds the strongest evidence in the workspace &mdash; the
+ThermoNet-2 authors&rsquo; own supplement, reporting <strong>8.0&nbsp;&deg;C on
+the 43 held-out records whose sequences were not in training</strong>, against
+the 4.9 in their abstract. Its source sits in <code>zotero/storage/</code> and
+belongs to <strong>no library item</strong>.</p>
+
+<p>So it will never appear in a bibliography, a citation manager, or a reference
+list. The note says so itself: <em>&ldquo;This is the most important number I
+have and I cannot cite it.&rdquo;</em></p>
+
+<p>The fix is not a vault fix. It is: open Zotero, add the file, give it
+metadata. An agent that offers to add it to the library is about to write to a
+denied path, and should say instead that this one is yours to do.</p>
+
+<h2>Where this sits</h2>
+
+<table>
+<tr><td><strong><a href="demo10.html">Demo 10</a></strong></td><td>The vault. Are the notes right?</td></tr>
+<tr><td><strong><a href="demo11.html">Demo 11</a></strong></td><td>The library. Can you cite what you have?</td></tr>
+<tr><td><strong>Demo 12</strong></td><td>The join. <strong>Do the two still agree?</strong></td></tr>
+</table>
+
+<p>Same literature across all three, so this one spends its time on the
+connection rather than re-teaching the papers.</p>
+
+<p><strong>Nothing here was anyone&rsquo;s mistake.</strong> Metadata got
+corrected, a duplicate got typed in, an attachment got replaced, a file got
+dropped in a folder. Every note was right when it was written. The drift is
+simply what ordinary use does to two systems with no shared identifier &mdash;
+which is why the one line that matters in this whole package is
+<code>zotero_key:</code>.</p>
+
+<h2>Using it on your own work</h2>
+
+<p>From Zotero: select a collection &rarr; right-click &rarr; <em>Export
+Collection</em> &rarr; Better BibTeX with <em>Export Files</em> ticked, and
+again as CSV. Drop both next to your vault, copy <code>CLAUDE.md</code> and
+<code>.claude/</code> across, add <code>zotero_key</code> to your note template,
+and start filling it in.</p>
+
+<p>That one field is the entire integration, and it is worth more than any MCP
+server you could install &mdash; because it survives a Zotero update, a vault
+rename, a change of reference manager, and a laptop.</p>
+
+<div class="note">
+<p><strong>What is verified and what is not.</strong> Every planted divergence
+was checked mechanically against the files: which keys resolve, which DOIs
+collide, which attachment paths are broken, which storage folder no item claims,
+and that the note and its PDF really do disagree about the year. <strong>The
+agent&rsquo;s behaviour was not measured</strong> &mdash; assembled without
+Claude Code available, so the expectations here are predictions. The library and
+the papers are synthetic; do not cite anything in the package.</p>
+</div>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo10.html">Demo 10 &mdash; the vault</a>
+  <a class="btn btn-ghost" href="demo11.html">Demo 11 &mdash; the library</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">The library and the notes in this package are
+    <strong>synthetic</strong>. The papers, authors, journals, DOIs and results
+    do not exist and were written for this exercise.</p>
+  </div>
+</footer>
+
+</body>
+</html>
