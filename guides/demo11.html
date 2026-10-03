@@ -71,6 +71,13 @@ or a repository.</p>
 get full text. <strong>All three are reads.</strong> There is no tool to add a
 tag, create a collection, fix a year or merge a duplicate.</p>
 
+<p>Worth knowing alongside this: the web API is <strong>free</strong> &mdash; no
+paid tier, no request quota. But <code>zotero_item_fulltext</code> only works on
+PDFs <em>synced to Zotero&rsquo;s servers</em>, and file storage is metered at
+300&nbsp;MB free, then $20&ndash;$120 a year. Past the quota the API can tell you
+a paper exists and not give you its text. Local reads your disk, at full size,
+for nothing.</p>
+
 <p>So &ldquo;use an agent to manage my Zotero library&rdquo; resolves into
 something more modest and more correct: <strong>the agent reads the library and
 writes files beside it.</strong> You apply changes in Zotero. That keeps a human
@@ -137,7 +144,7 @@ Zotero yourself.</p>
 library whose every attachment has stopped resolving &mdash; and Zotero will not
 tell you until you click one.</p>
 
-<h2>Five prompts</h2>
+<h2>Six prompts</h2>
 
 <ol class="steps">
 <li><strong>Audit first.</strong> <em>&ldquo;Reconcile the .bib, the .csv and
@@ -155,7 +162,48 @@ annotation it finds the claim in the PDF, or says it cannot. It can report that 
 citation is wrong; it cannot make the problem disappear.</li>
 <li><strong>Three sentences you could put in a paper</strong>, each citing an item
 key. If they come out hedged and short, the library did its job.</li>
+<li><strong>The review outline, and the test nobody runs.</strong> Ask for the
+eight-section outline everyone asks for &mdash; then ask <em>which of these
+sections could you have written without my library?</em></li>
 </ol>
+
+<h2>The sixth prompt is the one that matters</h2>
+
+<p>Every guide to this subject ends at &ldquo;and then it wrote me a literature
+review.&rdquo; Look closely at what those outlines contain: <em>Introduction ·
+Mechanisms · Global distribution · Methods · Open problems</em>. That is the
+generic structure of a review in almost any field. <strong>A model can produce
+it from training data alone</strong> &mdash; no library, no PDFs, no Zotero. The
+output looks identical whether it read your library or recalled the field, and
+you cannot tell by reading it.</p>
+
+<p>The <strong>item key</strong> settles it. <code>4J8KQW2M</code> is an
+eight-character string that exists only in <em>your</em> library. It cannot be
+recalled from training; it can only be read. Either the agent names one and you
+can check it, or it cannot.</p>
+
+<p>On the library as shipped, an eight-section outline comes back
+<strong>three sections grounded, one hollow, four generic</strong>:</p>
+
+<ul>
+<li><strong>Structure-based predictors</strong> &mdash; a section every review on
+this topic has. This library holds one stub for it: title, author, year, no DOI,
+no attachment. The method that <em>beats</em> ThermoNet-2 in ThermoNet-2&rsquo;s
+own table cannot be written about at all.</li>
+<li><strong>Evaluation and benchmarking</strong> &mdash; the strongest section,
+and it depends on the orphaned supplement. An agent that searches before it
+audits writes a decent version from one paper and never learns what it missed.</li>
+<li><strong>Introduction, applications, future directions</strong> &mdash;
+plausible, fluent, and from nowhere.</li>
+</ul>
+
+<p>A run that marks nothing as generic has failed this prompt. Not because the
+outline is wrong, but because it is claiming library support it does not have
+&mdash; the same error as the paywalled abstract in Demo 10, one level up.</p>
+
+<p>The last part of the template is the part worth keeping: <em>sections this
+library cannot support.</em> That is a reading list, and it is the only output
+in either demo that tells you what to go and do next.</p>
 
 <h2>The defect nothing catches</h2>
 
