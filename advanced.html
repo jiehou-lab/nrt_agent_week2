@@ -41,7 +41,7 @@
     agent whose only job is to disbelieve the first one. <strong>Demo 8</strong> is a map rather than
     a download: the named patterns, against the demos you have already run. <strong>Demo 10</strong> leaves the course
     folder entirely and points an agent at a vault of your own papers and notes;
-    <strong>Demo 11</strong> does the same for a Zotero library and the bibliography you build from it; <strong>Demo 12</strong> joins the two and asks whether they still agree.</p>
+    <strong>Demo 11</strong> does the same for a Zotero library and the bibliography you build from it; <strong>Demo 12</strong> joins the two and asks whether they still agree. <strong>Demo 13</strong> puts an agent on top of a scraper you already run, and reads the documents it only ever saw the titles of.</p>
     <p class="hero-cta" style="margin-top:1.3rem">
       <a class="btn btn-ghost" href="index.html#demos">← The four core demos</a>
       <a class="btn btn-ghost" href="guides/memory.html">Memory and sessions</a>
@@ -72,6 +72,7 @@
     <tr><td><strong>Reading, notes and your own documents</strong></td><td><strong>Demo 10</strong> &mdash; a vault of papers, clips and a spreadsheet, and what stops the notes an agent writes from being wrong.</td></tr>
     <tr><td><strong>A literature review or a reference library</strong></td><td><strong>Demo 11</strong> &mdash; a Zotero library whose three views disagree, and a bibliography checked claim by claim against the PDFs.</td></tr>
     <tr><td><strong>A reference manager and a note system that have drifted apart</strong></td><td><strong>Demo 12</strong> &mdash; the one field that joins Zotero to Obsidian, and the five ways ten months of ordinary use breaks it.</td></tr>
+    <tr><td><strong>A pipeline you already built that needs judgement on top</strong></td><td><strong>Demo 13</strong> &mdash; funding solicitations: why the scraper's top hit is unsubmittable, its bottom hit is the one to write, and where the reason for last year's decision should live.</td></tr>
     <tr><td><strong>Still deciding the shape</strong></td><td><strong>Demo 8</strong> &mdash; workflow or agent, and where each named pattern fails.</td></tr>
     <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered by a package. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting. Demo 6 says how to ask for that.</td></tr>
   </table>
@@ -407,6 +408,44 @@
         <p class="muted"><strong>Neither Zotero nor Obsidian is required.</strong> Both halves ship as folders on disk &mdash; no account, no key, no plugin, offline.</p>
         <p class="muted"><strong>The capstone for Demos 10 and 11.</strong> Demo 10 asks whether the notes are right; Demo 11 whether you can cite what you have; this one whether the two still agree.</p>
         <p class="muted"><strong>Synthetic, and the agent's behaviour is unmeasured</strong> &mdash; the divergences were verified mechanically, the expectations were not.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── DEMO 13 ───────────────────────── -->
+  <div class="level">
+    <div class="level-head">
+      <div class="level-num">13</div>
+      <div>
+        <h3>Funding radar &mdash; an agent layer over a system you already have</h3>
+        <p>The pipeline's highest-scoring call is one you cannot submit to. Its lowest-scoring call is the best fit in the set. Both are the scorer working correctly.</p>
+      </div>
+    </div>
+    <div class="level-body">
+      <div>
+        <h4>What you will do</h4>
+        <ul>
+          <li>Leave the scraper alone &mdash; fetching and scoring are deterministic work Python does better &mdash; and add the two things it <em>structurally cannot</em> do: read the actual solicitation, and remember last year's decision.</li>
+          <li>Drop <strong>six solicitations into <code>inbox/</code></strong> yourself &mdash; four PDFs, two saved web pages &mdash; and triage them against a profile that states <strong>constraints, not just interests</strong>.</li>
+          <li>Find the call scored <strong>96</strong> whose institutional down-select closed two months before the deadline on its cover.</li>
+          <li>Find the call scored <strong>38</strong> whose first area of interest is your own standing research question, written in vocabulary your keywords do not contain.</li>
+          <li>Run <code>recurrence</code> (<strong>no <code>Write</code> tool</strong>) <em>before</em> reading anything, and watch one call resolve to a paragraph quoting why you passed on it in February 2025.</li>
+        </ul>
+        <h4>What it teaches</h4>
+        <ul>
+          <li><strong>A real funding-radar schema has an empty <code>feedback</code> table.</strong> 90 items, 0 votes &mdash; because "the $200k cap is below what the work costs" does not fit in an <code>INTEGER</code>, so the reason goes nowhere and you read the call again next year.</li>
+          <li><strong>Four of the five traps are caught by the constraints half of the profile</strong> &mdash; indirect rate, smallest viable project, cost-share appetite, down-select timing. The half nobody writes down.</li>
+          <li>A keyword filter cannot match a description of your work that avoids your words. That is not a threshold problem and no tuning fixes it.</li>
+          <li>One way only: the database owns <em>what exists</em>, the notes own <em>what you decided</em>, and the exporter never eats a decision block.</li>
+        </ul>
+      </div>
+      <div class="demo-box">
+        <a class="btn" href="downloads/Demo13_funding_radar.zip" target="_blank" rel="noopener">Download demo 13 &nbsp;&darr;</a>
+        <a class="btn btn-ghost" href="guides/demo13.html" target="_blank" rel="noopener">Open the guide</a>
+        <p class="muted">ZIP &middot; 270&nbsp;KB &middot; 35&ndash;45 min. <code>pdftotext</code> required; Python 3, standard library only.</p>
+        <p class="muted"><strong>Closest to a real tool of any demo here.</strong> Point the exporter at your own database, rewrite the profile with your own numbers, and it is yours.</p>
+        <p class="muted"><strong>The solicitations are synthetic.</strong> Programme numbers, deadlines, award sizes and eligibility rules were written for this exercise. Do not act on anything in the package.</p>
+        <p class="muted"><strong>Traps verified, agent behaviour unmeasured.</strong> The verification pass found and fixed a real bug: an earlier exporter destroyed the decision block on re-export.</p>
       </div>
     </div>
   </div>

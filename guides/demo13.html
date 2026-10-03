@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 13 · Funding radar — Agentic AI Week 2</title>
+<meta name="description" content="An agent layer over a scraper you already have. The highest-scoring call is one you cannot submit to; the lowest-scoring one is the best fit. Both are the scorer working correctly.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='46' font-family='Georgia,serif' fill='%23fff'>13</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 13 &middot; ADVANCED &mdash; AN AGENT LAYER OVER A SYSTEM YOU ALREADY HAVE</p>
+    <h1>Funding radar</h1>
+    <p class="lede">The pipeline&rsquo;s <strong>highest-scoring</strong> call is one you cannot submit to. Its <strong>lowest-scoring</strong> call is the best fit in the set. Both of those are the scorer working correctly &mdash; it matched keywords in a title, which is all it had.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo13_funding_radar.zip" target="_blank" rel="noopener">Download Demo 13 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo12.html">&larr; Demo 12</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<p>Package:</p>
+<p><code>Demo13_funding_radar.zip</code> &middot; 270&nbsp;KB &middot; 35&ndash;45 minutes</p>
+
+<h2>Don&rsquo;t rebuild the scraper</h2>
+
+<p>Fetching, prefiltering, deduping and scoring are deterministic. Python does
+them faster, cheaper, reproducibly, and with tests. Turning a scraper into agent
+prompts makes it slower and non-reproducible &mdash; the wrong side of
+<a href="demo8.html">Demo 8</a>&rsquo;s workflow-versus-agent line.</p>
+
+<p>So this demo adds the two things a scraper <em>structurally cannot</em> do:
+<strong>read the actual solicitation</strong>, and <strong>remember what you
+decided last time.</strong></p>
+
+<div class="note">
+<p><strong>The one-line diagnosis.</strong> Here is the schema of a real
+funding-radar project:</p>
+<pre><code>CREATE TABLE items    (uid, feed, source, title, url, org, score, rationale, ...);
+CREATE TABLE feedback (uid TEXT, vote INTEGER, ts TEXT);</code></pre>
+<p><code>items</code>: 90 rows. <strong><code>feedback</code>: 0 rows.</strong></p>
+<p>The slot for the decision exists and is empty &mdash; because <em>&ldquo;passed,
+the $200k cap is below what the work costs&rdquo;</em> does not fit in an
+<code>INTEGER</code>. So the reason goes nowhere, and next year the same call
+comes round and you read it from scratch.</p>
+</div>
+
+<h2>The half the scraper never sees</h2>
+
+<p><code>inbox/</code> holds <strong>six solicitations you dropped in
+yourself</strong> &mdash; four PDFs and two saved web pages. The scraper only
+ever saw their titles and abstracts. The traps are all two pages in.</p>
+
+<table>
+<tr><th style="width:9%">Score</th><th style="width:34%">Call</th><th>What reading it reveals</th></tr>
+<tr><td><strong>96</strong></td><td>NSF 26-512 &mdash; AI Institutes</td>
+  <td><strong>Ineligible.</strong> Three dates, and the one on the cover is not binding: the institutional down-select closed in October, the required LOI closed in December.</td></tr>
+<tr><td><strong>91</strong></td><td>USDA-NIFA &mdash; Crop Resilience</td>
+  <td><strong>Already decided.</strong> The document says it reissues last year&rsquo;s call unchanged, and your log says you passed in February 2025 &mdash; with the reason.</td></tr>
+<tr><td><strong>88</strong></td><td>NIH PAR-26-118</td>
+  <td><strong>Superseded</strong>, in a banner at the top. The useful answer is not &ldquo;dead&rdquo; &mdash; it is <em>go and read PAR-27-042</em>.</td></tr>
+<tr><td><strong>85</strong></td><td>NSF 26-534 &mdash; Foundation Models</td>
+  <td>Six of your keyword domains, all genuinely present. 25% cost share required, and the life sciences are explicitly <em>out of scope</em>.</td></tr>
+<tr><td><strong>38</strong></td><td>DOE DE-FOA-0003291</td>
+  <td><strong>Submit.</strong> The only live call in the set.</td></tr>
+</table>
+
+<h2>The profile has two halves, and nobody writes the second one</h2>
+
+<p>Interests say what you would like. <strong>Constraints say what you can
+actually do</strong>, and they are what decides:</p>
+
+<pre><code>Uncommitted effort        0.35 FTE
+Indirect rate             54.5% on MTDC  →  a $200k *total* cap is ~$129k direct
+Smallest viable project   one student for two years ≈ $180k direct
+Cost share                the college does not commit it. A requirement is a decline.
+Limited submissions       down-select closes 8–10 weeks before an NSF LOI
+Equipment                 no wet lab</code></pre>
+
+<p><strong>Four of the five traps are caught by that table alone.</strong> A
+profile listing only research interests cannot produce a triage &mdash; it can
+only produce enthusiasm, which you already had.</p>
+
+<h2>The one at the bottom</h2>
+
+<p>The DOE call scored <strong>38</strong>, lowest in the set, and the scorer
+was honest about why: the document never says <em>foundation model</em>,
+<em>machine learning</em> or <em>deep learning</em>. Then read its first area of
+interest against the profile&rsquo;s first standing question:</p>
+
+<table>
+<tr><td style="width:50%"><strong>Profile, standing question 1</strong><br>
+&ldquo;Cross-species transfer for expression prediction &mdash; a model trained
+on reference species, evaluated honestly on a feedstock genome it has not seen.
+<em>This is the one I most want funded.</em>&rdquo;</td>
+<td><strong>DOE, AOI 1</strong><br>
+&ldquo;…building models that predict expression from sequence in genotypes for
+which no measurement exists. Applications proposing to <em>transfer models
+trained in reference species to feedstock genomes</em> are encouraged to address
+the generalisation problem explicitly.&rdquo;</td></tr>
+</table>
+
+<p>The same sentence, written by two people who have never met. All three of its
+areas of interest map onto the profile, and it clears every constraint.</p>
+
+<p><strong>That is the finding</strong> &mdash; and the fix is not a lower
+threshold. A keyword filter cannot match a description of your work that avoids
+your words. No amount of tuning produces this one; a reader does.</p>
+
+<h2>One way, and it never eats a decision</h2>
+
+<pre><code>pipeline/radar.db       system of record for WHAT EXISTS      read-only, denied
+      ↓  export_vault.py — one way, idempotent
+opportunities/*.md      one note per call
+      ↓
+inbox/*.pdf             the document itself
+      ↓
+YOU: decision + because ← the record that does not exist today
+      ↓
+memos/*.md              the deliverable</code></pre>
+
+<p>The exporter refreshes every note from the database and copies your
+<code>## Decision</code> block through verbatim. Run it twice; nothing you wrote
+is lost. <code>settings.json</code> denies writes to <code>pipeline/</code>, to
+<code>profile/</code>, to <code>inbox/</code>, and reads of <code>.env*</code>
+&mdash; a system of record an agent can edit is no longer a record.</p>
+
+<p>Three agents: <code>recurrence</code> (<strong>no <code>Write</code>
+tool</strong>) checks the log before anything else; <code>triage</code> answers
+<em>is this worth an afternoon?</em> in the order eligibility &rarr; deadlines
+&rarr; money &rarr; scope &rarr; science; <code>fitmemo</code> writes the memo,
+and refuses to write one for a call you cannot submit to &mdash; a well-argued
+memo for an ineligible call is worse than nothing, because it is persuasive.</p>
+
+<div class="note">
+<p><strong>What is verified and what is not.</strong> Every trap was checked
+mechanically against the documents: the submission limit, all three NSF dates,
+the cost-share line, the out-of-scope paragraph, the supersession banner, the
+reissue notice, the two conflicting deadlines, and the budget arithmetic the
+funder states itself. The exporter was run repeatedly to confirm it preserves a
+decision block &mdash; <strong>an earlier version did not, and that bug was
+found and fixed by this check.</strong> <strong>The agent&rsquo;s behaviour was
+not measured.</strong> The solicitations are synthetic: the programmes, numbers,
+agencies&rsquo; specific calls and deadlines do not exist. Do not act on
+anything in the package.</p>
+</div>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo12.html">&larr; Demo 12 &mdash; the join</a>
+  <a class="btn btn-ghost" href="demo10.html">Demo 10 &mdash; the vault</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">The solicitations in this package are <strong>synthetic</strong>.
+    Programme numbers, deadlines, award sizes and eligibility rules were written for
+    this exercise and do not describe any real funding opportunity.</p>
+  </div>
+</footer>
+
+</body>
+</html>
