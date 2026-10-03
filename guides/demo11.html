@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 11 · Zotero — Agentic AI Week 2</title>
+<meta name="description" content="A bibliography is a set of promises. Which of them can an agent check, and which can only you? A Zotero library with the damage every real library has.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='46' font-family='Georgia,serif' fill='%23fff'>11</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 11 &middot; ADVANCED &mdash; A BIBLIOGRAPHY THAT CHECKS ITSELF</p>
+    <h1>Zotero</h1>
+    <p class="lede">A bibliography is a set of promises: that each work exists, that it says what you say it says, and that it is where you say it is. <strong>Which of those can an agent check, and which can only you?</strong></p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo11_zotero_bibliography.zip" target="_blank" rel="noopener">Download Demo 11 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo10.html">&larr; Demo 10</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<p>Package:</p>
+<p><code>Demo11_zotero_bibliography.zip</code> &middot; 540&nbsp;KB &middot; 30&ndash;40 minutes</p>
+
+<h2>Three corrections to the usual tutorial</h2>
+
+<p>There is a widely shared seven-step guide to connecting Zotero to Claude Code.
+It works. Three of its steps are worth questioning before you follow them.</p>
+
+<div class="note">
+<p><strong>1. You probably do not want the web API.</strong> The usual
+instructions have you create a Zotero API key, paste it into
+<code>.mcp.json</code>, and reach your library through
+<code>api.zotero.org</code>. Zotero has had a <strong>local</strong> API since
+version 7 &mdash; Settings &rarr; Advanced &rarr; <em>&ldquo;Allow other
+applications on this computer to communicate with Zotero&rdquo;</em> &mdash; at
+<code>http://localhost:23119/api/</code>, with <strong>no key at all</strong>.
+<code>zotero-mcp</code> reaches it with one line:
+<code>"env": {"ZOTERO_LOCAL": "true"}</code>. Nothing leaves the machine, and
+there is no password-equivalent string to leak into a config file, a screenshot
+or a repository.</p>
+
+<p><strong>2. The MCP server cannot organise your library.</strong>
+<code>zotero-mcp</code> exposes exactly three tools: search items, get metadata,
+get full text. <strong>All three are reads.</strong> There is no tool to add a
+tag, create a collection, fix a year or merge a duplicate.</p>
+
+<p>So &ldquo;use an agent to manage my Zotero library&rdquo; resolves into
+something more modest and more correct: <strong>the agent reads the library and
+writes files beside it.</strong> You apply changes in Zotero. That keeps a human
+between an agent and ten years of references, which is where a human belongs.</p>
+
+<p><strong>3. You need none of it to start.</strong> A Zotero library on disk is
+a <code>.bib</code> export, a <code>.csv</code> export, and a
+<code>storage/</code> folder of PDFs. That is what this demo uses &mdash; no
+account, no key, no MCP, no Zotero installed, works offline. The live route is an
+appendix, for afterwards.</p>
+</div>
+
+<h2>The library</h2>
+
+<p>Nine entries. <strong>Six attachment folders.</strong> That gap is the demo.</p>
+
+<p>The three views of this library &mdash; the <code>.bib</code>, the
+<code>.csv</code> and <code>storage/</code> &mdash; disagree in five places, and
+every disagreement is something that happens to a real library through ordinary
+use:</p>
+
+<ul>
+<li>An entry whose attachment path points at a folder that <strong>does not
+exist</strong> &mdash; the citation is in the library, the paper is not</li>
+<li>That same paper sitting in <code>storage/</code> under a junk entry titled
+<code>scan0043</code>, with no author and no journal &mdash; dragged in once,
+typed in separately, cited zero times</li>
+<li>A folder in <code>storage/</code> that <strong>no entry claims</strong></li>
+<li>Two entries with <strong>the same DOI</strong>, one typed by hand from a
+conference programme with the wrong year</li>
+<li>An entry whose metadata is the preprint and whose attachment is the published
+version &mdash; wrong year, wrong venue, wrong DOI, and the cite key now lies</li>
+<li>A journal article entered as <code>@book</code>, which renders wrongly and
+silently</li>
+<li>An abstract field holding the <em>journal&rsquo;s marketing copy</em> rather
+than the paper&rsquo;s abstract &mdash; on the one entry with no attachment to
+check it against</li>
+</ul>
+
+<p>The orphaned folder is the one that matters. It holds the
+<strong>supplementary information</strong> for the paper the whole topic turns
+on, and in it the authors report their own method at <strong>8.0&nbsp;&deg;C</strong>
+on proteins it has not seen, against the <strong>4.9</strong> in the abstract.
+Every bibliography built from the <code>.bib</code> misses it, because the
+<code>.bib</code> does not know it exists.</p>
+
+<h2>The deny list is the lesson</h2>
+
+<pre><code>"deny": [
+  "Edit(./storage/**)",      "Write(./storage/**)",
+  "Edit(./My Library.bib)",  "Write(./My Library.bib)",
+  "Edit(./My Library.csv)",  "Write(./My Library.csv)",
+  "Bash(rm:*)",
+  "Bash(mv:*)"
+]</code></pre>
+
+<p><strong>The library is read-only and the agent cannot talk its way out of
+it.</strong> Not a polite request in <code>CLAUDE.md</code> &mdash; a rule checked
+before the tool runs. Output goes to <code>bib/</code>; you apply changes in
+Zotero yourself.</p>
+
+<p><code>Bash(mv:*)</code> is denied for a specific reason. Without it,
+&ldquo;tidy up <code>storage/</code>&rdquo; is one plausible command away from a
+library whose every attachment has stopped resolving &mdash; and Zotero will not
+tell you until you click one.</p>
+
+<h2>Five prompts</h2>
+
+<ol class="steps">
+<li><strong>Audit first.</strong> <em>&ldquo;Reconcile the .bib, the .csv and
+storage/. Report every place they disagree. Change nothing.&rdquo;</em> Five
+disagreements. Searching before auditing means never finding the orphan.</li>
+<li><strong>Search.</strong> <code>scout</code> looks for everything bearing on
+one question &mdash; <em>does sequence-only prediction beat a trivial baseline on
+proteins the model has not seen?</em> It cannot be answered from titles.</li>
+<li><strong>Build.</strong> A bibliography into <code>bib/</code>, every entry
+traced to a file in <code>storage/</code> or explicitly marked
+<code>[metadata only &mdash; not read]</code>.</li>
+<li><strong>Check its homework.</strong> <code>citecheck</code> has
+<strong>no <code>Write</code> tool</strong>. For every factual claim in every
+annotation it finds the claim in the PDF, or says it cannot. It can report that a
+citation is wrong; it cannot make the problem disappear.</li>
+<li><strong>Three sentences you could put in a paper</strong>, each citing an item
+key. If they come out hedged and short, the library did its job.</li>
+</ol>
+
+<h2>The defect nothing catches</h2>
+
+<p>The journal article entered as <code>@book</code> is well-formed, internally
+consistent, and wrong. No layer in this package finds it: not the contract, not
+the permissions, not the verifier. The person who notices is the one who has had
+a reference list come back from a copy editor.</p>
+
+<p>That is the honest end of the sequence the course has been building. Prose
+asks, permissions enforce, a missing tool removes the option &mdash; and some
+things are still only caught by someone who knows what the output is supposed to
+look like.</p>
+
+<h2>Pairs with Demo 10</h2>
+
+<p>Same literature, deliberately. <a href="demo10.html">Demo 10</a> is the
+<strong>notes</strong> &mdash; what you thought about what you read. Demo 11 is
+the <strong>library</strong> &mdash; what you have, and whether you can cite it.
+Together they are the shape worth copying: Zotero holds the PDFs, an Obsidian
+vault holds the thinking, and the agent reads both and writes only to the vault.</p>
+
+<div class="note">
+<p><strong>What is verified and what is not.</strong> The library is verified:
+the <code>.bib</code> parses, every planted defect was checked mechanically, the
+broken path really is broken, the orphan really is unreferenced, and the
+metadata/PDF mismatch is real in both directions. <strong>The agent&rsquo;s
+behaviour was not measured</strong> &mdash; assembled without Claude Code
+available, so the expectations here are predictions. The documents are synthetic;
+the papers, authors, journals and DOIs do not exist. Do not cite anything in the
+package.</p>
+</div>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo10.html">&larr; Demo 10 &mdash; Obsidian vault</a>
+  <a class="btn btn-ghost" href="memory.html">Memory and context</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">Zotero is reached through
+    <a href="https://pypi.org/project/zotero-mcp/" target="_blank" rel="noopener">zotero-mcp</a>,
+    a separate project. The local API is documented at
+    <a href="https://www.zotero.org/support/dev/web_api/v3/local_api" target="_blank" rel="noopener">zotero.org</a>.
+    The library in this package is synthetic.</p>
+  </div>
+</footer>
+
+</body>
+</html>
