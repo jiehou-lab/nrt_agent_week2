@@ -46,7 +46,7 @@
 <a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
 
 <p>Package:</p>
-<p><code>Demo10_obsidian_research_vault.zip</code> &middot; 540&nbsp;KB &middot; 35&ndash;45 minutes</p>
+<p><code>Demo10_obsidian_research_vault.zip</code> &middot; 610&nbsp;KB &middot; 50&ndash;60 minutes</p>
 
 <div class="note">
 <p><strong>There is nothing to integrate.</strong> An Obsidian vault is a folder of
@@ -126,7 +126,7 @@ away from being undone. No guide to this subject mentions it, and it matters
 more than any of the configuration above.</p>
 </div>
 
-<h2>The six prompts</h2>
+<h2>The first six prompts &mdash; getting the notes right</h2>
 
 <ol class="steps">
 <li><strong>Orient.</strong> <em>&ldquo;Look at inbox/ and tell me what kinds of
@@ -155,11 +155,80 @@ notes in papers/, what should I conclude about whether sequence-only prediction
 has actually improved since 2021? Cite the note for every claim.&rdquo;</em></li>
 </ol>
 
+<h2>Then the vault has to change its mind</h2>
+
+<p>Filing papers is the cost of entry, not the point. A knowledge base that only
+accumulates is a folder with better metadata. <strong>Prompts 7&ndash;9 are about
+what happens when the next paper arrives.</strong></p>
+
+<p>The <code>curator</code> subagent reads every note in <code>topics/</code> and
+<code>papers/</code> and answers four questions about a newly filed paper:</p>
+
+<ol class="steps">
+<li><strong>Which topic note does this bear on, and what does it change
+there?</strong> Naming the specific line &mdash; &ldquo;relates to
+thermostability&rdquo; is not an answer.</li>
+<li><strong>Which concept does it supplement?</strong></li>
+<li><strong>What does it contrast with</strong> &mdash; and is that a
+<em>contradiction</em> (one of them is wrong), a <em>refinement</em> (both true,
+different scope), or a <em>supersession</em> (same question, better evidence,
+later)? Those three need different responses, and collapsing them is the common
+mistake.</li>
+<li><strong>What gap does it open?</strong> The most valuable output, and the
+easiest to skip.</li>
+</ol>
+
+<p>It writes a <strong>proposal</strong> &mdash; the exact lines to add, and the
+exact lines to remove quoted from the current note &mdash; into
+<code>proposals/</code>. It never touches <code>topics/</code>, because both
+<code>Edit</code> and <code>Write</code> are denied there. You apply it, or you
+don&rsquo;t.</p>
+
+<p>That restriction is not distrust of the output. It is that <strong>a synthesis
+note you accepted is yours, and one that appeared while you were not looking is
+not</strong> &mdash; and six months from now you will not be able to tell which
+sentences you wrote. The deny rule exists to keep that distinction, which is the
+only thing separating a knowledge base from a pile of generated text.</p>
+
+<h3>And then it learns something that makes it wrong</h3>
+
+<p><code>wave2/</code> holds two documents that arrive later. Move them into
+<code>inbox/</code>, file them, and run <code>curator</code> again.</p>
+
+<p>The new paper adds buffer composition as an input and reports
+<strong>6.1&nbsp;&deg;C</strong> where every existing note is built on 7.8. Read
+quickly, that makes the vault&rsquo;s conclusion obsolete. Read properly it does
+not: the paper states in its own Section 5 that the sequence-only number is
+<em>unchanged</em>, and its table shows that <strong>buffer alone, with no
+sequence at all, scores 7.4</strong> &mdash; better than the published
+sequence-only model. The leaderboard clipped alongside it says the maintainers
+are splitting the table in two because <em>&ldquo;ranking them together has
+already caused two papers to cite the 6.1 as a sequence-only result.&rdquo;</em>
+The vault is being warned, in writing, about the exact mistake it is about to
+make.</p>
+
+<p>So the correct proposal is a <strong>refinement</strong> &mdash; a scope
+qualifier on the existing claim &mdash; not a replacement, and not a
+contradicting sentence appended beside it. A note that says both things reads as
+considered, which is worse than a note that is simply out of date.</p>
+
+<p>Prompt 9 then asks the same question as prompt 6. <strong>Same question, same
+vault, a more precise answer</strong>, because two documents arrived and the
+vault absorbed them rather than storing them. If the answer comes back
+identical, nothing was learned. If it reverses to &ldquo;sequence-only methods
+now work&rdquo;, the vault read the headline and skipped the tables &mdash; the
+failure this whole package is built around, arriving one last time at the end.</p>
+
 <h2>Why the skeptic has no Write tool</h2>
 
 <p>A verifier that can edit is a verifier you cannot trust, because it can make
 its own findings disappear. <code>skeptic.md</code> lists
 <code>Read, Glob, Grep, Bash</code> and nothing else. It reports; you decide.</p>
+
+<p>Three agents, three jobs, three different amounts of power:
+<code>librarian</code> files and may write notes; <code>curator</code> connects
+and may write only proposals; <code>skeptic</code> checks and may write nothing
+at all.</p>
 
 <p>This is also the clearest demonstration of the difference the course keeps
 coming back to. <code>CLAUDE.md</code> says &ldquo;do not rewrite my topic
@@ -208,7 +277,6 @@ your run differs, your run is the data. Report what you see.</p>
 <nav class="guidenav">
   <a class="btn" href="../advanced.html">Advanced demos</a>
   <a class="btn btn-ghost" href="demo9.html">&larr; Demo 9 &mdash; Lean proof agent</a>
-  <a class="btn btn-ghost" href="demo11.html">Demo 11 &mdash; Zotero &rarr;</a>
   <a class="btn btn-ghost" href="memory.html">Memory and context</a>
 </nav>
 </main>

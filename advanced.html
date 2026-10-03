@@ -295,8 +295,8 @@
     <div class="level-head">
       <div class="level-num">10</div>
       <div>
-        <h3>Claude Code + Obsidian &mdash; notes that check themselves</h3>
-        <p>Ten documents of the kind that actually pile up, seven of them quietly wrong. Not &ldquo;AI reads my papers&rdquo; &mdash; what stops the note it writes from being wrong?</p>
+        <h3>Claude Code + Obsidian &mdash; a vault that changes its mind</h3>
+        <p>Ten documents of the kind that actually pile up, seven of them quietly wrong &mdash; then two more that arrive later and make an earlier conclusion out of date.</p>
       </div>
     </div>
     <div class="level-body">
@@ -308,19 +308,23 @@
           <li>Process an inbox holding a preprint, a photocopied scan with no text layer, a clipped page that stops at &ldquo;Subscribe&rdquo;, and a spreadsheet in the wrong units.</li>
           <li>Run a <code>skeptic</code> subagent with <strong>no <code>Write</code> tool</strong> over the notes the first agent just wrote.</li>
           <li>Ask the vault a question that can only be answered by connecting three documents &mdash; and see whether the notes are good enough to support it.</li>
+          <li>Then run <code>curator</code>: <strong>which topic note does this change, what does it contrast with, what gap does it open?</strong> It writes a <em>proposal</em> &mdash; the exact lines to add and remove &mdash; and cannot touch <code>topics/</code> at all.</li>
+          <li>Drop in two documents that <strong>arrive later</strong> and make an existing conclusion out of date, then ask the same question again. Same vault, better answer.</li>
         </ul>
         <h4>What it teaches</h4>
         <ul>
           <li><strong>The same three layers, on something you own.</strong> <code>CLAUDE.md</code> asks, <code>settings.json</code> enforces, a missing tool removes the option &mdash; here applied to a year of your own notes rather than a demo folder.</li>
           <li><strong>A verifier that can edit is a verifier you cannot trust.</strong> It can make its own findings disappear.</li>
           <li>An abstract is a claim; the tables are the evidence. Most of the planted defects are invisible to anything that reads only abstracts.</li>
+          <li><strong>A knowledge base that only accumulates is a folder with better metadata.</strong> The test of "it grows" is whether the same question gets a different answer next month &mdash; and whether the agent can tell a <em>refinement</em> from a <em>contradiction</em> from a <em>supersession</em>.</li>
+          <li><strong>A synthesis note you accepted is yours; one that appeared while you weren't looking is not.</strong> In six months you cannot tell which sentences you wrote, which is why <code>topics/</code> is denied to every agent and the curator proposes instead.</li>
           <li><code>git init</code> in the vault is worth more than any configuration on the page.</li>
         </ul>
       </div>
       <div class="demo-box">
         <a class="btn" href="downloads/Demo10_obsidian_research_vault.zip" target="_blank" rel="noopener">Download demo 10 &nbsp;&darr;</a>
         <a class="btn btn-ghost" href="guides/demo10.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP &middot; 540&nbsp;KB &middot; 35&ndash;45 min. <code>pdftotext</code> helps but is optional.</p>
+        <p class="muted">ZIP &middot; 610&nbsp;KB &middot; 50&ndash;60 min, nine prompts. <code>pdftotext</code> helps but is optional.</p>
         <p class="muted"><strong>Obsidian is not required.</strong> It is the viewer &mdash; install it to see the property tables and the graph, or skip it entirely.</p>
         <p class="muted"><strong>The documents are synthetic.</strong> The papers, authors, journals, DOIs and results were written for this exercise and do not exist. Do not cite anything in the package.</p>
         <p class="muted"><strong>The agent&rsquo;s behaviour is unmeasured.</strong> The corpus and its defects were verified; the package was assembled without Claude Code available, so the expectations in the guide are predictions. Report what your run actually does.</p>
