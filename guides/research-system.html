@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The research system — a handbook · Agentic AI Week 2</title>
+<meta name="description" content="Demos 10 to 13 as one system: what every file does, how to set it up, how the pieces connect, and how to keep it running week after week.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='70' x='50' text-anchor='middle' font-size='54' font-family='Georgia,serif' fill='%23fff'>H</text></svg>">
+<style>
+.hb-toc{background:#f6f6f4;border:1px solid #e0e0da;border-radius:6px;padding:1.1rem 1.4rem;margin:1.6rem 0 2.2rem}
+.hb-toc h3{margin:0 0 .6rem;font-size:.95rem;letter-spacing:.04em;text-transform:uppercase;color:#555}
+.hb-toc ol{margin:0;padding-left:1.3rem;columns:2;column-gap:2rem}
+.hb-toc li{margin:.22rem 0;break-inside:avoid}
+@media(max-width:620px){.hb-toc ol{columns:1}}
+.filetree{background:#1d1f21;color:#e8e8e3;border-radius:6px;padding:1rem 1.2rem;overflow-x:auto;
+          font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;line-height:1.62;margin:1rem 0}
+.filetree .c{color:#8fa876}
+.filetree .y{color:#e6c07b}
+.filetree .r{color:#e08b7b}
+.filetree b{color:#fff;font-weight:600}
+.lbl{display:inline-block;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;
+     padding:.1rem .45rem;border-radius:3px;vertical-align:.08em;font-weight:600}
+.lbl-edit{background:#dff0d8;color:#2d5a1b;border:1px solid #b6d7a8}
+.lbl-never{background:#fde2e1;color:#8a1f16;border:1px solid #f0b3ae}
+.lbl-gen{background:#e4ecf7;color:#1d3f6b;border:1px solid #b7cce8}
+.step{border-left:3px solid #18453B;padding:.1rem 0 .1rem 1.1rem;margin:1.6rem 0}
+.step h4{margin:.2rem 0 .5rem;font-size:1.02rem}
+.expect{background:#f4f7f4;border-left:3px solid #6b8f68;padding:.7rem 1rem;margin:.7rem 0;font-size:.92rem}
+.expect strong{color:#3c5c39}
+.gotcha{background:#fff8e6;border-left:3px solid #d0a030;padding:.7rem 1rem;margin:.7rem 0;font-size:.92rem}
+</style>
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">HANDBOOK &middot; DEMOS 10&ndash;13 AS ONE SYSTEM</p>
+    <h1>The research system</h1>
+    <p class="lede">The four demo guides argue why the system is shaped the way it is. <strong>This page is the manual</strong>: every file, what it does, how to set it up from nothing, how the pieces connect, and &mdash; the part the guides skip entirely &mdash; <strong>how to keep it running once the demo is over.</strong></p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../advanced.html">All advanced demos</a>
+      <a class="btn btn-ghost" href="demo10.html">Demo 10</a>
+      <a class="btn btn-ghost" href="demo11.html">Demo 11</a>
+      <a class="btn btn-ghost" href="demo12.html">Demo 12</a>
+      <a class="btn btn-ghost" href="demo13.html">Demo 13</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+
+<div class="hb-toc">
+<h3>Contents</h3>
+<ol>
+<li><a href="#what">What the four parts are</a></li>
+<li><a href="#prereq">Prerequisites, and how to check them</a></li>
+<li><a href="#layout">Where to put everything</a></li>
+<li><a href="#files">The files that matter</a></li>
+<li><a href="#flow">How information moves</a></li>
+<li><a href="#firstrun">First run, step by step</a></li>
+<li><a href="#daily">Daily: a paper arrives</a></li>
+<li><a href="#weekly">Weekly: the two routines</a></li>
+<li><a href="#monthly">Monthly: drift and decisions</a></li>
+<li><a href="#newdata">Adding each kind of new data</a></li>
+<li><a href="#rot">What goes wrong over time</a></li>
+<li><a href="#trouble">Troubleshooting</a></li>
+</ol>
+</div>
+
+<h2 id="what">1. What the four parts are</h2>
+
+<p>Four packages. They were built to be run in order and they share one body of
+literature on purpose, so each can teach its own lesson instead of
+re-explaining the papers.</p>
+
+<table>
+<tr><th style="width:13%">Demo</th><th style="width:26%">The thing</th><th>The question it answers</th></tr>
+<tr><td><a href="demo10.html"><strong>10</strong></a></td><td>An Obsidian vault</td>
+  <td><strong>Are the notes right?</strong> Documents arrive, notes get written. What stops a note from being wrong?</td></tr>
+<tr><td><a href="demo11.html"><strong>11</strong></a></td><td>A Zotero library</td>
+  <td><strong>Can you cite what you have?</strong> Three views of one library that disagree in five places.</td></tr>
+<tr><td><a href="demo12.html"><strong>12</strong></a></td><td>Both, side by side</td>
+  <td><strong>Do they still agree?</strong> The join between them, and what ten months of ordinary use does to it.</td></tr>
+<tr><td><a href="demo13.html"><strong>13</strong></a></td><td>A funding radar</td>
+  <td><strong>Is this worth an afternoon?</strong> An agent layer over a pipeline you already run.</td></tr>
+</table>
+
+<p>You can run any one on its own. If you only do one, do <strong>Demo 10</strong>
+&mdash; it is the foundation and the other three assume its vocabulary.</p>
+
+<h3>The single idea underneath all four</h3>
+
+<p>Three ways to control what an agent does, in increasing order of force. Every
+demo is an application of this and nothing else:</p>
+
+<table>
+<tr><th style="width:22%">Mechanism</th><th style="width:20%">Where it lives</th><th>How strong</th></tr>
+<tr><td><strong>Context</strong></td><td><code>CLAUDE.md</code></td>
+  <td><strong>A request.</strong> Usually obeyed. Nothing enforces it. Good for conventions, judgement, taste.</td></tr>
+<tr><td><strong>Permission</strong></td><td><code>.claude/settings.json</code></td>
+  <td><strong>A refusal.</strong> Checked before the tool runs, client-side. The agent cannot argue with it.</td></tr>
+<tr><td><strong>Capability</strong></td><td>a subagent&rsquo;s <code>tools:</code> list</td>
+  <td><strong>Absence.</strong> The tool is not there. Nothing to refuse, nothing to work around.</td></tr>
+</table>
+
+<p>When something in your own setup goes wrong, the useful question is always
+<em>which of these three should have caught it?</em> &mdash; and the answer is
+usually the one you did not write.</p>
+
+<h2 id="prereq">2. Prerequisites, and how to check them</h2>
+
+<p>Run all four checks before unzipping anything. Each one tells you what a
+pass looks like and what to do about a fail.</p>
+
+<div class="step">
+<h4>Claude Code</h4>
+<pre><code>claude --version</code></pre>
+<div class="expect"><strong>Pass:</strong> a version number, e.g. <code>2.1.x</code>.</div>
+<div class="gotcha"><strong>Fail:</strong> <code>command not found</code> &rarr; you have not finished Week 3 setup. Field Guide Part 8, slides 62&ndash;65, or the <a href="../index.html#setup">Setup section</a> on this site.</div>
+</div>
+
+<div class="step">
+<h4>pdftotext &mdash; needed by all four</h4>
+<pre><code>pdftotext -v</code></pre>
+<div class="expect"><strong>Pass:</strong> <code>pdftotext version 24.x</code> (it prints to stderr, which is normal).</div>
+<div class="gotcha"><strong>Fail:</strong> macOS <code>brew install poppler</code> &middot; Ubuntu/Debian <code>sudo apt install poppler-utils</code> &middot; Windows: install inside WSL.
+<br>Demo 10 survives without it &mdash; Claude Code reads short PDFs natively, up to 20 pages per call. Demos 11&ndash;13 will be slow and expensive without it, because they search inside documents repeatedly.</div>
+</div>
+
+<div class="step">
+<h4>git &mdash; this is not optional</h4>
+<pre><code>git --version</code></pre>
+<div class="expect"><strong>Pass:</strong> any version from the last decade.</div>
+<p>You will <code>git init</code> inside every one of these folders before letting
+an agent near them. It is the single most useful line in all four packages and
+it costs nothing.</p>
+</div>
+
+<div class="step">
+<h4>Python 3 &mdash; Demo 13 only</h4>
+<pre><code>python3 --version</code></pre>
+<div class="expect"><strong>Pass:</strong> 3.9 or later. No packages needed &mdash; the exporter uses only the standard library.</div>
+</div>
+
+<div class="step">
+<h4>Obsidian and Zotero &mdash; both optional</h4>
+<p><strong>Neither is required for any demo.</strong> This surprises people, so
+it is worth being blunt about:</p>
+<ul>
+<li>An <strong>Obsidian vault is a folder of Markdown files.</strong> Obsidian is a
+viewer for that folder. Install it to see property tables, backlinks and the
+graph; skip it and every demo still works.</li>
+<li>A <strong>Zotero library on disk</strong> is a <code>.bib</code> export, a
+<code>.csv</code> export and a <code>storage/</code> folder of PDFs. Demos 11&ndash;13
+ship exactly that, so you need no Zotero account, no API key and no plugin.</li>
+</ul>
+<p>Install them when you want to use this on your own material. For the demos,
+they are scenery.</p>
+</div>
+
+<h2 id="layout">3. Where to put everything</h2>
+
+<p>Make one parent folder and unzip all four inside it. Keeping them together
+matters for Demo 12, which uses a library and a vault side by side.</p>
+
+<pre><code>mkdir -p ~/research-system
+cd ~/research-system
+
+unzip ~/Downloads/Demo10_obsidian_research_vault.zip
+unzip ~/Downloads/Demo11_zotero_bibliography.zip
+unzip ~/Downloads/Demo12_zotero_obsidian_claude.zip
+unzip ~/Downloads/Demo13_funding_radar.zip
+
+ls</code></pre>
+
+<div class="expect"><strong>You should see four directories:</strong>
+<pre style="margin:.4rem 0 0"><code>Demo10_obsidian_research_vault
+Demo11_zotero_bibliography
+Demo12_zotero_obsidian_claude
+Demo13_funding_radar</code></pre></div>
+
+<p><strong>Each package has the same shape</strong>, which is worth learning
+once:</p>
+
+<div class="filetree">
+Demo1X_name/
+├── <b>README.md</b>          <span class="c"># what this is and why. read first.</span>
+├── <b>SETUP.md</b>           <span class="c"># step by step. the prompts to paste.</span>
+├── <b>MAINTENANCE.md</b>     <span class="c"># how to live with it afterwards.</span>
+├── <span class="r">ANSWER_KEY.md</span>      <span class="c"># every planted defect. SPOILER — read last.</span>
+└── <b>&lt;workdir&gt;/</b>         <span class="c"># vault/ or library/ or workspace/ or radar/</span>
+    ├── <b>CLAUDE.md</b>       <span class="c">#   the contract — what you want the agent to do</span>
+    ├── <b>.claude/</b>
+    │   ├── <b>settings.json</b>  <span class="c"># what the agent CANNOT do. enforced.</span>
+    │   └── <b>agents/</b>*.md    <span class="c"># the subagents</span>
+    └── ...                <span class="c">#   the actual material</span>
+</div>
+
+<div class="gotcha"><strong>Open <code>ANSWER_KEY.md</code> last.</strong> It lists
+every planted defect. Reading it first turns the exercise into a reading
+comprehension test, which is not the point.</div>
+
+<h2 id="files">4. The files that matter</h2>
+
+<p>Each package has 25&ndash;45 files. <strong>Six of them do the work.</strong>
+Everything else is material for the agent to chew on.</p>
+
+<p>Throughout, these labels mean:</p>
+<p>
+<span class="lbl lbl-edit">YOU EDIT</span> &nbsp;yours to change, and the point of the exercise is changing it &nbsp;&nbsp;
+<span class="lbl lbl-gen">GENERATED</span> &nbsp;written by a script or an agent; safe to delete and remake &nbsp;&nbsp;
+<span class="lbl lbl-never">NEVER TOUCH</span> &nbsp;the system of record; a deny rule stops the agent and should stop you too
+</p>
+
+<h3>The six that matter, in every package</h3>
+
+<table>
+<tr><th style="width:24%">File</th><th style="width:14%"></th><th>What it actually does</th></tr>
+
+<tr><td><code>CLAUDE.md</code></td><td><span class="lbl lbl-edit">YOU EDIT</span></td>
+<td><strong>Loaded into context automatically</strong> every time you run <code>claude</code> in that folder. It is how you say "notes go in <code>papers/</code>", "read past the abstract", "never state a number that is not in the source". <strong>It is a request, not a rule</strong> — the agent usually obeys and sometimes does not, and noticing when it does not is half of what these demos teach.</td></tr>
+
+<tr><td><code>.claude/settings.json</code></td><td><span class="lbl lbl-edit">YOU EDIT</span></td>
+<td><strong>The deny list.</strong> Checked before a tool runs, so no amount of prompting gets around it. This is what protects <code>.obsidian/</code>, your Zotero library, your own synthesis notes, and a pipeline database. Deny beats ask beats allow; first match wins; an allow cannot carve an exception out of a deny.</td></tr>
+
+<tr><td><code>.claude/agents/*.md</code></td><td><span class="lbl lbl-edit">YOU EDIT</span></td>
+<td>Subagents. Frontmatter sets <code>name</code>, <code>description</code> (which is what decides when it gets used), <code>tools</code> (an allowlist — <strong>omit it and the agent inherits everything</strong>), and <code>model</code>. The prose below the frontmatter is its brief.</td></tr>
+
+<tr><td><code>_templates/*.md</code></td><td><span class="lbl lbl-edit">YOU EDIT</span></td>
+<td>The shape of the output. Changing a template changes every note written afterwards, which is the cheapest lever in the whole system.</td></tr>
+
+<tr><td><code>inbox/</code></td><td><span class="lbl lbl-edit">YOU EDIT</span></td>
+<td>Where new material lands. <strong>This is the folder you will actually use day to day.</strong> Drop a PDF in, run a prompt.</td></tr>
+
+<tr><td>the system of record</td><td><span class="lbl lbl-never">NEVER TOUCH</span></td>
+<td><code>pdfs/</code>, <code>zotero/</code>, <code>pipeline/radar.db</code>, <code>.obsidian/</code>. Different in each demo; always denied; always for the same reason — a record an agent can edit is no longer a record.</td></tr>
+</table>
+
+<h3>Demo 10 — the vault, annotated</h3>
+
+<div class="filetree">
+vault/
+├── <b>CLAUDE.md</b>                 <span class="y">YOU EDIT</span>  <span class="c">the note contract + the growth rules</span>
+├── <b>.claude/settings.json</b>     <span class="y">YOU EDIT</span>  <span class="c">denies .obsidian/, pdfs/, topics/, rm</span>
+├── <b>.claude/agents/</b>
+│   ├── librarian.md           <span class="c">intake. document → note. has Write.</span>
+│   ├── skeptic.md             <span class="c">cross-check. NO Write tool.</span>
+│   └── curator.md             <span class="c">connects new reading to topics/. writes proposals only.</span>
+├── <b>inbox/</b>                    <span class="y">YOU EDIT</span>  <span class="c">10 raw documents. drop new ones here.</span>
+├── <b>papers/</b>                   <span class="r">GENERATED</span> <span class="c">one note per paper. the real database.</span>
+├── <b>pdfs/</b>                     <span class="r">NEVER</span>     <span class="c">the files themselves, renamed</span>
+├── <b>web/</b>                      <span class="r">GENERATED</span> <span class="c">processed clips</span>
+├── <b>topics/</b>                   <span class="y">YOURS ONLY</span> <span class="c">what you think. Edit AND Write denied.</span>
+├── <b>proposals/</b>                <span class="r">GENERATED</span> <span class="c">curator's suggested changes to topics/</span>
+├── <b>wave2/</b>                    <span class="c">2 documents that arrive later (prompt 8)</span>
+└── <b>_templates/</b>               <span class="y">YOU EDIT</span>  <span class="c">paper.md, proposal.md</span>
+</div>
+
+<p><strong>The one to understand:</strong> <code>topics/</code> is denied to every
+agent, and <code>proposals/</code> exists because of that. The agent can tell you
+your synthesis note is out of date and hand you the exact replacement lines; it
+cannot apply them. That is deliberate — <em>a synthesis note you accepted is
+yours, and one that appeared while you were not looking is not.</em></p>
+
+<h3>Demo 11 — the library, annotated</h3>
+
+<div class="filetree">
+library/
+├── <b>CLAUDE.md</b>                 <span class="y">YOU EDIT</span>
+├── <b>.claude/settings.json</b>     <span class="y">YOU EDIT</span>  <span class="c">the library itself is read-only</span>
+├── <b>.claude/agents/</b>
+│   ├── scout.md               <span class="c">finds candidates. no Write.</span>
+│   └── citecheck.md           <span class="c">verifies the bibliography. no Write.</span>
+├── <b>My Library.bib</b>            <span class="r">NEVER</span>     <span class="c">Better BibTeX export</span>
+├── <b>My Library.csv</b>            <span class="r">NEVER</span>     <span class="c">Zotero CSV — carries the ITEM KEY</span>
+├── <b>storage/</b>                  <span class="r">NEVER</span>     <span class="c">one folder per item, named with its 8-char key</span>
+│   ├── 4J8KQW2M/...pdf
+│   └── 9FGM2XPQ/...pdf        <span class="c">← the orphan. no .bib entry claims it.</span>
+├── <b>bib/</b>                      <span class="r">GENERATED</span> <span class="c">your output goes here, and only here</span>
+└── <b>_templates/</b>               <span class="y">YOU EDIT</span>  <span class="c">bibliography.md, review_outline.md</span>
+</div>
+
+<p><strong>The one to understand:</strong> the three views — the <code>.bib</code>,
+the <code>.csv</code> and <code>storage/</code> — disagree in five places, and the
+<code>Key</code> column of the CSV is the only stable identifier. Cite keys are
+regenerated whenever you fix metadata; titles get retyped; filenames carry
+years that turn out to be wrong.</p>
+
+<h3>Demo 12 — the join, annotated</h3>
+
+<div class="filetree">
+workspace/
+├── <b>CLAUDE.md</b>                 <span class="y">YOU EDIT</span>  <span class="c">one contract covering two owners</span>
+├── <b>.claude/settings.json</b>     <span class="y">YOU EDIT</span>
+├── <b>.claude/agents/</b>
+│   ├── linker.md              <span class="c">repairs the join. may change ONE field.</span>
+│   └── drift.md               <span class="c">reports divergence. NO Write tool.</span>
+├── <b>zotero/</b>                   <span class="r">NEVER</span>     <span class="c">the Demo 11 library, unchanged</span>
+└── <b>vault/</b>
+    ├── <b>papers/</b>               <span class="c">7 notes written over 10 months</span>
+    ├── <b>topics/</b>               <span class="y">YOURS ONLY</span>
+    ├── <b>proposals/</b>            <span class="r">GENERATED</span>
+    └── <b>_templates/paper.md</b>   <span class="y">YOU EDIT</span>  <span class="c">note the zotero_key field</span>
+</div>
+
+<p><strong>The one to understand:</strong> a single frontmatter field,
+<code>zotero_key</code>, is the entire integration. Two of the seven notes have
+one that resolves. The other five show the five ways ten months of ordinary use
+breaks the link.</p>
+
+<h3>Demo 13 — the radar, annotated</h3>
+
+<div class="filetree">
+radar/
+├── <b>CLAUDE.md</b>                 <span class="y">YOU EDIT</span>  <span class="c">the order of work: eligibility before science</span>
+├── <b>.claude/settings.json</b>     <span class="y">YOU EDIT</span>  <span class="c">denies pipeline/, profile/, inbox/, .env*</span>
+├── <b>.claude/agents/</b>
+│   ├── recurrence.md          <span class="c">have I decided this before? NO Write.</span>
+│   ├── triage.md              <span class="c">is this worth an afternoon?</span>
+│   └── fitmemo.md             <span class="c">writes the memo. refuses for ineligible calls.</span>
+├── <b>profile/research_profile.md</b> <span class="y">YOU EDIT</span> <span class="c">★ interests AND constraints</span>
+├── <b>inbox/</b>                    <span class="y">YOU EDIT</span>  <span class="c">6 solicitations. drop new ones here.</span>
+├── <b>pipeline/</b>                 <span class="r">NEVER</span>
+│   ├── radar.db               <span class="c">what EXISTS. the scraper owns it.</span>
+│   └── export_vault.py        <span class="c">db → notes. one way. preserves decisions.</span>
+├── <b>opportunities/</b>            <span class="r">GENERATED</span> <span class="c">+ your decision blocks, preserved</span>
+├── <b>memos/</b>                    <span class="r">GENERATED</span> <span class="c">the deliverable</span>
+└── <b>_templates/fit_memo.md</b>    <span class="y">YOU EDIT</span>
+</div>
+
+<p><strong>The one to understand:</strong> <code>profile/research_profile.md</code>
+has two halves, and the second one — uncommitted FTE, indirect rate, smallest
+viable project, cost-share appetite, down-select timing — is what decides.
+<strong>Four of the five traps in that demo are caught by that table alone.</strong></p>
+
+<h2 id="flow">5. How information moves</h2>
+
+<p>Every one of these systems is the same three-stage shape. Learn it once:</p>
+
+<pre><code>  SYSTEM OF RECORD          →    YOUR NOTES          →    THE DELIVERABLE
+  what exists                    what you decided         what you send
+
+  pdfs/ zotero/ radar.db         papers/ topics/          bib/ memos/
+  ─────────────────────          ───────────────          ───────────────
+  NEVER written by an agent      agent writes;            agent writes
+  deny rules enforce it          you own topics/          freely</code></pre>
+
+<p>Three rules hold it together, and they are the same three in all four demos:</p>
+
+<ol class="steps">
+<li><strong>Information flows left to right, never right to left.</strong> Notes
+never write back into the library. The vault never edits the database. If you
+want the record changed, you change it in the tool that owns it — Zotero,
+your scraper — by hand.</li>
+<li><strong>Regeneration must be safe.</strong> Anything marked GENERATED can be
+deleted and rebuilt. The corollary is the thing to watch for in your own
+setups: any generator that touches a file you also write into <strong>must
+preserve your part verbatim</strong>. Demo 13's exporter does this, and an
+earlier version of it silently destroyed decision blocks on every run until a
+verification pass caught it.</li>
+<li><strong>The verifier cannot write.</strong> <code>skeptic</code>,
+<code>citecheck</code>, <code>drift</code> and <code>recurrence</code> all ship
+with no <code>Write</code> tool. A verifier that can edit is a verifier you
+cannot trust, because it can make its own findings disappear.</li>
+</ol>
+
+<h2 id="firstrun">6. First run, step by step</h2>
+
+<p>Demo 10, from a clean unzip. The same pattern applies to the other three;
+only the prompts differ.</p>
+
+<div class="step">
+<h4>Step 1 — get into the working directory</h4>
+<pre><code>cd ~/research-system/Demo10_obsidian_research_vault/vault
+ls</code></pre>
+<div class="expect"><strong>Expected:</strong>
+<pre style="margin:.4rem 0 0"><code>CLAUDE.md   _templates  inbox  papers  pdfs  proposals  topics  wave2  web</code></pre>
+<p style="margin:.5rem 0 0">If you see <code>README.md</code> and <code>SETUP.md</code> instead, you are one level too high. <code>cd vault</code>.</p></div>
+<div class="gotcha"><strong>This matters more than it looks.</strong> <code>CLAUDE.md</code> and <code>.claude/</code> are picked up from the directory you launch <code>claude</code> in. Start one level up and the agent runs with no contract and no deny list — it will happily do the thing the demo is about preventing.</div>
+</div>
+
+<div class="step">
+<h4>Step 2 — make the undo button</h4>
+<pre><code>git init
+git add -A
+git commit -m "before the agent"</code></pre>
+<div class="expect"><strong>Expected:</strong> <code>35 files changed, ... insertions(+)</code></div>
+<p>From here on, <code>git diff</code> reviews everything the agent did and
+<code>git checkout .</code> undoes all of it. <strong>Do this in your own vault
+before you point an agent at five years of notes.</strong> It is worth more than
+every configuration file in these packages combined.</p>
+</div>
+
+<div class="step">
+<h4>Step 3 — read the contract before running anything</h4>
+<pre><code>cat CLAUDE.md
+cat .claude/settings.json
+ls .claude/agents/</code></pre>
+<div class="expect"><strong>Expected:</strong> three agents — <code>librarian.md</code>, <code>skeptic.md</code>, <code>curator.md</code>.</div>
+<p>Two minutes here saves twenty later. You are looking for: where notes go,
+what the agent is forbidden to touch, and which agent has which tools.</p>
+</div>
+
+<div class="step">
+<h4>Step 4 — look at the raw material</h4>
+<pre><code>ls -la inbox/</code></pre>
+<div class="expect"><strong>Expected:</strong> ten files with realistic download-garbage names —
+<code>1-s2.0-S0022283624001147-main.pdf</code>, <code>scan0043.pdf</code>,
+<code>mps-12-44.pdf</code>, three <code>.md</code> clips, a <code>.csv</code> and a <code>.docx</code>.</div>
+<p>Check the scan behaves as advertised before you start:</p>
+<pre><code>pdftotext inbox/scan0043.pdf - | wc -c</code></pre>
+<div class="expect"><strong>Expected: <code>0</code> or <code>1</code>.</strong> That file has no text layer — it is a photocopy. How the agent handles that is one of the things being tested.</div>
+</div>
+
+<div class="step">
+<h4>Step 5 — start Claude Code</h4>
+<pre><code>claude</code></pre>
+<div class="expect"><strong>Expected:</strong> the prompt, and a line naming the working directory. Type <code>/status</code> if you want to confirm which project it thinks it is in.</div>
+<p>Then work through the nine prompts in <code>SETUP.md</code>, one at a time,
+<strong>reading the output before pasting the next one</strong>. The demo does
+not work as a batch — most of the findings are in what the agent says between
+steps.</p>
+</div>
+
+<div class="step">
+<h4>Step 6 — check what actually changed</h4>
+<pre><code>git diff --stat
+git status --short topics/</code></pre>
+<div class="expect"><strong>Expected:</strong> changes in <code>papers/</code>, <code>web/</code> and <code>proposals/</code>. <strong><code>topics/</code> empty.</strong></div>
+<div class="gotcha">If <code>topics/</code> shows changes, the deny rule is not working — check you launched <code>claude</code> from inside <code>vault/</code> and that <code>.claude/settings.json</code> is valid JSON (<code>python3 -m json.tool .claude/settings.json</code>).</div>
+</div>
+
+<h2 id="daily">7. Daily: a paper arrives</h2>
+
+<p>This is the loop you will actually run, and it takes about two minutes once
+the folders exist.</p>
+
+<h3>The 30-second version</h3>
+
+<pre><code>cd ~/research-system/Demo10_obsidian_research_vault/vault
+cp ~/Downloads/whatever-i-just-downloaded.pdf inbox/
+claude</code></pre>
+
+<p>then:</p>
+
+<pre><code>File everything in inbox/.</code></pre>
+
+<p>That is it. The contract in <code>CLAUDE.md</code> carries the conventions, so
+you do not re-explain them. Then, when you have a minute:</p>
+
+<pre><code>Use the curator subagent on the note you just wrote.</code></pre>
+
+<p>which tells you which of your topic notes it bears on, what it contradicts,
+and what gap it opens — as a proposal in <code>proposals/</code>, for you to
+accept or not.</p>
+
+<h3>The habit that makes it worth doing</h3>
+
+<p><strong>Fill in <code>## My take</code> yourself, the same day.</strong> Every
+template has that section and no agent writes in it. Two sentences is enough.
+Six months from now it is the only part of the note you will trust without
+re-reading the paper, because it is the only part you wrote.</p>
+
+<p>A vault where that section is always empty is a vault of summaries, and
+summaries are what you could have generated at any time. The notes are not the
+asset; your reaction to them is.</p>
+
+<h3>What <em>not</em> to do daily</h3>
+
+<ul>
+<li><strong>Do not run the skeptic on every note.</strong> It is a cross-document
+pass and it needs several documents to have anything to say. Weekly.</li>
+<li><strong>Do not accept proposals the day they are written.</strong> Let them
+sit. A proposal that still looks right a week later usually is.</li>
+<li><strong>Do not tidy.</strong> Resist asking the agent to reorganise folders.
+There is nothing to gain and a rename breaks every wikilink pointing at it.</li>
+</ul>
+
+<h2 id="weekly">8. Weekly: the two routines</h2>
+
+<h3>Friday, ten minutes — verify</h3>
+
+<pre><code>cd ~/research-system/Demo10_obsidian_research_vault/vault
+claude</code></pre>
+<pre><code>Use the skeptic subagent to cross-check everything added this week
+against the sources in pdfs/.
+</code></pre>
+
+<p>Then skim the report for one thing only: <strong>claims in notes that are not
+in the source.</strong> Everything else can wait. That is the error that
+compounds, because a wrong number in a note becomes a wrong number in a draft
+becomes a wrong number in a submission.</p>
+
+<pre><code>git add -A && git commit -m "week of $(date +%Y-%m-%d)"</code></pre>
+
+<h3>Friday, five more minutes — decide</h3>
+
+<p>Open <code>proposals/</code>. For each one: accept it by pasting the lines
+into the topic note yourself, or write one line under <code>## Rejected
+reasons</code> saying why not.</p>
+
+<p><strong>A rejected proposal with a reason is worth as much as an accepted
+one.</strong> It stops the same suggestion coming back next month, and the
+reason is often more interesting than the proposal.</p>
+
+<p>Then delete the proposal file. <code>proposals/</code> should be near-empty
+most of the time; a folder with forty pending proposals is a folder nobody
+reads.</p>
+
+<h2 id="monthly">9. Monthly: drift and decisions</h2>
+
+<h3>Reconcile the library against the notes — Demo 12's job</h3>
+
+<p>Once a month, or after any session of cleaning up Zotero:</p>
+
+<pre><code>cd ~/research-system/Demo12_zotero_obsidian_claude/workspace
+claude</code></pre>
+<pre><code>Use the drift subagent on the whole workspace.
+</code></pre>
+
+<p>Read the last section of its report first — <em>which conclusions rest on a
+note I just flagged?</em> A broken link is bookkeeping; a belief resting on one
+is the reason to run this at all.</p>
+
+<p><strong>What to expect in a real vault:</strong> drift accumulates at roughly
+the rate you edit Zotero. If you fixed metadata on ten items this month, expect
+ten stale notes. This is normal and is not anyone's mistake.</p>
+
+<h3>Re-export the radar — Demo 13's job</h3>
+
+<pre><code>cd ~/research-system/Demo13_funding_radar/radar
+python3 pipeline/export_vault.py</code></pre>
+
+<div class="expect"><strong>Expected:</strong> a line per note, <code>new</code> for ones that did not exist, <code>kept decision=pass</code> for ones where you had already decided. Then <code>N new, M refreshed. Decisions preserved.</code></div>
+
+<div class="gotcha"><strong>Verify this the first time you use it on your own data.</strong> Write a decision into a note, re-run the exporter, and confirm the text is still there. A generator that silently eats your writing is the worst possible bug in a system like this, and it is invisible until the day you need what it ate.</div>
+
+<p>Then, before reading any new solicitation:</p>
+
+<pre><code>Use the recurrence subagent. Which calls in this cycle are reissues
+of ones I have already decided on?
+</code></pre>
+
+<h3>Quarterly: is the profile still true?</h3>
+
+<p><code>profile/research_profile.md</code> decays silently. Your FTE changes, a
+student graduates, the indirect rate goes up, a collaborator leaves. Nothing in
+the system notices, and a stale constraints table produces confidently wrong
+triage.</p>
+
+<p>Four lines to re-check every few months: uncommitted FTE, indirect rate,
+smallest viable project, collaborators in place.</p>
+
+<h2 id="newdata">10. Adding each kind of new data</h2>
+
+<p>Six kinds of thing arrive in real use. Here is where each goes.</p>
+
+<h3>A PDF of a paper</h3>
+<pre><code>cp paper.pdf ~/research-system/.../vault/inbox/</code></pre>
+<p>Then <em>"File inbox/paper.pdf."</em> The librarian renames it into
+<code>pdfs/</code>, writes a note in <code>papers/</code>, and fills in the
+frontmatter. Keep the download name — the agent should not need it to be tidy,
+and if it does, that is a finding.</p>
+
+<h3>A web page</h3>
+<p>Use the <a href="https://github.com/obsidianmd/obsidian-clipper" target="_blank" rel="noopener">Obsidian Web Clipper</a> and save it into <code>inbox/</code>.
+It uses your logged-in browser, so it gets past paywalls and institutional
+logins that an agent cannot. <strong>Capture in the browser, process in the
+agent</strong> — do not ask the agent to be your scraper.</p>
+<p>Then <em>"File the new clip in inbox/."</em> It lands in <code>web/</code>,
+citing the paper note it refers to.</p>
+
+<h3>A scanned PDF with no text layer</h3>
+<p>Same place. Check first:</p>
+<pre><code>pdftotext scan.pdf - | wc -c</code></pre>
+<p>If that prints a number under about 100, there is no text layer. Say so in
+the prompt — <em>"this is a scan, read it as images"</em> — because Claude Code
+can read PDF pages visually, 20 at a time, but will waste a step discovering
+the extraction is empty. For a long scan, OCR it first with
+<code>ocrmypdf</code>.</p>
+
+<h3>A fresh Zotero export</h3>
+<p>In Zotero: select the collection → right-click → <strong>Export
+Collection</strong> → Better BibTeX, tick <em>Export Files</em>. Then again as
+CSV. Replace all three — the <code>.bib</code>, the <code>.csv</code> and
+<code>storage/</code> — as a set.</p>
+<div class="gotcha"><strong>Replace them together or not at all.</strong> A new
+<code>.csv</code> against an old <code>storage/</code> produces exactly the
+broken-attachment symptoms Demo 11 is built from. After any re-export, run
+Demo 12's <code>drift</code> pass — that is precisely when new drift appears.</div>
+
+<h3>A funding solicitation</h3>
+<pre><code>cp ~/Downloads/NSF-27-xxx.pdf ~/research-system/.../radar/inbox/</code></pre>
+<p>Then <em>"Use the recurrence subagent"</em> first, and only then
+<em>"Use the triage subagent on inbox/NSF-27-xxx.pdf."</em> That order is not
+decoration: checking the decision log costs one prompt and can save the whole
+afternoon.</p>
+<p>Saved web pages work the same way. If you have both the program page and the
+solicitation PDF, <strong>put both in</strong> — they often disagree, and finding
+out which is authoritative is part of the job.</p>
+
+<h3>Your own data — a spreadsheet of measurements</h3>
+<p>Into <code>inbox/</code>, and say what the units are in the prompt. The most
+common real failure in these demos is comparing numbers in different units
+without noticing, and the fix is one sentence from you at the start.</p>
+
+<h2 id="rot">11. What goes wrong over time</h2>
+
+<p>Nothing here fails loudly. Four things decay quietly, and each has a tell:</p>
+
+<table>
+<tr><th style="width:22%">What rots</th><th style="width:28%">How you notice</th><th>What to do</th></tr>
+
+<tr><td><strong>The join</strong><br><span class="muted">notes ↔ library</span></td>
+<td>A note cites a year that does not match its PDF. Or Demo 12's <code>drift</code> starts reporting more each month.</td>
+<td>Run <code>drift</code> monthly, and always after editing Zotero. Repair with <code>linker</code>, which may change only the key field.</td></tr>
+
+<tr><td><strong>The profile</strong><br><span class="muted">Demo 13</span></td>
+<td>Triage verdicts stop matching your judgement — it recommends things you would decline.</td>
+<td>Re-read the constraints table quarterly. It is four numbers and they all change.</td></tr>
+
+<tr><td><strong><code>CLAUDE.md</code></strong></td>
+<td>It grows. Once it is long, the agent follows the first half and drifts on the rest.</td>
+<td>Keep it under roughly one screen. When a rule gets ignored repeatedly, that is the signal to <strong>move it from <code>CLAUDE.md</code> into <code>settings.json</code></strong> — from a request to a refusal. That migration is the single most useful maintenance habit in this whole system.</td></tr>
+
+<tr><td><strong>The decision log</strong></td>
+<td><code>decision: undecided</code> on things whose deadline has passed.</td>
+<td>Decide, even if the decision is "pass, no reason recorded". An empty log is the state Demo 13 diagnoses: 90 items, 0 votes.</td></tr>
+</table>
+
+<h3>The rule of thumb for all of it</h3>
+
+<p>When the agent does something you did not want:</p>
+
+<ol class="steps">
+<li><strong>Was it a convention?</strong> → a line in <code>CLAUDE.md</code>.
+Cheap, flexible, not enforced.</li>
+<li><strong>Should it have been impossible?</strong> → a deny rule in
+<code>settings.json</code>. Enforced, and it will not be argued with.</li>
+<li><strong>Should this agent never have been able to?</strong> → remove the tool
+from its <code>tools:</code> list. Absolute.</li>
+</ol>
+
+<p>Most people only ever write the first kind and then wonder why it keeps
+happening.</p>
+
+<h2 id="trouble">12. Troubleshooting</h2>
+
+<table>
+<tr><th style="width:34%">Symptom</th><th>Cause and fix</th></tr>
+
+<tr><td>The agent ignores <code>CLAUDE.md</code> entirely</td>
+<td>You launched <code>claude</code> from the wrong directory. It loads from the folder you start in. <code>cd</code> into <code>vault/</code>, <code>library/</code>, <code>workspace/</code> or <code>radar/</code> — not the package root.</td></tr>
+
+<tr><td>It edits a file that should be denied</td>
+<td>Same cause nine times out of ten. Otherwise check the JSON parses: <code>python3 -m json.tool .claude/settings.json</code>. One trailing comma disables the whole file silently.</td></tr>
+
+<tr><td><code>Subagent not found</code></td>
+<td>The file must be in <code>.claude/agents/</code> with YAML frontmatter and a <code>name:</code> that matches what you typed. Check with <code>head -6 .claude/agents/*.md</code>.</td></tr>
+
+<tr><td>A subagent refuses to launch</td>
+<td>An entry in its <code>tools:</code> list does not resolve — usually an MCP tool for a server that is not configured. Remove the entry or configure the server.</td></tr>
+
+<tr><td>It will not read a PDF</td>
+<td>Either no text layer (<code>pdftotext file.pdf - | wc -c</code> → 0; tell it to read as images) or over 10 pages, where it must read in ranges. For anything long, <code>pdftotext -f 1 -l 12 file.pdf -</code> first.</td></tr>
+
+<tr><td>Everything is slow and expensive</td>
+<td><code>pdftotext</code> is missing, so it is reading whole PDFs as images repeatedly. Install poppler.</td></tr>
+
+<tr><td>It summarises abstracts instead of reading tables</td>
+<td>The failure the demos exist to show. Add an explicit instruction to <code>CLAUDE.md</code> and name the sections it must open. If that does not hold, run the verifier pass separately — a dedicated agent with one job beats a longer instruction.</td></tr>
+
+<tr><td>The exporter wiped my notes</td>
+<td>Should not happen — Demo 13's preserves the <code>## Decision</code> block verbatim and that is tested. <code>git checkout .</code> gets them back, which is why step 2 is <code>git init</code>. If you wrote your own exporter, this is the bug to look for first.</td></tr>
+
+<tr><td>Obsidian shows frontmatter as raw text</td>
+<td>Turn on <strong>Properties</strong> in the right sidebar, or Settings → Editor → Properties in document → Visible.</td></tr>
+
+<tr><td>Obsidian will not open the folder</td>
+<td>Point it at the folder containing <code>.obsidian/</code> — <code>vault/</code>, not the package root. "Trust author" when asked.</td></tr>
+
+<tr><td>I want to start over</td>
+<td><code>git checkout . &amp;&amp; git clean -fd</code> inside the working directory. Back to the shipped state, with your git history intact.</td></tr>
+</table>
+
+<div class="note">
+<p><strong>A standing caveat.</strong> In all four packages the <em>material</em>
+is verified — every planted defect was checked mechanically against the files.
+<strong>The agent's behaviour was not measured</strong>: the packages were
+assembled on a machine without Claude Code, so the expectations in the guides
+are predictions. If your run differs, your run is the data. Everything in the
+demos is synthetic — the papers, the library, the solicitations and their
+deadlines do not exist. Do not cite or act on any of it.</p>
+</div>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">All advanced demos</a>
+  <a class="btn btn-ghost" href="demo10.html">Demo 10 &mdash; the vault</a>
+  <a class="btn btn-ghost" href="demo11.html">Demo 11 &mdash; the library</a>
+  <a class="btn btn-ghost" href="demo12.html">Demo 12 &mdash; the join</a>
+  <a class="btn btn-ghost" href="demo13.html">Demo 13 &mdash; the radar</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">All material in Demos 10&ndash;13 is <strong>synthetic</strong>.
+    The papers, authors, journals, DOIs, library items, funding programmes,
+    deadlines and award amounts were written for these exercises and do not exist.</p>
+  </div>
+</footer>
+
+</body>
+</html>
