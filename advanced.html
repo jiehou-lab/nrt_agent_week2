@@ -345,6 +345,7 @@
           <li>Find the folder in <code>storage/</code> that no entry claims. It holds the supplement in which the authors report their own method at <strong>8.0&nbsp;&deg;C</strong> where the abstract says 4.9 &mdash; invisible to any bibliography built from the <code>.bib</code>.</li>
           <li>Tell a <strong>spurious duplicate</strong> (same DOI, typed twice) from a <strong>genuine near-duplicate</strong> (preprint and published version). Merging the second destroys information.</li>
           <li>Build a topic bibliography, then run <code>citecheck</code> &mdash; <strong>no <code>Write</code> tool</strong> &mdash; over your own output, claim by claim against the PDFs.</li>
+          <li>Ask for the eight-section review outline everyone asks for &mdash; then ask <strong>which of these sections could you have written without my library?</strong> Three come back grounded, one hollow, four generic.</li>
           <li>Optionally connect a real Zotero: <strong>locally, with no API key</strong>.</li>
         </ul>
         <h4>What it teaches</h4>
@@ -352,13 +353,14 @@
           <li><strong>The reference manager is read-only.</strong> The deny list makes editing it impossible, because an agent editing a library in place is how a decade of citations gets quietly corrupted.</li>
           <li><strong>The MCP server cannot organise anything.</strong> <code>zotero-mcp</code> has three tools and all three are reads &mdash; so the agent reads, and writes files you apply yourself.</li>
           <li>Metadata is whatever was true on import. The PDF is what the item <em>is</em>. They drift, and the cite key drifts with them.</li>
+          <li><strong>An outline is not evidence that anything was read.</strong> A model can generate a review structure for a known topic from training data alone. The <em>item key</em> is the only thing in the output that cannot be recalled &mdash; it can only be read from your library.</li>
           <li><strong>One defect no layer catches.</strong> A journal article entered as <code>@book</code> is well-formed, consistent and wrong &mdash; and only a human who has seen a copy-edited reference list will notice.</li>
         </ul>
       </div>
       <div class="demo-box">
         <a class="btn" href="downloads/Demo11_zotero_bibliography.zip" target="_blank" rel="noopener">Download demo 11 &nbsp;&darr;</a>
         <a class="btn btn-ghost" href="guides/demo11.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP &middot; 540&nbsp;KB &middot; 30&ndash;40 min. <code>pdftotext</code> recommended.</p>
+        <p class="muted">ZIP &middot; 545&nbsp;KB &middot; 35&ndash;45 min. <code>pdftotext</code> recommended.</p>
         <p class="muted"><strong>Zotero is not required.</strong> The library ships as exports on disk &mdash; no account, no API key, no MCP, offline. The live route is an appendix for afterwards.</p>
         <p class="muted"><strong>Pairs with Demo 10</strong>, same literature. Demo 10 is the notes; this is the library.</p>
         <p class="muted"><strong>The library is synthetic</strong> and the agent&rsquo;s behaviour is unmeasured &mdash; the defects were verified mechanically, the expectations were not. Report what your run does.</p>
