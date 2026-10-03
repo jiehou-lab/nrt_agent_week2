@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 10 · Claude Code + Obsidian — Agentic AI Week 2</title>
+<meta name="description" content="A research vault that checks itself. Ten real documents, seven planted defects, and the question underneath: when an agent writes a note about a paper, what stops the note from being wrong?">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='46' font-family='Georgia,serif' fill='%23fff'>10</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI &middot; Week 2</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#demos">Demos</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../advanced.html">Advanced</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 10 &middot; ADVANCED &mdash; NOTES THAT CHECK THEMSELVES</p>
+    <h1>Claude Code + Obsidian</h1>
+    <p class="lede">A folder of papers, clips, a scan and a spreadsheet &mdash; the pile every researcher already has. The demo is not &ldquo;AI reads my papers.&rdquo; It is the question underneath: when an agent writes a note about a paper, <strong>what stops the note from being wrong?</strong></p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo10_obsidian_research_vault.zip" target="_blank" rel="noopener">Download Demo 10 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo9.html">&larr; Demo 9</a>
+      <a class="btn btn-ghost" href="../advanced.html">Advanced demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<a class="backlink" href="../advanced.html">&larr; Back to the advanced demos</a>
+
+<p>Package:</p>
+<p><code>Demo10_obsidian_research_vault.zip</code> &middot; 540&nbsp;KB &middot; 35&ndash;45 minutes</p>
+
+<div class="note">
+<p><strong>There is nothing to integrate.</strong> An Obsidian vault is a folder of
+Markdown files. You <code>cd</code> into it and run <code>claude</code>. No plugin,
+no API key, no local server, no MCP.</p>
+<p>Most guides on this topic open by telling you to install Obsidian&rsquo;s
+<em>Local REST API</em> plugin and paste a key into a config file. That is an
+optional extra &mdash; it buys you Obsidian&rsquo;s own search index, which
+understands frontmatter and backlinks in ways <code>grep</code> does not, and it
+lets Claude talk to a <em>running</em> Obsidian. It is not how you connect the two,
+and it is the wrong first step. Nothing on this page needs it.</p>
+<p><strong>You do not need Obsidian installed to do this demo.</strong> Obsidian is
+the viewer. Install it to see the property tables and the graph; skip it if you
+only want to watch the agent work.</p>
+</div>
+
+<h2>What is in the box</h2>
+
+<p><code>inbox/</code> holds ten documents with the filenames they really arrive
+with &mdash; <code>1-s2.0-S0022283624001147-main.pdf</code>,
+<code>scan0043.pdf</code>, <code>mps-12-44.pdf</code>:</p>
+
+<ul>
+<li>Four journal PDFs on one topic (machine-learned protein melting temperature)</li>
+<li>A preprint that turns out to be an earlier version of one of them, reporting
+<em>better</em> numbers on <em>more</em> data, with no explanation</li>
+<li>A 1998 paper that is a photocopy &mdash; no text layer at all</li>
+<li>Three clipped web pages: a blog post, a journal page, and a documentation page</li>
+<li>A CSV of your own lab measurements</li>
+<li>Group meeting notes in Word</li>
+</ul>
+
+<p>Seven of them contain a defect. All seven are ordinary: an abstract whose
+percentage does not follow from its own table; an <em>n</em> that counts
+measurements and calls them proteins; a clipped page that stops at
+&ldquo;Subscribe&rdquo;; a correction notice above the abstract; a blog that turns
+&ldquo;associated with&rdquo; into &ldquo;determines&rdquo;; a spreadsheet in kelvin
+when every paper is in celsius; failed runs stored as <code>-999</code>.</p>
+
+<p>None of these is exotic. Every one of them is invisible if you read abstracts.</p>
+
+<h2>Three files, three kinds of instruction</h2>
+
+<p>Before running anything, open these three. They are the demo.</p>
+
+<table>
+<tr><th style="width:30%">File</th><th style="width:34%">What it is</th><th>Enforced?</th></tr>
+<tr><td><code>CLAUDE.md</code></td><td>How I want notes written</td>
+    <td><strong>No.</strong> It is context. The agent usually obeys and sometimes does not.</td></tr>
+<tr><td><code>.claude/settings.json</code></td><td>What the agent <em>cannot</em> do here</td>
+    <td><strong>Yes.</strong> Client-side, checked before the tool runs.</td></tr>
+<tr><td><code>.claude/agents/skeptic.md</code></td><td>A verifier with no <code>Write</code> tool</td>
+    <td><strong>Yes</strong> &mdash; the capability is simply absent.</td></tr>
+</table>
+
+<p>The deny list is short and every line has a reason:</p>
+
+<pre><code>"deny": [
+  "Edit(./.obsidian/**)",     &lt;- plugin state, hotkeys, graph layout
+  "Write(./.obsidian/**)",
+  "Edit(./pdfs/**)",          &lt;- the sources are evidence; evidence is read-only
+  "Write(./pdfs/**)",
+  "Edit(./topics/**)",        &lt;- where my own thinking lives
+  "Bash(rm:*)"
+]</code></pre>
+
+<p><code>.obsidian/</code> is the one most people leave open. It holds a year of
+configuration, and an agent asked to &ldquo;tidy the vault&rdquo; is perfectly
+capable of tidying it away.</p>
+
+<div class="callout">
+<p><strong>Before you let an agent near your notes:</strong></p>
+<pre><code>git init &amp;&amp; git add -A &amp;&amp; git commit -m "before the agent"</code></pre>
+<p>This is the most useful line in the whole demo. Every step afterwards is
+<code>git diff</code> away from being reviewed and <code>git checkout .</code>
+away from being undone. No guide to this subject mentions it, and it matters
+more than any of the configuration above.</p>
+</div>
+
+<h2>The six prompts</h2>
+
+<ol class="steps">
+<li><strong>Orient.</strong> <em>&ldquo;Look at inbox/ and tell me what kinds of
+documents are there. Do not process anything yet.&rdquo;</em> &mdash; does it
+distinguish <em>kinds</em>, or just list ten filenames?</li>
+
+<li><strong>One paper, carefully.</strong> <em>&ldquo;Use the librarian subagent to
+file inbox/1-s2.0-S0022283624001147-main.pdf.&rdquo;</em> Then read the
+<code>## Checks</code> section of the note it wrote, open the PDF yourself, and
+compare the abstract to Table 2. Two numbers in that abstract do not follow from
+that table. Did it find both, one, or neither?</li>
+
+<li><strong>The batch.</strong> <em>&ldquo;File everything else in inbox/.&rdquo;</em>
+Watch what happens to the scan and to the page that ends in
+&ldquo;Subscribe&rdquo;.</li>
+
+<li><strong>Turn it on its own work.</strong> <em>&ldquo;Use the skeptic subagent to
+cross-check everything in papers/ and web/ against the sources.&rdquo;</em></li>
+
+<li><strong>Your own data.</strong> <em>&ldquo;Compare the measurements in
+lab_tm_measurements.csv against the melting temperatures in the papers I have
+filed.&rdquo;</em> If the answer is a clean table with no caveat, it fell in.</li>
+
+<li><strong>The question the vault is for.</strong> <em>&ldquo;Based only on the
+notes in papers/, what should I conclude about whether sequence-only prediction
+has actually improved since 2021? Cite the note for every claim.&rdquo;</em></li>
+</ol>
+
+<h2>Why the skeptic has no Write tool</h2>
+
+<p>A verifier that can edit is a verifier you cannot trust, because it can make
+its own findings disappear. <code>skeptic.md</code> lists
+<code>Read, Glob, Grep, Bash</code> and nothing else. It reports; you decide.</p>
+
+<p>This is also the clearest demonstration of the difference the course keeps
+coming back to. <code>CLAUDE.md</code> says &ldquo;do not rewrite my topic
+notes&rdquo; and that is a request. <code>Edit(./topics/**)</code> in the deny
+list is a refusal. An agent with no <code>Write</code> tool has no option at all.
+Three layers, increasing in force, and they fail in different ways.</p>
+
+<h2>What usually happens</h2>
+
+<p>On a first run with the files as shipped, expect roughly three to five of the
+seven defects. Some are reachable by a careful read of one document; the rest are
+cross-document and only turn up in the skeptic pass. The gap between those two
+numbers is the thing worth showing a room.</p>
+
+<p>The exercise is not the score. For every defect that was missed, work out
+<strong>which of the three layers should have caught it</strong>, change that one
+file, and re-run. <code>git checkout .</code> resets the vault. That loop &mdash;
+run, miss, fix the layer, re-run &mdash; is the only part of this that transfers
+to your own work.</p>
+
+<h2>Using it on your own papers</h2>
+
+<p>Copy <code>vault/CLAUDE.md</code>, <code>vault/.claude/</code> and
+<code>vault/_templates/</code> into a vault of your own, empty the folders, and
+rewrite <code>CLAUDE.md</code> to describe how <em>you</em> want notes written.
+Keep the deny list. Keep the git repo. The planted defects were scaffolding; the
+contract and the guardrails are the part you keep.</p>
+
+<p>One thing the demo cannot decide for you: everything the agent reads goes to
+the model. If your vault holds unpublished results, data under an IRB protocol,
+or anything covered by an agreement, that is a question to answer before you point
+an agent at the folder &mdash; not after. Narrowing the working directory to a
+subfolder is the simplest answer; a <code>deny</code> rule on the sensitive paths
+is the next.</p>
+
+<div class="note">
+<p><strong>What is verified and what is not.</strong> The corpus is verified: every
+planted defect was checked to be present and extractable, <code>pdftotext</code>
+returns exactly zero characters from the scan, the unit arithmetic was recomputed,
+and <code>settings.json</code> was validated. <strong>The agent&rsquo;s behaviour
+was not measured</strong> &mdash; the package was assembled on a machine without
+Claude Code, so the expectations on this page are predictions, not results. If
+your run differs, your run is the data. Report what you see.</p>
+</div>
+
+<nav class="guidenav">
+  <a class="btn" href="../advanced.html">Advanced demos</a>
+  <a class="btn btn-ghost" href="demo9.html">&larr; Demo 9 &mdash; Lean proof agent</a>
+  <a class="btn btn-ghost" href="memory.html">Memory and context</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI &middot; Week 2</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">The documents in this package are <strong>synthetic</strong>. The
+    papers, authors, journals, DOIs and results do not exist and were written for
+    this exercise. Any resemblance to real work is accidental &mdash; do not cite
+    anything in it.</p>
+  </div>
+</footer>
+
+</body>
+</html>
