@@ -39,9 +39,8 @@
     it has a user interface on the front. <strong>Demo 6</strong> takes the preparation away and hands you
     an unprepared project &mdash; the situation your own code is in. <strong>Demo 7</strong> adds a second
     agent whose only job is to disbelieve the first one. <strong>Demo 8</strong> is a map rather than
-    a download: the named patterns, against the demos you have already run. <strong>Demo 10</strong> leaves the course
-    folder entirely and points an agent at a vault of your own papers and notes;
-    <strong>Demo 11</strong> does the same for a Zotero library and the bibliography you build from it; <strong>Demo 12</strong> joins the two and asks whether they still agree. <strong>Demo 13</strong> puts an agent on top of a scraper you already run, and reads the documents it only ever saw the titles of.</p>
+    a download: the named patterns, against the demos you have already run.</p>
+    <p class="muted">More packages &mdash; the research-writing workspaces and the earlier synthetic-corpus demos &mdash; are not listed here yet. They will appear as the course reaches them.</p>
     <p class="hero-cta" style="margin-top:1.3rem">
       <a class="btn btn-ghost" href="index.html#demos">← The four core demos</a>
       <a class="btn btn-ghost" href="guides/memory.html">Memory and sessions</a>
@@ -68,11 +67,6 @@
     <tr><td><strong>A workflow plus a user-facing application</strong></td><td><strong>Demo 5</strong> &mdash; a form and a text box over the same server, and an explicit answer to which one each control should be.</td></tr>
     <tr><td><strong>Code you already have, not yet agent-ready</strong></td><td><strong>Demo 6</strong> &mdash; four prompts that take an existing script and produce the card, schema, server and agent instructions, on code nobody prepared for you.</td></tr>
     <tr><td><strong>A result somebody will act on</strong></td><td><strong>Demo 7</strong> &mdash; what a checking agent must be allowed to see, and why the careful version of it confirms a wrong answer.</td></tr>
-    <tr><td><strong>A field with a real oracle</strong></td><td><strong>Demo 9</strong> &mdash; formal proof: what an unarguable checker does and does not settle.</td></tr>
-    <tr><td><strong>Reading, notes and your own documents</strong></td><td><strong>Demo 10</strong> &mdash; a vault of papers, clips and a spreadsheet, and what stops the notes an agent writes from being wrong.</td></tr>
-    <tr><td><strong>A literature review or a reference library</strong></td><td><strong>Demo 11</strong> &mdash; a Zotero library whose three views disagree, and a bibliography checked claim by claim against the PDFs.</td></tr>
-    <tr><td><strong>A reference manager and a note system that have drifted apart</strong></td><td><strong>Demo 12</strong> &mdash; the one field that joins Zotero to Obsidian, and the five ways ten months of ordinary use breaks it.</td></tr>
-    <tr><td><strong>A pipeline you already built that needs judgement on top</strong></td><td><strong>Demo 13</strong> &mdash; funding solicitations: why the scraper's top hit is unsubmittable, its bottom hit is the one to write, and where the reason for last year's decision should live.</td></tr>
     <tr><td><strong>Still deciding the shape</strong></td><td><strong>Demo 8</strong> &mdash; workflow or agent, and where each named pattern fails.</td></tr>
     <tr><td><strong>A workflow on a cluster or a long queue</strong></td><td>Not covered by a package. The shape is the same: a tool that submits and returns a job id, and an agent that asks about it later rather than waiting. Demo 6 says how to ask for that.</td></tr>
   </table>
@@ -254,215 +248,9 @@
     </div>
   </div>
 
-  <!-- ───────────────────────── DEMO 9 ───────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">9</div>
-      <div>
-        <h3>Lean proof agent &mdash; an oracle, and what it cannot tell you</h3>
-        <p>A checker that cannot be argued with, paired with one that can &mdash; because the first one still will not tell you the proof wandered.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Read three proofs of one theorem: the route a mathematician chose, a skeleton with <code>sorry</code> holes, and a <strong>valid proof that took fifteen steps instead of three</strong>.</li>
-          <li>Run a shape checker &mdash; no Lean, no model, no tokens &mdash; and watch the detour score <strong>5.0&times;</strong> its budget.</li>
-          <li>Find the failure that matters: the intermediate statement the mathematician cared about has vanished from a proof Lean accepts.</li>
-          <li>Give an agent one hole at a time, so it fills the argument rather than choosing it.</li>
-          <li>Run the evaluator&ndash;optimiser loop in the one setting where it genuinely converges.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li><strong>Two checkers, two jobs.</strong> <code>lake build</code> answers <em>is it a proof?</em>; a contract you wrote answers <em>is it THE proof?</em> Neither replaces the other.</li>
-          <li>Mathematics gets an oracle almost no other field has &mdash; and <strong>still needs the weak, hand-written check</strong> to get the answer it wanted.</li>
-          <li>You cannot prompt your way out of a search problem. Constrain the route, then measure the shape.</li>
-          <li>A detour is sometimes information: the direct step may want a lemma that does not exist yet.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo9_lean_proof_agent.zip" target="_blank" rel="noopener">Download demo 9 &nbsp;&darr;</a>
-        <a class="btn btn-ghost" href="guides/demo9.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP &middot; Python 3 &middot; Lean 4, core only (no Mathlib). Streamlit optional.</p>
-        <p class="muted"><strong>The shape checker needs no Lean at all</strong> &mdash; it is pure Python, so the main result is reproducible before anyone installs a toolchain.</p>
-        <p class="muted"><strong>The Lean half is unverified.</strong> It was written without a Lean toolchain available; <code>lake build</code> has not been run. Please report what breaks.</p>
-        <p class="muted">Lean is reached through <a href="https://github.com/oOo0oOo/lean-lsp-mcp" target="_blank" rel="noopener">lean-lsp-mcp</a>, a separate project. Prompted by a question from a mathematics attendee about proofs that take the wrong route.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="note" style="margin:2rem 0">
-    <p><strong>Demos 10&ndash;13 are one system.</strong> They share a body of literature and build on
-    each other: the vault, the library, the join between them, and an agent layer over a pipeline.</p>
-    <p><strong>Start with the <a href="guides/research-system.html">handbook</a></strong> &mdash; prerequisites
-    with verification commands, the full annotated file map for all four, what every file does and which
-    ones you must never touch, how information flows, a step-by-step first run with expected output, and
-    the daily, weekly and monthly routines for keeping it running. Each package also ships
-    <code>SETUP.md</code> and <code>MAINTENANCE.md</code>.</p>
-  </div>
-
-  <!-- ───────────────────────── DEMO 10 ───────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">10</div>
-      <div>
-        <h3>Claude Code + Obsidian &mdash; a vault that changes its mind</h3>
-        <p>Ten documents of the kind that actually pile up, seven of them quietly wrong &mdash; then two more that arrive later and make an earlier conclusion out of date.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Point Claude Code at an Obsidian vault with <strong>no plugin, no API key and no MCP</strong> &mdash; a vault is a folder of Markdown, so there is nothing to connect.</li>
-          <li>File one paper and compare the note against the PDF: <strong>two numbers in that abstract do not follow from its own table.</strong></li>
-          <li>Process an inbox holding a preprint, a photocopied scan with no text layer, a clipped page that stops at &ldquo;Subscribe&rdquo;, and a spreadsheet in the wrong units.</li>
-          <li>Run a <code>skeptic</code> subagent with <strong>no <code>Write</code> tool</strong> over the notes the first agent just wrote.</li>
-          <li>Ask the vault a question that can only be answered by connecting three documents &mdash; and see whether the notes are good enough to support it.</li>
-          <li>Then run <code>curator</code>: <strong>which topic note does this change, what does it contrast with, what gap does it open?</strong> It writes a <em>proposal</em> &mdash; the exact lines to add and remove &mdash; and cannot touch <code>topics/</code> at all.</li>
-          <li>Drop in two documents that <strong>arrive later</strong> and make an existing conclusion out of date, then ask the same question again. Same vault, better answer.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li><strong>The same three layers, on something you own.</strong> <code>CLAUDE.md</code> asks, <code>settings.json</code> enforces, a missing tool removes the option &mdash; here applied to a year of your own notes rather than a demo folder.</li>
-          <li><strong>A verifier that can edit is a verifier you cannot trust.</strong> It can make its own findings disappear.</li>
-          <li>An abstract is a claim; the tables are the evidence. Most of the planted defects are invisible to anything that reads only abstracts.</li>
-          <li><strong>A knowledge base that only accumulates is a folder with better metadata.</strong> The test of "it grows" is whether the same question gets a different answer next month &mdash; and whether the agent can tell a <em>refinement</em> from a <em>contradiction</em> from a <em>supersession</em>.</li>
-          <li><strong>A synthesis note you accepted is yours; one that appeared while you weren't looking is not.</strong> In six months you cannot tell which sentences you wrote, which is why <code>topics/</code> is denied to every agent and the curator proposes instead.</li>
-          <li><code>git init</code> in the vault is worth more than any configuration on the page.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo10_obsidian_research_vault.zip" target="_blank" rel="noopener">Download demo 10 &nbsp;&darr;</a>
-        <a class="btn btn-ghost" href="guides/demo10.html" target="_blank" rel="noopener">Open the guide</a>
-        <a class="btn btn-ghost" href="guides/research-system.html" target="_blank" rel="noopener">Handbook</a>
-        <p class="muted">ZIP &middot; 610&nbsp;KB &middot; 50&ndash;60 min, nine prompts. <code>pdftotext</code> helps but is optional.</p>
-        <p class="muted"><strong>Obsidian is not required.</strong> It is the viewer &mdash; install it to see the property tables and the graph, or skip it entirely.</p>
-        <p class="muted"><strong>The documents are synthetic.</strong> The papers, authors, journals, DOIs and results were written for this exercise and do not exist. Do not cite anything in the package.</p>
-        <p class="muted"><strong>The agent&rsquo;s behaviour is unmeasured.</strong> The corpus and its defects were verified; the package was assembled without Claude Code available, so the expectations in the guide are predictions. Report what your run actually does.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ───────────────────────── DEMO 11 ───────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">11</div>
-      <div>
-        <h3>Zotero &mdash; a bibliography that checks itself</h3>
-        <p>A bibliography is a set of promises: that each work exists, says what you say it says, and is where you say it is. Which of those can an agent check?</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Reconcile the three views of a Zotero library &mdash; the <code>.bib</code>, the <code>.csv</code> and <code>storage/</code> &mdash; which <strong>disagree in five places</strong>.</li>
-          <li>Find the folder in <code>storage/</code> that no entry claims. It holds the supplement in which the authors report their own method at <strong>8.0&nbsp;&deg;C</strong> where the abstract says 4.9 &mdash; invisible to any bibliography built from the <code>.bib</code>.</li>
-          <li>Tell a <strong>spurious duplicate</strong> (same DOI, typed twice) from a <strong>genuine near-duplicate</strong> (preprint and published version). Merging the second destroys information.</li>
-          <li>Build a topic bibliography, then run <code>citecheck</code> &mdash; <strong>no <code>Write</code> tool</strong> &mdash; over your own output, claim by claim against the PDFs.</li>
-          <li>Ask for the eight-section review outline everyone asks for &mdash; then ask <strong>which of these sections could you have written without my library?</strong> Three come back grounded, one hollow, four generic.</li>
-          <li>Optionally connect a real Zotero: <strong>locally, with no API key</strong>.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li><strong>The reference manager is read-only.</strong> The deny list makes editing it impossible, because an agent editing a library in place is how a decade of citations gets quietly corrupted.</li>
-          <li><strong>The MCP server cannot organise anything.</strong> <code>zotero-mcp</code> has three tools and all three are reads &mdash; so the agent reads, and writes files you apply yourself.</li>
-          <li>Metadata is whatever was true on import. The PDF is what the item <em>is</em>. They drift, and the cite key drifts with them.</li>
-          <li><strong>An outline is not evidence that anything was read.</strong> A model can generate a review structure for a known topic from training data alone. The <em>item key</em> is the only thing in the output that cannot be recalled &mdash; it can only be read from your library.</li>
-          <li><strong>One defect no layer catches.</strong> A journal article entered as <code>@book</code> is well-formed, consistent and wrong &mdash; and only a human who has seen a copy-edited reference list will notice.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo11_zotero_bibliography.zip" target="_blank" rel="noopener">Download demo 11 &nbsp;&darr;</a>
-        <a class="btn btn-ghost" href="guides/demo11.html" target="_blank" rel="noopener">Open the guide</a>
-        <a class="btn btn-ghost" href="guides/research-system.html" target="_blank" rel="noopener">Handbook</a>
-        <p class="muted">ZIP &middot; 545&nbsp;KB &middot; 35&ndash;45 min. <code>pdftotext</code> recommended.</p>
-        <p class="muted"><strong>Zotero is not required.</strong> The library ships as exports on disk &mdash; no account, no API key, no MCP, offline. The live route is an appendix for afterwards.</p>
-        <p class="muted"><strong>Pairs with Demo 10</strong>, same literature. Demo 10 is the notes; this is the library.</p>
-        <p class="muted"><strong>The library is synthetic</strong> and the agent&rsquo;s behaviour is unmeasured &mdash; the defects were verified mechanically, the expectations were not. Report what your run does.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ───────────────────────── DEMO 12 ───────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">12</div>
-      <div>
-        <h3>Zotero + Obsidian + Claude Code &mdash; the join</h3>
-        <p>Both halves are folders, so the setup takes one <code>cd</code>. Keeping them in step over ten months is the part no workflow post covers.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Connect a Zotero library and an Obsidian vault with <strong>no MCP server, no API key, no plugin</strong> &mdash; they are two folders side by side.</li>
-          <li>Check seven notes written between Nov 2025 and Aug 2026 against a library that moved underneath them. <strong>Two of the seven keys still resolve.</strong></li>
-          <li>Repair the join with <code>linker</code>, which may change <strong>one field</strong> &mdash; and watch it <em>refuse</em> the one note where two library items share a DOI.</li>
-          <li>Run <code>drift</code> (<strong>no <code>Write</code> tool</strong>) in both directions: dead keys, wrong records, stale metadata, notes that cannot be verified, orphans, and two notes about one paper that contradict each other.</li>
-          <li>Find the note holding the best evidence in the workspace &mdash; and work out why it <strong>can never be cited</strong>.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li><strong>One field is the whole integration:</strong> <code>zotero_key</code>. Not the title, which gets retyped; not the cite key, which Better BibTeX regenerates when you fix metadata; not the filename, which carries a year that may be wrong.</li>
-          <li><strong>A key that resolves is not a key that is right.</strong> The nastiest defect here points at a real record &mdash; the wrong one &mdash; so every naive check passes it.</li>
-          <li>The attachment outranks the library, and the library outranks the note. Three copies of a fact in three places, and only one of them is the paper.</li>
-          <li><strong>Nothing here was anyone's mistake.</strong> This is just what ordinary use does to two systems with no shared identifier.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo12_zotero_obsidian_claude.zip" target="_blank" rel="noopener">Download demo 12 &nbsp;&darr;</a>
-        <a class="btn btn-ghost" href="guides/demo12.html" target="_blank" rel="noopener">Open the guide</a>
-        <a class="btn btn-ghost" href="guides/research-system.html" target="_blank" rel="noopener">Handbook</a>
-        <p class="muted">ZIP &middot; 550&nbsp;KB &middot; 30&ndash;40 min. <code>pdftotext</code> recommended.</p>
-        <p class="muted"><strong>Neither Zotero nor Obsidian is required.</strong> Both halves ship as folders on disk &mdash; no account, no key, no plugin, offline.</p>
-        <p class="muted"><strong>The capstone for Demos 10 and 11.</strong> Demo 10 asks whether the notes are right; Demo 11 whether you can cite what you have; this one whether the two still agree.</p>
-        <p class="muted"><strong>Synthetic, and the agent's behaviour is unmeasured</strong> &mdash; the divergences were verified mechanically, the expectations were not.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ───────────────────────── DEMO 13 ───────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">13</div>
-      <div>
-        <h3>Funding radar &mdash; an agent layer over a system you already have</h3>
-        <p>The pipeline's highest-scoring call is one you cannot submit to. Its lowest-scoring call is the best fit in the set. Both are the scorer working correctly.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Leave the scraper alone &mdash; fetching and scoring are deterministic work Python does better &mdash; and add the two things it <em>structurally cannot</em> do: read the actual solicitation, and remember last year's decision.</li>
-          <li>Drop <strong>six solicitations into <code>inbox/</code></strong> yourself &mdash; four PDFs, two saved web pages &mdash; and triage them against a profile that states <strong>constraints, not just interests</strong>.</li>
-          <li>Find the call scored <strong>96</strong> whose institutional down-select closed two months before the deadline on its cover.</li>
-          <li>Find the call scored <strong>38</strong> whose first area of interest is your own standing research question, written in vocabulary your keywords do not contain.</li>
-          <li>Run <code>recurrence</code> (<strong>no <code>Write</code> tool</strong>) <em>before</em> reading anything, and watch one call resolve to a paragraph quoting why you passed on it in February 2025.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li><strong>A real funding-radar schema has an empty <code>feedback</code> table.</strong> 90 items, 0 votes &mdash; because "the $200k cap is below what the work costs" does not fit in an <code>INTEGER</code>, so the reason goes nowhere and you read the call again next year.</li>
-          <li><strong>Four of the five traps are caught by the constraints half of the profile</strong> &mdash; indirect rate, smallest viable project, cost-share appetite, down-select timing. The half nobody writes down.</li>
-          <li>A keyword filter cannot match a description of your work that avoids your words. That is not a threshold problem and no tuning fixes it.</li>
-          <li>One way only: the database owns <em>what exists</em>, the notes own <em>what you decided</em>, and the exporter never eats a decision block.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo13_funding_radar.zip" target="_blank" rel="noopener">Download demo 13 &nbsp;&darr;</a>
-        <a class="btn btn-ghost" href="guides/demo13.html" target="_blank" rel="noopener">Open the guide</a>
-        <a class="btn btn-ghost" href="guides/research-system.html" target="_blank" rel="noopener">Handbook</a>
-        <p class="muted">ZIP &middot; 270&nbsp;KB &middot; 35&ndash;45 min. <code>pdftotext</code> required; Python 3, standard library only.</p>
-        <p class="muted"><strong>Closest to a real tool of any demo here.</strong> Point the exporter at your own database, rewrite the profile with your own numbers, and it is yours.</p>
-        <p class="muted"><strong>The solicitations are synthetic.</strong> Programme numbers, deadlines, award sizes and eligibility rules were written for this exercise. Do not act on anything in the package.</p>
-        <p class="muted"><strong>Traps verified, agent behaviour unmeasured.</strong> The verification pass found and fixed a real bug: an earlier exporter destroyed the decision block on re-export.</p>
-      </div>
-    </div>
-  </div>
+  <!-- Demos 9, 10, 10x and the earlier research demos are hidden.
+       Saved verbatim in backup/advanced_hidden_demos9plus.html;
+       paste that file back here to restore them. -->
 
 </section>
 <section id="reference">
