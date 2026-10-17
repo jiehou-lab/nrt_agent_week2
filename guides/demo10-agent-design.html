@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 10 · Design your own agent — Agentic AI Week 4</title>
+<meta name="description" content="The Week 4 in-class demo. Collect papers, turn them into notes, design an agent tool with Claude Code, and write the implementation plan into a LaTeX document the whole room contributes to. No Zotero, no git, no LaTeX install.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='46' font-family='Georgia,serif' fill='%23fff'>10</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../demos.html">Demos</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 10 &middot; WEEK 4 IN CLASS &mdash; DESIGN AN AGENT, WRITE THE PLAN, SHIP IT TOGETHER</p>
+    <h1>Design your own agent &mdash; and write the plan</h1>
+    <p class="lede">Two hours, eight steps, one shared document. Bring a few papers, turn them into notes, then <strong>design an agent tool you actually want</strong> and write the implementation plan for it &mdash; cited, checked, and uploaded into a LaTeX project the whole room contributes to. No Zotero, no git, no LaTeX install.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo10_agent_design.zip" target="_blank" rel="noopener">Download Demo 10 &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo9.html">&larr; Demo 9</a>
+      <a class="btn btn-ghost" href="#map">The eight steps</a>
+      <a class="btn btn-ghost" href="#instructor">For the instructor</a>
+      <a class="btn btn-ghost" href="../demos.html">All demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<div class="callout">
+<p style="margin:0"><strong>This is the Week&nbsp;4 in-class demo.</strong> Two hours, eight steps, one shared document at the end. No Zotero, no git, no LaTeX install &mdash; a folder, a browser, and Claude Code. The full research-writing system with a reference manager underneath is <a href="demo10x-paper-zotero.html">Demo 10x</a>, and it is worth your time <em>after</em> Friday rather than before it.</p>
+</div>
+
+<h2 id="map">The whole session on one page</h2>
+
+<figure style="margin:1.5rem 0 1.2rem">
+<img src="../assets/img/demo10-agent-design.png" style="width:100%;height:auto;border:1px solid #ddd6ca;border-radius:10px;display:block"
+     alt="Workflow diagram. Collect Papers (a PDF) feeds the Notes Agent, which writes notes/*.md. Collect a .bib file for anything you will cite. Then you talk your agent idea through with Claude, the Writing Agent drafts the plan in LaTeX or Markdown from notes, library, the web or you, producing a Draft report (.tex with cite keys), which goes to Overleaf writing in a push-compile-pull-revise loop. Collaborative: each person uploads groups/name.tex and the instructor assembles main.tex.">
+<figcaption class="muted" style="margin-top:.6rem;font-size:.9rem">Eight steps. The first three are preparation, step&nbsp;4 is the point, and the last four turn it into something twenty people can read.</figcaption>
+</figure>
+
+<div class="callout" style="margin:1.6rem 0">
+<p style="margin:0"><strong>The steps:</strong>
+<a href="#s0">0&nbsp;Setup</a> &middot;
+<a href="#s1">1&nbsp;Collect</a> &middot;
+<a href="#s2">2&nbsp;Notes</a> &middot;
+<a href="#s3">3&nbsp;Bib</a> &middot;
+<a href="#s4">4&nbsp;Design</a> &middot;
+<a href="#s5">5&nbsp;Draft</a> &middot;
+<a href="#s6">6&nbsp;Upload</a> &middot;
+<a href="#s7">7&nbsp;Assemble</a> &middot;
+<a href="#s8">8&nbsp;A skill of your own</a> &middot;
+<a href="#instructor">For the instructor</a></p>
+</div>
+
+<h2>What you leave with</h2>
+
+<p>A section of a real LaTeX document, in a project the whole room contributed to, describing <strong>an agent tool you actually want to build</strong> &mdash; with citations to the papers or documents you brought, and a list of the things you could not support.</p>
+
+<p>Not a toy. The plan is the thing you would hand a collaborator, or give to Claude Code next week as the brief for building it.</p>
+
+<pre><code>sources/        whatever you collected — papers, decks, posts, SOPs, code
+sources/notes/  one structured note per source
+refs/refs.bib   the sources you will cite
+writing/        myplan.tex — the deliverable
+.claude/        three subagents, two skills, one permission boundary
+IDEAS.md        starter questions for the part that matters
+tools/          five Python tools that check things and fix nothing</code></pre>
+
+<h2 id="s0">0 &middot; Setup &mdash; two minutes, in the room</h2>
+
+<pre><code>cd Demo10_agent_design
+python3 tools/doctor.py
+python3 tools/snapshot.py</code></pre>
+
+<p><code>doctor.py</code> needs <code>python3</code> and Claude Code. It names everything else as optional and says why. You should see four <code>ok</code> lines under <strong>Core</strong> and nothing missing.</p>
+
+<p><code>snapshot.py</code> is the undo button: it zips your notes, refs and plan into <code>.snapshots/</code> so an agent cannot lose work you wanted to keep, and <code>--restore</code> puts them back. Source PDFs are skipped &mdash; they are the one thing no agent will overwrite. That safety net is what makes it reasonable to let an agent write files at all.</p>
+
+<div class="callout">
+<p style="margin:0"><strong>There is no git in this package, and no shell scripts either.</strong> Every tool is Python, so <strong>Windows needs <code>python3</code> and nothing else</strong> &mdash; no Git for Windows, no Git Bash, no WSL. The earlier draft of this demo required all three, for one reason: two of the five tools were <code>.sh</code> files. Porting them removed the requirement rather than documenting it. If you already use git, <code>git init &amp;&amp; git add -A &amp;&amp; git commit</code> is better than the snapshot and you should use that instead.</p>
+</div>
+
+<h2 id="s1">1 &middot; Collect your sources &mdash; 10 min</h2>
+
+<pre><code>cp ~/Downloads/*.pdf sources/</code></pre>
+
+<p><strong>Not just papers.</strong> Anything that describes the work your agent would help with, or the problem it would solve:</p>
+
+<table>
+<tr><th style="width:38%">what</th><th>how it gets in</th></tr>
+<tr><td>papers, preprints</td><td><code>.pdf</code> &mdash; Claude reads these directly</td></tr>
+<tr><td>slide decks</td><td><code>.pptx</code>, via <code>tools/totext.py</code> &mdash; or export to PDF</td></tr>
+<tr><td>reports, SOPs, protocols</td><td><code>.docx</code>, <code>.pdf</code>, <code>.md</code></td></tr>
+<tr><td>blog posts, docs pages</td><td><strong>save the page first</strong> &mdash; Print &rarr; Save as PDF</td></tr>
+<tr><td>meeting notes, emails</td><td><code>.md</code>, <code>.txt</code></td></tr>
+<tr><td>a README or a script</td><td>code counts, and is often the most honest source you have</td></tr>
+</table>
+
+<p><strong>Two or three is plenty.</strong> This is not a literature review; you want enough that the tool you design has something concrete to be about.</p>
+
+<h3>Decks and Word files need one command</h3>
+
+<p>A <code>.pptx</code> or <code>.docx</code> is a zip of XML. <code>pdftotext</code> fails on one, nothing renders it, and <code>strings</code> finds nothing once the zip is compressed &mdash; so out of the box they are simply unreadable.</p>
+
+<pre><code>python3 tools/totext.py sources/deck.pptx      <span class="c"># slides + speaker notes</span>
+python3 tools/totext.py sources/report.docx
+python3 tools/totext.py sources/post.html      <span class="c"># script, style, nav stripped</span></code></pre>
+
+<p>Standard library only, nothing to install. Verified against a real 62-slide deck: 62 slides and 62 speaker-note blocks out, in order. A deck that is <em>entirely images</em> extracts nothing &mdash; export it as PDF and let Claude read the pages.</p>
+
+<div class="callout">
+<p style="margin:0"><strong>Why you have to save a web page rather than paste the URL.</strong> The <code>notes</code> agent has no <code>WebSearch</code> and no <code>WebFetch</code>. Given a link, an agent that can browse will write a fluent, confident note from an abstract, a landing page, or a search result &mdash; and that note is <em>indistinguishable</em> from one written from the source. Saving the page takes five seconds and removes the whole failure mode. The cost is real and worth feeling: this is the capability layer working on you as well as for you. The <code>writer</code> agent <em>does</em> have web tools, because in a draft &ldquo;found this online&rdquo; is a legitimate tier that gets marked as such.</p>
+</div>
+
+<p>Nothing to hand? <code>sources/README.md</code> lists three real open-access papers (CC BY 4.0, you may cite them) that share one question and disagree about it.</p>
+
+<div class="note">
+<p style="margin:0"><code>sources/</code> is <strong>flat</strong>, on purpose. A document can be relevant to two things at once and a folder can only hold it in one place. The test before you ever add a subfolder: <em>can one document belong to two of these at the same time?</em> If yes, it is a field, not a folder &mdash; put it in the note's frontmatter and generate a view.</p>
+</div>
+
+<h2 id="s2">2 &middot; Turn them into notes &mdash; 20 min</h2>
+
+<pre><code>claude
+/agents          <span class="c"># notes, writer, citecheck</span></code></pre>
+
+<p>Then once per document:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the notes subagent on sources/&lt;file&gt;</div>
+
+<p>It works out how to read the thing, writes <code>sources/notes/&lt;name&gt;.md</code> against a fixed eight-section template, sets <code>kind:</code> to what it actually is, and adds one row to <code>sources/_index.md</code>.</p>
+
+<p><strong>The template fits a blog post as well as a paper</strong>, and the sections that go thin are the point:</p>
+
+<table>
+<tr><th style="width:30%">section</th><th>for a paper</th><th>for a launch post</th></tr>
+<tr><td><code>## What it is</code></td><td>a 2019 randomised trial</td><td>a vendor post &mdash; <strong>and who benefits from believing it</strong></td></tr>
+<tr><td><code>## Evidence given</code></td><td><code>0.71 &rarr; 0.78 AUC, Table 2, n=418</code></td><td><code>none &mdash; asserted, not shown</code></td></tr>
+<tr><td><code>## Limits</code></td><td>what the design cannot tell you</td><td>usually the most useful section on the page</td></tr>
+</table>
+
+<p>Writing <em>&ldquo;none &mdash; asserted, not shown&rdquo;</em> is a finding, not a hole in your note. <code>check_notes.py</code> only expects numbers in <code>## Evidence given</code> when <code>kind:</code> is <code>paper</code> or <code>preprint</code>; it <em>does</em> fail on an empty one, whatever the kind.</p>
+
+<div class="callout">
+<p style="margin:0"><strong>It cannot fetch anything.</strong> Its tool list is <code>Read, Write, Glob, Grep, Bash</code> &mdash; no <code>WebSearch</code>, no <code>WebFetch</code>. If the document is not already in <code>sources/</code> it says so and stops. That is deliberate: an agent that can browse will write a fluent, confident note from an abstract or a publisher blurb, and <strong>that note is indistinguishable from one written from the paper</strong>. Note that the <code>writer</code> agent <em>does</em> have web tools. The writer may browse; the filer may not.</p>
+</div>
+
+<h3>Check it with a tool that repairs nothing</h3>
+
+<pre><code>python3 tools/check_notes.py</code></pre>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">  sources/notes/Blog2026-why-we-stopped-notebooks.md
+    ok      8 of 8 sections
+    note    doi: none — from https://example.com/why-we-stopped-...
+  sources/notes/Deck2026-lab-automation.md
+    ok      8 of 8 sections
+
+  2 note(s), 0 error(s), 0 warning(s)</div>
+
+<p>It reports and fixes nothing, deliberately &mdash; a checker that edits is one that can make its own findings disappear. Two of its warnings are worth triggering on purpose so you see them:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">    WARN    ## My take is not empty. If you wrote it, good.
+            If an agent did, delete it — that section is yours.
+    WARN    ## Evidence given has no numbers and kind is paper.
+            citecheck would have to reopen the source to do
+            what this section is for.
+    ERROR   ## Evidence given is empty. If the source shows
+            nothing, write: none — asserted, not shown</div>
+
+<h3>Then read one note like a reviewer</h3>
+
+<p><strong><code>## My take</code> is empty.</strong> It always is. No agent writes there. In six months it is the only section you can trust to be your own thinking.</p>
+
+<p><strong><code>## Problem and aim</code> comes before <code>## Claim</code>.</strong> A note that opens with the claim has already accepted the document's framing. What did they think was missing, and was the gap real?</p>
+
+<p><strong><code>## What it is</code> is the provenance line</strong>, and it earns its place on the things that are <em>not</em> papers. A vendor post claiming a tool saves 40% is evidence of a claim, not of 40%.</p>
+
+<p><strong><code>## Relevance to my tool</code> is the bridge to step 4.</strong> It is the agent's guess at why you collected this. Argue with it &mdash; the argument is most of what step 4 needs.</p>
+
+<h2 id="s3">3 &middot; A <code>.bib</code> entry for anything you will cite &mdash; 5 min</h2>
+
+<p>Only for real publications. <strong>Skip this entirely if your documents are internal</strong>; a plan with no citations is a fine plan.</p>
+
+<p><strong>Easiest route:</strong> on the paper's own page, find <em>Cite</em> or <em>Export citation</em> and choose <strong>BibTeX</strong>. Every major publisher has this.</p>
+
+<p><strong>No publisher page?</strong> Paste the DOI into <a href="https://www.doi2bib.org" target="_blank" rel="noopener">doi2bib.org</a> and copy what comes back.</p>
+
+<p>Paste the entry into <code>refs/refs.bib</code>, then <strong>rename the cite key so it starts with your first name and a colon</strong>:</p>
+
+<pre><code>@article{alice:horne2012,          <span class="c"># was horne2012pharmacogenetic</span>
+  title  = {Pharmacogenetic warfarin dose refinements},
+  year   = {2012},
+  doi    = {10.1160/TH11-06-0388},
+}</code></pre>
+
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:1.1rem 0">
+<p style="margin-top:0"><strong>The prefix is not decoration.</strong> In step 6 twenty people paste into one shared <code>refs.bib</code>. Two identical cite keys make BibTeX fail, and the damage is not local:</p>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.8rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">Repeated entry---line 5 of file refs.bib
+latexmk exit 12
+
+every citation in the document  →  (?)
+the References section          →  <b>gone entirely</b></div>
+<p>Measured here, not assumed. A <code>.bbl</code> <em>is</em> still written with the duplicate dropped, but latexmk stops before the pass that would use it &mdash; which is why the whole bibliography vanishes rather than losing one row. <strong>One person's collision breaks everybody's PDF.</strong></p>
+<p style="margin-bottom:0">The opposite failure is worth knowing too, because it is the quiet one: a cite key with <em>no</em> entry renders <code>(?)</code> for that one citation and <strong><code>latexmk</code> exits 0</strong>. Nothing fails. You would find it at proof stage, or a reviewer would.</p>
+</div>
+
+<pre><code>python3 tools/bibcheck.py</code></pre>
+
+<p>Duplicate keys across every file you give it, keys with no prefix, and entries with no DOI. <strong>Keep the <code>doi</code> field</strong> &mdash; it is the only identifier that survives moving between tools, and it is how <code>citecheck</code> joins your notes to your citations. Google Scholar's BibTeX export <a href="https://libanswers.caltech.edu/faq/225020" target="_blank" rel="noopener">does not include one</a>, which is why it is not the route recommended here.</p>
+
+<h2 id="s4">4 &middot; Design your agent, out loud, with Claude &mdash; 15 min</h2>
+
+<div class="callout">
+<p style="margin:0"><strong>This is the part the rest of the session exists for.</strong> Everything before it is preparation; everything after it is write-up.</p>
+</div>
+
+<p>Open <code>IDEAS.md</code> for starter questions, then talk:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the design skill. I want an agent that &lt;describe the job&gt;.</div>
+
+<p>The skill is under instruction to <strong>ask you four questions and wait</strong> before proposing anything:</p>
+
+<ol class="steps">
+<li><strong>What is the input, concretely?</strong> If the answer is abstract, it asks for a real example.</li>
+<li><strong>What is the output, and how would you know it was wrong?</strong> If the answer is &ldquo;I would read it carefully&rdquo;, the design is not finished. What is the <em>check</em>?</li>
+<li><strong>What must it never be able to do?</strong> Not <em>should not</em> &mdash; <em>could not</em>. That answer becomes a missing tool or a deny rule, not a sentence in a prompt.</li>
+<li><strong>How often, and who else sees the output?</strong> Runs once &rarr; just ask. Runs weekly &rarr; a skill. Other people depend on it &rarr; the failure modes have to be written down.</li>
+</ol>
+
+<p>Then it proposes, and the proposal has to place <strong>every rule in the lowest layer that can hold it</strong>:</p>
+
+<table>
+<tr><th style="width:16%">layer</th><th style="width:28%">where it lives</th><th>what it is</th></tr>
+<tr><td><strong>context</strong></td><td><code>CLAUDE.md</code></td><td>a <em>request</em>. It can be misread, or forgotten the first time a fix looks obvious mid-task.</td></tr>
+<tr><td><strong>permission</strong></td><td><code>.claude/settings.json</code></td><td>a <em>refusal</em>. The call is blocked.</td></tr>
+<tr><td><strong>capability</strong></td><td>a subagent's <code>tools:</code> list</td><td>an <em>absence</em>. There is nothing to call, so there is nothing to argue with.</td></tr>
+</table>
+
+<p><strong>If every rule in the proposal lands in &ldquo;context&rdquo;, say so and try again.</strong> That is the most common failure of a first design, and catching it here costs fifteen minutes instead of a term.</p>
+
+<h3>Starter questions, if the room goes quiet</h3>
+
+<ul>
+<li>What did you do more than three times last month that felt mechanical?</li>
+<li>What do you explain to every new student, in the same words?</li>
+<li>Which step in your analysis do you most often get wrong, or skip?</li>
+<li>What do you <em>not</em> do, because doing it properly would take a week?</li>
+</ul>
+
+<p>Vague targets produce plans that read well and cannot be built. Push for the concrete version:</p>
+
+<table>
+<tr><th style="width:38%">vague</th><th>concrete</th></tr>
+<tr><td>&ldquo;help with my literature&rdquo;</td><td>&ldquo;given a PDF, tell me whether its cohort overlaps a paper I already filed&rdquo;</td></tr>
+<tr><td>&ldquo;clean my data&rdquo;</td><td>&ldquo;given a plate-reader CSV, flag wells outside 3&nbsp;SD and write a one-line log&rdquo;</td></tr>
+<tr><td>&ldquo;help me write&rdquo;</td><td>&ldquo;given a results table, draft the paragraph in my group's house style&rdquo;</td></tr>
+</table>
+
+<p>The skill ends by naming <strong>the one assumption that, if wrong, makes the whole design pointless</strong>, and how you could check it this week. Every design has one.</p>
+
+<h2 id="s5">5 &middot; Draft the implementation plan &mdash; 25 min</h2>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the writer subagent: an implementation plan for the agent we just
+  designed. LaTeX, into writing/myplan.tex. Cite anything from
+  refs/refs.bib that supports a design choice.</div>
+
+<p>Six subsections, and two of them are the ones people skip: <strong>Design</strong>, which must name the layer for each rule and say why not a weaker one, and <strong>How it can fail</strong>, which needs at least three failure modes each paired with the check that catches it. A plan with no failure modes has not been thought about.</p>
+
+<p>What comes back marks <strong>where every claim came from</strong>:</p>
+
+<table>
+<tr><th style="width:34%">marker</th><th>means</th></tr>
+<tr><td><code>\cite{alice:horne2012}</code></td><td>in <code>refs/refs.bib</code>, and there is a note saying you read it</td></tr>
+<tr><td><code>% [UNREAD: key]</code></td><td>the agent read the PDF just now. <strong>You have not.</strong></td></tr>
+<tr><td><code>% [WEB: url]</code></td><td>found online, not in your refs. <strong>Not a citation yet.</strong></td></tr>
+<tr><td><code>% [GAP: &hellip;]</code></td><td>nothing supports this. Say so rather than writing smoothly.</td></tr>
+</table>
+
+<p>The last three are LaTeX comments, so they never typeset &mdash; but they stay in the source where you and anyone reading it can see them. <strong>Leave the gaps in.</strong> They are the plan telling you what you still have to find out, and <code>\subsection{Open questions}</code> is where they get promoted to prose. Deleting them so it reads finished is the one move that turns an honest plan into a confident wrong one.</p>
+
+<div class="note">
+<p style="margin:0">A <code>[WEB:]</code> marker is settled by sending it round the loop again: decide the source is worth keeping, get its BibTeX, paste it into <code>refs.bib</code> with your prefix &mdash; and only then is it a real <code>\cite{}</code>. Free to <em>write</em> from anything; not free to <em>cite</em> anything.</p>
+</div>
+
+<h3>Check the citations with an agent that cannot edit</h3>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the citecheck subagent on writing/myplan.tex</div>
+
+<p>It works cheapest-first: <strong>your notes</strong>, then the <code>.bib</code> as a lookup, and it opens a PDF only when those cannot settle the claim. It distinguishes <em>confirmed by a note you read</em> from <em>confirmed by a note nobody read</em> &mdash; the second is fidelity to your own summary, which is not the same as truth.</p>
+
+<p>Expect several <em>cannot verify</em> verdicts and treat them as correct.</p>
+
+<pre><code>head -6 .claude/agents/citecheck.md</code></pre>
+
+<p>Look at the <code>tools:</code> line &mdash; <code>Read, Glob, Grep, Bash</code>. <strong>There is no <code>Write</code>.</strong> Now ask it to fix something and watch it decline, not because it was told to but because there is nothing to decline with. That is the bottom layer, and it is the only one that cannot be talked out of.</p>
+
+<h3>Last check before you upload</h3>
+
+<pre><code>python3 tools/texcheck.py writing/myplan.tex</code></pre>
+
+<p>Three things, and they are specifically the three that break <strong>somebody else's</strong> build:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">  FAIL  preamble in a fragment. These lines belong in main.tex:
+          1:\documentclass{article}
+          2:\usepackage{natbib}
+  FAIL  unbalanced environments:
+          itemize            1 begin, 0 end
+  FAIL  cite key(s) not in refs.bib — these render as (?):
+          nobody:ghost2099
+  note  1 open [GAP:] marker(s), 0 [WEB:] marker(s)
+        Gaps are a result, not a defect. Leave them in.</div>
+
+<p><strong>It does not need LaTeX installed.</strong> It is a text check, because requiring a TeX install would have excluded half the room &mdash; and because what it is looking for is visible in the source anyway.</p>
+
+<h2 id="s6">6 &middot; Upload to the shared Overleaf project &mdash; 10 min</h2>
+
+<p>The link is on the slide. It opens the project with edit access.</p>
+
+<ol class="steps">
+<li><strong>Rename your file.</strong> In Overleaf, select the <code>groups</code> folder, then <strong>Upload</strong>:
+<pre><code>groups/firstname-lastname.tex     <span class="c"># e.g. groups/alice-nguyen.tex</span></code></pre>
+<p>Upload it as <code>myplan.tex</code> and you will silently overwrite whoever went before you. Say the filename out loud before anyone uploads.</p></li>
+
+<li><strong>Paste your entries into <code>refs.bib</code></strong>, at the end. Your keys are prefixed, so nothing can collide.</li>
+
+<li><strong>Add one line to <code>main.tex</code></strong>, in the marked block:
+<pre><code>\input{groups/firstname-lastname}</code></pre></li>
+</ol>
+
+<p>Overleaf is a real-time collaborative editor, so twenty people each adding one line to <code>main.tex</code> is exactly what it is built for. Watch the PDF rebuild with your section in it &mdash; that is the moment the session is for.</p>
+
+<h2 id="s7">7 &middot; The instructor assembles &mdash; 10 min</h2>
+
+<p>Live, on the projector. Compile, look at what twenty people produced in one document, and see what broke.</p>
+
+<p>Something usually does, and that is the useful part. The three failures in order of likelihood are in the <a href="#instructor">instructor notes</a> below, with the fix for each.</p>
+
+<h2 id="s8">8 &middot; If time: a skill of your own &mdash; 15 min</h2>
+
+<p>A skill is a folder with a <code>SKILL.md</code> in it. Open <code>.claude/skills/design/SKILL.md</code> &mdash; that is the entire format: frontmatter with a name and a description, then instructions.</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Create a skill called &lt;name&gt; that &lt;the thing you kept re-explaining
+  to Claude today&gt;.</div>
+
+<table>
+<tr><th style="width:18%"></th><th>use it when</th></tr>
+<tr><td><strong>subagent</strong></td><td>the point is a <strong>narrower tool list</strong> &mdash; it must not be able to do something, or it needs its own context window</td></tr>
+<tr><td><strong>skill</strong></td><td>the point is a <strong>consistent procedure</strong> &mdash; the same steps, the same order, every time</td></tr>
+<tr><td><strong>neither</strong></td><td>it runs once. Just ask. Do not build a thing.</td></tr>
+</table>
+
+<p><code>citecheck</code> is an agent because the point is what it <em>cannot</em> do. <code>design</code> is a skill because the point is the order it works in.</p>
+
+<h2 id="instructor">For the instructor</h2>
+
+<p>The package ships an <code>instructor/</code> folder with <code>main.tex</code>, a worked <code>example-plan.tex</code>, and the setup steps. Fifteen minutes, once, before the session.</p>
+
+<ol class="steps">
+<li><strong>New Project &rarr; Blank Project.</strong> Upload <code>main.tex</code>, replacing the default.</li>
+<li><strong>Create a <code>groups</code> folder</strong> and upload <code>example-plan.tex</code> into it. It gives the class something to look at and proves the <code>\input</code> wiring works before anyone depends on it.</li>
+<li><strong>Create <code>refs.bib</code></strong> at the top level and paste in the header comment from the package's <code>refs/refs.bib</code>, so the key-prefix rule is visible to anyone who opens it.</li>
+<li><strong>Recompile.</strong> Title page, table of contents, one example section. If it does not work now it will not work with twenty people in it.</li>
+<li><strong>Share &rarr; link sharing &rarr; anyone with the link can edit.</strong> Put the link on a slide, not in the downloadable package.</li>
+</ol>
+
+<h3>When it breaks</h3>
+
+<table>
+<tr><th style="width:40%">symptom</th><th>cause and fix</th></tr>
+<tr><td>Every citation is <code>(?)</code>, the References section is gone, the log says <code>Repeated entry</code></td><td>Two people used the same cite key. Download the project (Menu &rarr; Download &rarr; Source) and run <code>python3 tools/bibcheck.py refs.bib</code> &mdash; it names the duplicate. Prefix one and recompile.</td></tr>
+<tr><td><code>File groups/xyz.tex not found</code></td><td>The <code>\input</code> line was added but the upload failed, or the filename does not match. Check the file tree.</td></tr>
+<tr><td>Something unhelpful about a missing <code>\begin{document}</code></td><td>A stray <code>\documentclass</code> or <code>\usepackage</code> inside a group file. <code>texcheck.py</code> catches this before upload, which is why it is in the attendee steps.</td></tr>
+<tr><td>One citation is <code>(?)</code>, everything else is fine, exit code 0</td><td>That key has no entry. Localised and silent &mdash; the opposite of the duplicate failure.</td></tr>
+</table>
+
+<div class="note">
+<p style="margin:0"><strong>Afterwards, turn link sharing off.</strong> The link grants edit access to anyone who kept it, permanently. Or treat the project as disposable and abandon it.</p>
+</div>
+
+<h2>What it teaches</h2>
+
+<ul>
+<li><strong>Three layers, and they are not interchangeable.</strong> <code>CLAUDE.md</code> is a <em>request</em>, <code>settings.json</code> is a <em>refusal</em>, a subagent's missing tool is an <em>absence</em>. Put each rule in the lowest layer that can hold it. The design conversation in step 4 is an hour of practice at exactly this.</li>
+<li><strong>A verifier that can edit is one you cannot trust.</strong> It can make its own findings disappear. <code>citecheck</code> has no <code>Write</code>, and neither does <code>check_notes.py</code>.</li>
+<li><strong>The agent that files may not browse; the agent that writes may.</strong> A note written from an abstract looks exactly like one written from the paper. The only reliable prevention is removing the tool.</li>
+<li><strong><code>[GAP:]</code> is a result.</strong> Deleting the gaps so a plan reads finished is how a confident, wrong document gets written.</li>
+<li><strong>Folders may encode lifecycle, never classification.</strong> The test: <em>can one thing be in two of these at once?</em> If yes, it is a field.</li>
+<li><strong>A requirement you can delete is better than one you document.</strong> This package needed Git for Windows, Git Bash and WSL instructions for exactly one reason: two of its five tools were shell scripts. Porting them to Python removed three dependencies and a paragraph of caveats. Look for that shape in your own design.</li>
+<li><strong>The cheap check that runs before the expensive one.</strong> <code>texcheck.py</code> is a text scan with no LaTeX; <code>bibcheck.py</code> is a regex over a <code>.bib</code>. Between them they catch the three failures that would otherwise surface as a broken compile in front of twenty people.</li>
+</ul>
+
+<h2>Making it yours</h2>
+
+<ul>
+<li>The seven note sections in <code>.claude/agents/notes.md</code> are a starting point. Rewrite them for what you actually need to remember about a paper in your field.</li>
+<li><code>IDEAS.md</code> is yours. The sentence you write at the bottom before the session is worth comparing with the plan you have at the end of it.</li>
+<li>The <code>design</code> skill's four questions are the part most worth adapting. If your group has a fifth question it always asks, add it.</li>
+<li>Want the reference manager, the Word exit, and git? That is <a href="demo10x-paper-zotero.html">Demo 10x</a> &mdash; same shape, more machinery.</li>
+</ul>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">The three fallback papers are <strong>real and open access under CC BY 4.0</strong> &mdash; you may
+    cite them. They are not included in the download; <code>sources/README.md</code> lists their DOIs.
+    Bring your own instead if you have them. The scaffold is yours to adapt.</p>
+  </div>
+</footer>
+
+</body>
+</html>

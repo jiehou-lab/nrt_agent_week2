@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 10x · Paper writing with Zotero — the full system</title>
+<meta name="description" content="From an empty folder to a Word document with live Zotero citations you can keep editing. Three real open-access papers, your own Zotero, and the question underneath: what stops a cited claim from being wrong?">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='46' font-family='Georgia,serif' fill='%23fff'>10x</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../demos.html">Demos</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">DEMO 10x &middot; ADVANCED &mdash; THE FULL RESEARCH-WRITING SYSTEM</p>
+    <h1>Paper writing with Zotero &mdash; the full system</h1>
+    <p class="lede">Eight stages from an empty folder to a submitted paper &mdash; notes, a reference manager Claude can cite from, a verifier that cannot edit, and a draft that ends up in <strong>Overleaf or in Word with live Zotero fields</strong>. Three real open-access papers, your own Zotero, and the question underneath: when an agent writes a sentence with a citation on it, <strong>what stops the citation from being wrong?</strong></p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/Demo10x_research_paper_with_zotero.zip" target="_blank" rel="noopener">Download Demo 10x &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="demo9.html">&larr; Demo 9</a>
+      <a class="btn btn-ghost" href="#map">The workflow</a>
+      <a class="btn btn-ghost" href="#before">Setup, at home</a>
+      <a class="btn btn-ghost" href="../demos.html">All demos</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:0 0 1.4rem">
+<p style="margin:0"><strong>This is the advanced version.</strong> It needs Zotero, Better BibTeX, a pandoc built with HTTP support, and &mdash; for Overleaf &mdash; git and a premium token. That is roughly twenty minutes of setup before anything runs. <strong>If you are following the Week&nbsp;4 session, you want <a href="demo10-agent-design.html">Demo 10</a> instead</strong>, which does the same work with a PDF folder, a <code>.bib</code> file and a browser upload. Come back here when you want the full system.</p>
+</div>
+
+<div class="note">
+<p><strong>This one is different from the earlier research demos.</strong> The earlier research demos (previously 10&ndash;13) ran on synthetic corpora with planted defects, offline, with nothing installed. This one uses <strong>three real papers and your real Zotero</strong>, and finishes with a <code>.docx</code> &mdash; or a <code>.tex</code> &mdash; you could actually submit. It needs about twenty minutes of setup. That is the trade.</p>
+</div>
+
+<h2 id="map">The whole workflow, on one page</h2>
+
+<figure style="margin:1.5rem 0 1.2rem">
+<img src="../assets/img/demo10-workflow.png" style="width:100%;height:auto;border:1px solid #ddd6ca;border-radius:10px;display:block"
+     alt="Workflow diagram. Left column: New papers (a PDF or just a DOI) to Notes Agent to Reference manager (Zotero) to Writing Agent to Draft report (.tex or .md with cite keys), which branches left to the optional Word route and down to Overleaf writing with a push-compile-pull-revise loop. Right column, a panel of what is on disk: (1) notes/*.md, (2) .bib from Zotero, (3) .pdf papers, all feeding down into a read-only Cite-check sub-agent, which the draft also feeds.">
+<figcaption class="muted" style="margin-top:.6rem;font-size:.9rem">Every numbered stage below is one box on this diagram. Nothing on the page is outside it.</figcaption>
+</figure>
+
+<p>Three things are worth reading off the picture before you type anything.</p>
+
+<p><strong>The left column is work; the right column is what ends up on disk.</strong> The pipeline runs top to bottom, and at two points it deposits something durable: the Notes Agent writes <code>notes/*.md</code>, and Zotero yields both a <code>.bib</code> and the PDFs themselves. Those three files are the only evidence that survives the session.</p>
+
+<p><strong>Cite-check has arrows going in and none coming out.</strong> It reads all three files plus your draft, and it emits a report. It has <strong>no <code>Write</code> tool</strong> &mdash; not a rule it follows, a tool it does not have. A verifier that can edit is one that can make its own findings disappear.</p>
+
+<p><strong>The numbers (1) (2) (3) are an order, not a list.</strong> Cite-check reads your notes first, joins cite key to DOI through the <code>.bib</code> second, and opens a PDF only when the first two cannot settle the claim. On a hundred-citation manuscript that ordering is the difference between about 155k tokens and about 11M.</p>
+
+
+<div class="callout" style="margin:1.6rem 0">
+<p style="margin:0"><strong>The stages:</strong>
+<a href="#before">0&nbsp;Setup</a> &middot;
+<a href="#stage1">1&nbsp;New papers</a> &middot;
+<a href="#stage2">2&nbsp;Notes agent</a> &middot;
+<a href="#stage3">3&nbsp;Reference manager</a> &middot;
+<a href="#stage4">4&nbsp;Writing agent</a> &middot;
+<a href="#stage5">5&nbsp;Cite-check</a> &middot;
+<a href="#stage6">6&nbsp;Overleaf</a> &middot;
+<a href="#stage7">7&nbsp;Word</a> &middot;
+<a href="#wordback">8&nbsp;Word, back again</a></p>
+</div>
+
+<div class="callout">
+<p><strong>How to use this page.</strong> Each stage is <em>do this</em>, then <em>check it</em> &mdash; a command and the output you should see. Run the checks. Every one of them exists because something failed silently here first, and a silent failure in a citation is the only kind that reaches a reviewer.</p>
+</div>
+
+<h2>What you end up with</h2>
+
+<p>A folder you keep. Drop a PDF in, get a structured note out. Ask the library a question and get an answer that says what it cannot support. Draft a paragraph where every claim carries the <em>kind</em> of source behind it. Then publish to Overleaf, or to Word with citations Zotero still owns &mdash; so you can restyle for a different journal, add a citation by hand, send it to a co-author, and have Refresh keep working.</p>
+
+<pre><code>papers/      PDFs in, notes out, one index, one library export
+writing/     drafts — markdown or LaTeX — then Word or Overleaf
+tools/       scripts that check things
+.claude/     four subagents, five skills, one permission boundary
+CLAUDE.md    the contract
+QUESTIONS.md what you are trying to find out. Numbered.</code></pre>
+
+<p>Four subagents, five skills, eleven scripts. Nothing else &mdash; no projects, no proposals, no topic syntheses. The package does one thing.</p>
+
+<h2 id="before">Stage 0 &middot; Before the session, at home</h2>
+
+<p>Ten minutes. Doing it in the room costs everyone the interesting half.</p>
+
+<ol class="steps">
+<li><strong>Unzip it and run the doctor.</strong>
+<pre><code>cd Demo10x_research_paper_with_zotero
+tools/doctor.sh</code></pre>
+It prints what is installed, what is missing, and the exact command for each gap, grouped by how much you lose without it. <strong>Only the Core block has to pass before you arrive</strong> &mdash; <code>python3</code> and <code>python-docx</code>.
+<p class="muted"><strong>Windows:</strong> install <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">Git for Windows</a> first and run everything from <strong>Git Bash</strong>. Every tool here is a shell script; PowerShell will not run them.</p></li>
+
+<li><strong>Install Zotero 7 and Better BibTeX.</strong> Get the BBT <code>.xpi</code> from its GitHub releases page &mdash; in Firefox, <em>right-click &rarr; Save Link As</em>, because a left-click installs it as a Firefox extension instead. Then Zotero &rarr; <strong>Tools &rarr; Plugins</strong> &rarr; gear &rarr; <em>Install Plugin From File</em>.
+<p class="muted">In Zotero 6 that menu was <em>Add-ons</em>. Zotero 7 renamed it to <strong>Plugins</strong>, and most tutorials still say the old name. This trips up nearly everyone.</p>
+<strong>Check it</strong>, with Zotero open:
+<pre><code>curl -s http://127.0.0.1:23119/connector/ping
+curl -s 'http://127.0.0.1:23119/better-bibtex/cayw?probe=1'</code></pre>
+<p>The second must print <code>ready</code>. If the first is silent, Zotero is not running; if the first answers and the second does not, BBT is not installed. Two different failures, and the scripts tell them apart.</p></li>
+
+<li><strong>Add the three papers by DOI.</strong> In Zotero, the green <em>Add Item by Identifier</em> wand. Paste all three at once &mdash; the wand accepts a multi-line list:
+<pre><code>10.1038/s41598-023-49831-6
+10.3390/jpm12050717
+10.31083/RCM33425</code></pre>
+All three are <strong>CC BY 4.0</strong>, so the PDFs should arrive with the metadata. <a href="#stage1">Stage 1</a> explains what to do when one does not.</li>
+
+<li><strong>If you want the Word half</strong> (recommended, and the part most people have never seen work), do the pandoc step in <code>SETUP.md &sect;11</code>. Two downloads, about a minute. <code>doctor.sh</code> prints the exact commands.</li>
+
+<li><strong>One line before an agent touches anything.</strong>
+<pre><code>git init &amp;&amp; git add -A &amp;&amp; git commit -m "before the agent"</code></pre>
+Still the most useful line in any of these demos. Every step afterwards is <code>git diff</code> away from being reviewed and <code>git checkout .</code> away from being undone.</li>
+</ol>
+
+<h2 id="stage1">Stage 1 &middot; New papers &rarr; a PDF Zotero actually holds</h2>
+
+<p>The first box on the diagram says <em>a PDF, or just a DOI</em>, and the difference between those two matters more than it looks.</p>
+
+<div class="callout">
+<p style="margin:0"><strong>A DOI makes a paper citable. A PDF makes it checkable. A note makes it yours.</strong> Each of the three buys you exactly one of those, and the rest of this page is about not confusing them.</p>
+</div>
+
+<h3>What Zotero does with a DOI</h3>
+
+<p><strong>Add Item by Identifier fetches the metadata and then automatically tries to find the PDF.</strong> It loads the page behind the DOI, tries access you already have, and then looks for an open-access copy. This is the same lookup as the <em>Find Full Text</em> right-click item, run for you.</p>
+
+<p class="muted">Zotero's own manual is silent on this; the behaviour is stated by Zotero staff on the <a href="https://forums.zotero.org/discussion/103321/how-does-find-available-pdf-works" target="_blank" rel="noopener">forums</a>. An earlier version of this page said the wand fetched metadata only. That was wrong, and the correction matters, because it changes what an empty <code>storage/</code> folder means.</p>
+
+<p>So a DOI-built library is not fileless by design. It is <em>unevenly</em> filled, and the gaps are silent:</p>
+
+<table>
+<tr><th style="width:56%">case</th><th>does a file arrive?</th></tr>
+<tr><td>open access, and Unpaywall knows about it</td><td><strong>usually yes</strong></td></tr>
+<tr><td>your institution subscribes, IP- or VPN-authenticated</td><td>often</td></tr>
+<tr><td>your institution subscribes through a <strong>web login proxy</strong> (an EZproxy sign-in page)</td><td><strong>no</strong> &mdash; the desktop app cannot drive a browser-based proxy</td></tr>
+<tr><td>hosted on an aggregator (EBSCO, ProQuest, JSTOR)</td><td><strong>no</strong></td></tr>
+<tr><td>paywalled with no open-access copy</td><td>no</td></tr>
+</table>
+
+<h3>Attaching the PDF yourself, when it did not arrive</h3>
+
+<p>Right-click the item &rarr; <strong>Add Attachment</strong>. Zotero 7 gives you three options and the first is the one you want:</p>
+
+<table>
+<tr><th style="width:22%">option</th><th>where the file lives</th><th>can Claude read it?</th></tr>
+<tr><td><strong>File</strong></td><td>copied into <code>~/Zotero/storage/&lt;key&gt;/</code>, managed and synced by Zotero</td><td><strong>yes</strong></td></tr>
+<tr><td>Linked File</td><td>stays where it already is &mdash; Downloads, Desktop, a network share</td><td><strong>no</strong></td></tr>
+<tr><td>Web Link</td><td>nothing on disk at all</td><td>no</td></tr>
+</table>
+
+<p>Dragging a PDF onto the item in the centre pane does the same thing as <strong>File</strong>.</p>
+
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:1.1rem 0">
+<p style="margin-top:0"><strong>Use <em>File</em>, never <em>Linked File</em>.</strong> Your <code>.claude/settings.json</code> grants <code>additionalDirectories: ["/Users/you/Zotero/storage"]</code> and nothing else. A linked file in <code>~/Downloads</code> is a path Claude is not permitted to open.</p>
+<p style="margin-bottom:0">And the failure is a bad one: the CSV's <code>File Attachments</code> column records the path either way, so <strong>the library reports a file, <code>citecheck</code> cannot read it, and it looks like the tool is broken</strong> rather than the attachment being the wrong kind. Linked files also do not sync.</p>
+</div>
+
+<h3>Where it lands &mdash; and the key that confuses everybody</h3>
+
+<p>A stored file goes to <code>&lt;Zotero data directory&gt;/storage/&lt;key&gt;/&lt;filename&gt;.pdf</code>. The trap is which key:</p>
+
+<pre><code>the paper's item key        RDEWFSFF     &larr; this is in your CSV and your notes
+the storage folder          UD9ILPQB     &larr; this is the ATTACHMENT's key</code></pre>
+
+<p><strong>They are different keys and the second one appears in no export.</strong> That asymmetry is why a library with 48 PDFs shows 48 folders under <code>storage/</code> and not one of their names matches a row in your CSV. People conclude their export is broken and re-export in a loop.</p>
+
+<p>The join that <em>does</em> work is the CSV's <strong><code>File Attachments</code></strong> column, which carries the full path. That is what <code>tools/check_notes.py</code> reads &mdash; never the key space.</p>
+
+<h3 id="reexport">Then re-export. Every time.</h3>
+
+<p><code>library.csv</code> and <code>library.bib</code> are snapshots. Until you re-export, the workspace still believes that item has no file.</p>
+
+<p><strong>Right-click <code>My Library</code> &rarr; Export Library</strong> &mdash; not the collection. A collection exports only its own items while <code>storage/</code> holds attachments for everything, so you get a handful of rows against hundreds of folders and every lookup outside the collection fails with no error at all. Group libraries are not included in a My Library export either.</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap"><b>Check it.</b> After attaching and re-exporting:
+
+python3 -c "import csv; r=list(csv.DictReader(open('papers/library/library.csv',encoding='utf-8-sig'))); n=sum(1 for x in r if (x.get('File Attachments') or '').strip()); print(f'{n} of {len(r)} items have a file')"
+
+<span style="color:#8c8">4 of 4 items have a file</span></div>
+
+<p>If it says <code>0 of 4</code>, you re-exported before attaching, or you exported the collection. If it says <code>1 of 400</code>, you exported the collection.</p>
+
+<h2 id="stage2">Stage 2 &middot; Notes Agent &rarr; <code>(1) notes/*.md</code></h2>
+
+<p>Drop the PDF where the agent looks, then ask:</p>
+
+<pre><code>cp ~/Zotero/storage/UD9ILPQB/Horne*.pdf papers/inbox/
+claude
+/agents                  <span class="c"># you should see: librarian, citecheck, drafter, prose</span></code></pre>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the librarian subagent on papers/inbox/Horne2012.pdf</div>
+
+<p><strong>Watch the order it works in</strong>, because the order is the design:</p>
+
+<ol class="steps">
+<li><strong>Duplicate check on DOI first</strong> &mdash; not title, which gets retyped, and not the cite key, which regenerates. Already filed? It writes no second note, reports the existing one, and quotes your <code>## My take</code> back at you.</li>
+<li><strong>Reads <code>papers/library/MANIFEST.md</code></strong> to learn which metadata file holds the keys and how a key becomes a path. Every Zotero-specific fact in the workspace lives in that one file.</li>
+<li><strong>Writes the note</strong>, then one row in <code>papers/_index.md</code>, then rebuilds the generated view.</li>
+</ol>
+
+<div class="callout">
+<p style="margin:0"><strong>The librarian cannot fetch anything.</strong> Its tool list is <code>Read, Write, Glob, Grep, Bash</code> &mdash; no <code>WebSearch</code>, no <code>WebFetch</code>, and <code>curl</code> is not on the Bash allow list. <strong>Zotero does the fetching; Claude does the reading.</strong> This is deliberate: a librarian that can browse will write a fluent, confident note from an abstract or a publisher blurb, and that note is indistinguishable from one written from the paper. Note that <code>drafter</code> <em>does</em> have web tools. The writer may browse; the filer may not.</p>
+</div>
+
+<h3>Check it &mdash; with a tool that repairs nothing</h3>
+
+<pre><code>python3 tools/check_notes.py</code></pre>
+
+<p>Ten required sections, a DOI, a matching index row, a resolvable attachment path. It reports and <strong>fixes nothing, deliberately</strong>. A checker that edits is one that can make its own findings disappear.</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">  papers/notes/Horne2012-warfarin-dose-refinement.md
+    ok    10 of 10 sections present
+    ok    doi 10.1160/TH11-06-0388 matches library row RDEWFSFF
+    ok    index row present
+    ok    attachment resolves on disk
+
+  1 note, 0 errors, 0 warnings</div>
+
+<p class="muted">Run this from your own machine. Zotero listens on <code>127.0.0.1</code> and <code>~/Zotero/storage</code> is outside any shared folder, so a cloud or bridged session will report every attachment as missing &mdash; a false negative that looks exactly like a real one.</p>
+
+<h3>Read the note like a reviewer</h3>
+
+<p>Two things to look at, and they are the whole reason the template is shaped this way.</p>
+
+<p><strong><code>## My take</code> is empty.</strong> It always is. No agent writes there. In six months it is the only section you can trust to be your own thinking.</p>
+
+<p><strong><code>## Problem and aim</code> comes before <code>## Claim</code>.</strong> A note that opens with the claim has already accepted the paper's framing. What did the authors think was missing, and was the gap real?</p>
+
+<h3>Two more papers, then look at the shape</h3>
+
+<pre><code>python3 tools/build_views.py</code></pre>
+
+<p><code>papers/notes/</code> is <strong>flat</strong> &mdash; no subfolders. A note carries <code>area:</code> in its frontmatter and that field holds two values, while a folder holds one. So the generated view puts a two-area paper under <em>both</em> headings, which is the thing a folder cannot do.</p>
+
+<div class="callout">
+<p style="margin:0"><strong>The test before you ever add a subfolder:</strong> <em>can a paper be in two of these at the same time?</em> If yes, it is a field, not a folder. <code>inbox/</code> is a folder because <em>unprocessed</em> is a state a paper is in exactly one of. <strong>Folders may encode lifecycle, never classification.</strong></p>
+</div>
+
+<h2 id="stage3">Stage 3 &middot; Reference manager &rarr; <code>(2) .bib</code> and <code>(3) .pdf</code></h2>
+
+<p>One Zotero library produces both of the remaining files on the right of the diagram, and they do different jobs. The <code>.bib</code> is what a <code>\cite{key}</code> resolves against. The PDFs are what a claim gets checked against. <strong>Metadata is enough to cite a paper and not enough to check one.</strong></p>
+
+<h3>The three joins that have to line up</h3>
+
+<p>Four identifiers are in play and it is worth knowing which survives what:</p>
+
+<table>
+<tr><th style="width:20%">identifier</th><th>example</th><th>lives in</th><th>survives</th></tr>
+<tr><td><code>doi</code></td><td><code>10.1160/TH11-06-0388</code></td><td>note, CSV, <code>.bib</code></td><td><strong>everything</strong> &mdash; the only cross-tool identifier</td></tr>
+<tr><td><code>item_key</code></td><td><code>RDEWFSFF</code></td><td>note, CSV <code>Key</code></td><td>this Zotero library</td></tr>
+<tr><td>attachment key</td><td><code>UD9ILPQB</code></td><td><code>storage/</code> folder name only</td><td>nothing &mdash; never appears in an export</td></tr>
+<tr><td>cite key</td><td><code>hornePharmacogenetic&hellip;2012</code></td><td><code>.bib</code>, your <code>\cite{}</code></td><td>only if you <strong>pin</strong> it</td></tr>
+</table>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap"><b>Check them.</b> All four lines should agree:
+
+grep -E '^(doi|item_key):' papers/notes/&lt;note&gt;.md
+grep -oE '^@[a-zA-Z]+\{[^,]+'  papers/library/library.bib
+grep -nE '^\s*doi\s*='         papers/library/library.bib
+
+<span style="color:#8c8">doi: "10.1160/TH11-06-0388"
+item_key: "RDEWFSFF"
+@article{hornePharmacogeneticWarfarinDose2012
+  doi = {10.1160/TH11-06-0388},</span></div>
+
+<p><strong>Pin the keys you cite.</strong> In Zotero: the item &rarr; <code>Extra</code> &rarr; <code>Citation Key: horne2012warfarin</code>. Better BibTeX <em>regenerates</em> an unpinned key when you fix metadata, and a regenerated key silently breaks every <code>\cite</code> already written. Pinning is the only thing that makes the fourth row of that table safe.</p>
+
+<h3>Let Claude read your PDFs</h3>
+
+<p>They live in <code>~/Zotero/storage/</code>, outside the project. Add the absolute path &mdash; no tilde &mdash; to <code>.claude/settings.json</code>:</p>
+
+<pre><code>"additionalDirectories": ["/Users/YOURNAME/Zotero/storage"]</code></pre>
+
+<p class="muted">The data directory is relocatable (Settings &rarr; Advanced &rarr; Files and Folders). If you ever move it, this line has to move with it or every PDF read fails at once.</p>
+
+<h3 id="twobibs">Keep exactly one <code>.bib</code> per destination</h3>
+
+<p>This is the mistake that scales worst, and it is nearly invisible until a room full of people hits it at once.</p>
+
+<pre><code>papers/library/library.bib              17:11   has file =    &larr; just re-exported
+writing/tex/my-paper/library.bib        05:07   no file =     &larr; stale by 12 hours</code></pre>
+
+<p>Two files, both defining <code>hornePharmacogeneticWarfarinDose2012</code>. The everyday problem is drift: a paper you add today resolves in one and not the other. The <em>sharp</em> problem is what happens if both reach the same build &mdash; <code>bibtex</code> reports <code>Repeated entry</code>, <code>latexmk</code> exits 12, and <strong>every citation in the document renders as <code>(?)</code> while the reference list disappears entirely</strong> &mdash; not just the duplicated entry. One person's duplicate breaks everybody's PDF. <span class="muted">(Measured 2026-10-04 with natbib/plainnat. A <code>.bbl</code> is still written, with the duplicate dropped, but latexmk stops before the pass that would use it &mdash; which is why the bibliography vanishes rather than merely losing one row. An earlier version of this page said <code>[?]</code>; that is the marker for a <em>missing</em> key under the default style, not for this failure.)</span></p>
+
+<p>The fix is to have one generator per destination. Point Better BibTeX's <strong>Keep updated</strong> export straight at the file your LaTeX project uses, and let it maintain itself:</p>
+
+<pre><code>right-click My Library → Export Library → Better BibTeX
+  → tick "Keep updated"
+  → save as writing/tex/&lt;project&gt;/library.bib</code></pre>
+
+<p><code>tools/tex-assemble.sh</code> catches cross-file duplicates before a push and names both owners, which is why the collaborative session uses it.</p>
+
+<div class="note">
+<p style="margin:0"><strong>Untick the <code>file</code> field before you share a project.</strong> A Better BibTeX export records the attachment as <code>file = {/Users/jiehou/Zotero/storage/UD9ILPQB/&hellip;}</code>. LaTeX ignores it, so you lose nothing by omitting it &mdash; but if you do not, your home directory path ships to every collaborator in the shared Overleaf project.</p>
+</div>
+
+<h2 id="stage4">Stage 4 &middot; Writing Agent &rarr; the draft</h2>
+
+<p>The box on the diagram says <em>from notes, library, the web or you</em>, and it means it. The <code>drafter</code> subagent's own first line is <strong>&ldquo;No fixed source, no fixed shape&rdquo;</strong>, and unlike the librarian it <em>does</em> have <code>WebSearch</code> and <code>WebFetch</code>. Your notes are an available input, not a required one.</p>
+
+<p>What does not vary is that <strong>every claim declares where it came from</strong>:</p>
+
+<table>
+<tr><th style="width:14%">tier</th><th style="width:26%">marker</th><th>what it means</th></tr>
+<tr><td><strong>note</strong></td><td><code>{Horne, 2012}</code></td><td>in your library <strong>and</strong> you have read it &mdash; there is a note with <code>## Evidence</code>. May quote numbers.</td></tr>
+<tr><td><strong>library</strong></td><td><code>{Saon, 2022 &middot;unread}</code></td><td>in your library; the agent read the PDF just now. <strong>You have not.</strong> May quote a number, but must say which table.</td></tr>
+<tr><td><strong>web</strong></td><td><code>[WEB:1]</code></td><td>found online, not in your library, may not be peer reviewed. <strong>May not state a number as established fact</strong> &mdash; it must be attributed.</td></tr>
+<tr><td><strong>none</strong></td><td><code>[GAP: &hellip;]</code></td><td>nothing supports this. Say so; do not write the sentence smoothly anyway.</td></tr>
+</table>
+
+<p>So the shape is an <strong>asymmetry, not a constraint</strong>: free to <em>write</em> from anything, not free to <em>cite</em> anything. A <code>\cite{key}</code> only resolves against the <code>.bib</code>, and that is enforced in two places &mdash; <code>tools/tex.sh</code> fails on an undefined citation, and <code>tools/render.sh live</code> fails when the field count does not match the citation count.</p>
+
+<div class="callout">
+<p style="margin:0"><strong>A <code>[WEB:1]</code> is settled by sending it round the diagram again.</strong> Decide the source is worth keeping &rarr; add it to Zotero &rarr; it re-enters at <em>New papers</em> &rarr; re-export &rarr; now it is a real <code>\cite{}</code>. That is the loop the right-hand column exists to close, and it is why web findings are marked rather than cited.</p>
+</div>
+
+<h3>Ask it for a section, not a topic</h3>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the drafter subagent: the Introduction's second paragraph, on whether
+  published dose-model accuracy describes patients who never stabilise.
+  Write into main.tex. LaTeX, \cite keys from library.bib.</div>
+
+<p>&ldquo;Write an introduction&rdquo; produces the generic one a model can write without reading anything. &ldquo;The second paragraph, on whether X&rdquo; produces a paragraph that has to rest on something. In LaTeX the non-citation markers go in <code>%</code> comments so they never typeset:</p>
+
+<pre><code>... raised explained variance from 61.2\% to 69.1\%
+\citep{hornePharmacogeneticWarfarinDose2012}.
+% [GAP: error stratified by achieved INR band — no source opened reports it]</code></pre>
+
+<p><strong>Leave the gaps in.</strong> They are the paper telling you which search or experiment is still owed. Deleting them so the draft reads finished is the single move that turns an honest draft into a confident wrong one.</p>
+
+<h3>Before that: ask the library something it cannot answer</h3>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the question skill: do these models work for patients who never
+  reach a therapeutic INR?</div>
+
+<p>The honest answer is that no source here separates that out. You should get <code>[GAP:]</code> markers, not a synthesis. <strong>If three papers produce a smooth, complete answer, something invented the rest</strong> &mdash; and noticing that is worth more than anything else on this page.</p>
+
+<h2 id="stage5">Stage 5 &middot; Cite-check &mdash; verify, on demand, read-only</h2>
+
+<p>Nothing triggers this automatically. You invoke it, typically per section while drafting and once in full before you submit.</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the citecheck subagent on main.tex
+&gt; Use the prose subagent on main.tex</div>
+
+<p><code>prose</code> reads only the draft. <code>citecheck</code> works the numbered order on the diagram:</p>
+
+<ol class="steps">
+<li><strong>Your notes first.</strong> A claim whose number is recorded in a note's <code>## Evidence</code> section is settled there, for a few hundred tokens.</li>
+<li><strong>The <code>.bib</code> second</strong>, to join cite key &rarr; DOI &rarr; note. This is a lookup, not reading.</li>
+<li><strong>The PDF only if the first two cannot settle it.</strong> Even then it does not read the whole paper: <code>pdftotext</code> into a cache, grep for the figure, <code>sed</code> a window around the hit.</li>
+</ol>
+
+<p>It distinguishes <em>confirmed by a note you wrote</em> from <em>confirmed by a note nobody has read</em> from <em>confirmed in the PDF</em> &mdash; the middle one is fidelity to your note, which is not the same as truth.</p>
+
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:1.1rem 0">
+<p style="margin-top:0"><strong>It re-checks every claim, every run. There is no &ldquo;already verified&rdquo; skip.</strong></p>
+<p>That is a deliberate choice against the obvious optimisation. <code>tools/cite-ledger.py</code> keeps a record of what was verified and when, and that record is <em>context</em>, not a skip list &mdash; a verdict that <strong>changes</strong> between runs is a serious finding, and you only ever see it if you re-run.</p>
+<p style="margin-bottom:0"><strong>Cache the extraction, never the conclusion.</strong> Re-extracting a PDF gives byte-identical text, so <code>.cache/pdftext/</code> is free and risk-free and it is where the expensive part actually lives. A cached <em>judgement</em> is somewhere false confidence hides: if the invalidation logic is subtly wrong, the ledger asserts &ldquo;verified&rdquo; for a claim that has since changed, silently. An unverified claim is a known unknown. A wrongly-cached one is a trap.</p>
+</div>
+
+<p>What that costs, so it is on the record: a full hundred-claim sweep is roughly <strong>155k tokens and about thirteen minutes</strong>. Per-section while writing, it is seconds. It is affordable only because the extraction cache and the note-first ordering already removed the parts that were expensive for no good reason &mdash; the naive version of the same sweep is about 11M tokens.</p>
+
+<p>Expect several <em>cannot verify</em> verdicts and treat them as correct. Then edit yourself:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; citecheck says the 71.8% figure is not independently validated. Soften
+  that sentence to say so, keep the citation, recompile and show me the page.</div>
+
+<h3>Prove it cannot write</h3>
+
+<pre><code>head -6 .claude/agents/citecheck.md</code></pre>
+
+<p>Look at the <code>tools:</code> line &mdash; <code>Read, Glob, Grep, Bash</code>. There is no <code>Write</code>. Now ask it to fix something:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the citecheck subagent on papers/notes/&lt;note&gt;.md and fix anything wrong.</div>
+
+<p>It reports. It cannot fix. It did not <em>decide</em> to behave &mdash; there is no tool to ask about. That is the bottom of the three layers, and it is the only one that cannot be talked out of.</p>
+<span id="latex"></span>
+<h2 id="stage6">Stage 6 &middot; Overleaf &mdash; push, compile, pull, revise</h2>
+
+<p>Many of you do, and <strong>this is the easier half of the demo, not a workaround.</strong> Everything up to the draft is identical &mdash; same <code>papers/</code>, same notes, same <code>librarian</code>, same <code>citecheck</code>. Only the last step changes, and it changes in your favour.</p>
+
+<table>
+<tr><th style="width:26%"></th><th>Word route</th><th>LaTeX route</th></tr>
+<tr><td>source of truth</td><td>flips to the <code>.docx</code> at handoff</td><td>the <code>.tex</code>, always</td></tr>
+<tr><td>can an agent edit the final form?</td><td>only as tracked changes</td><td><strong>yes, directly</strong></td></tr>
+<tr><td>round trip</td><td><strong>impossible</strong> &mdash; pandoc destroys field codes</td><td>it is plain text</td></tr>
+<tr><td>library drifting out of date</td><td>manual re-export, easy to forget</td><td><strong>auto-export keeps it in sync</strong></td></tr>
+<tr><td>diffs</td><td>binary</td><td>readable</td></tr>
+</table>
+
+<p><strong>There is no one-way door.</strong> Write <code>.tex</code> from the first line and keep editing it forever &mdash; the whole &ldquo;markdown drafts, then a Word endgame&rdquo; discipline simply does not apply.</p>
+
+<p>Setup is two things. Export from Zotero as <strong>Better BibTeX</strong> and <strong>tick <code>Keep updated</code></strong> &mdash; BBT then re-exports whenever the library changes, so the <code>.bib</code> cannot drift. And <strong>pin your cite keys</strong> in each item's <code>Extra</code> field (<code>Citation Key: smith2024</code>), because BBT regenerates a key when you fix metadata, silently breaking every <code>\cite</code> already written.</p>
+
+<pre><code>tools/tex.sh writing/tex/paper.tex           <span class="c"># compile and check</span>
+tools/tex.sh writing/tex/paper.tex --look    <span class="c"># render each page to PNG</span></code></pre>
+
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:1.1rem 0">
+<p><strong>The check that earns the script: <code>latexmk</code> exits 0 on an undefined citation.</strong></p>
+<p>Verified here. A one-character typo in a cite key produced a 68&nbsp;KB PDF, <strong>exit status 0</strong>, a <code>?</code> where the citation should be, and that reference missing from the bibliography. Nothing failed, nothing warned on screen. You would find it at proof stage &mdash; or a reviewer would.</p>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.8rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">  ok    compiled — paper.pdf
+
+  Undefined citation keys — the PDF built anyway and renders "?":
+        guoPredictionModelStabel2025
+
+  <b>FAIL</b>  undefined citations. latexmk exited 0; this script does not.</div>
+<p style="margin-bottom:0">It also fails on undefined <code>\ref</code> targets, and reports open <code>[GAP:]</code> markers without failing on them. One more trap, for anyone checking the log by hand: <strong>LaTeX wraps warnings across lines mid-word</strong> &mdash; <code>undef</code> / <code>ined</code> &mdash; so <code>grep undefined paper.log</code> finds nothing on a file that has them. <code>tex.sh</code> flattens the log first.</p>
+</div>
+
+<p><code>--look</code> writes one PNG per page and prints the paths, so you can ask Claude to <strong>read the rendered pages</strong>. Worth doing: a PDF that compiles is not a PDF that is right. A table running off the page, a figure that lost its caption, and a bibliography in the wrong style all compile cleanly.</p>
+
+<h3>Overleaf specifically</h3>
+
+<p><strong>Overleaf's Git integration is a premium feature</strong> &mdash; not on the free plan, though many universities hold an institutional licence, so check yours rather than assuming either way.</p>
+
+<p><strong>With Git access</strong>, this is the best setup in the whole demo:</p>
+
+<pre><code>git clone https://git.overleaf.com/&lt;project-id&gt; writing/tex/&lt;name&gt;
+cd writing/tex/&lt;name&gt; &amp;&amp; claude</code></pre>
+
+<p>Claude Code works directly in the clone, you push, Overleaf shows the result. Overleaf compiles for you, so a local TeX install is optional &mdash; though running <code>tex.sh</code> locally still gives you the undefined-citation check, which <strong>Overleaf's compiler will not fail on either</strong>.</p>
+
+<p><strong>Without Git access</strong>, do not fight it: write and compile locally, and move files at the boundaries &mdash; download the project as a ZIP to start, upload the changed <code>.tex</code> and <code>.bib</code> at the end. Dropbox and GitHub sync are premium too, so there is no free automatic path. Either way keep <code>library.bib</code> generated by Better BibTeX rather than hand-edited in Overleaf: one generator, one direction, no merge conflicts in a file nobody writes by hand.</p>
+
+<p>A local TeX engine, if you want one: <code>brew install --cask basictex</code> is about 100&nbsp;MB and enough. Tectonic is a single binary that fetches packages on demand. <strong>MacTeX is ~5&nbsp;GB and you do not need it.</strong> <code>tools/doctor.sh</code> reports what you have.</p>
+
+<h2 id="cycle">The full LaTeX cycle in Claude Code &mdash; what to actually type</h2>
+
+<p>Everything below was run end to end against a live Overleaf project before being written down. The prompts are verbatim; use them as they are.</p>
+
+<h3>Day zero &mdash; once per project</h3>
+
+<pre><code><span class="c"># 1. tell git to remember the Overleaf token in the keychain, not a file</span>
+git config --global credential.helper osxkeychain
+
+<span class="c"># 2. clone (Overleaf: Menu → Sync → Git → Generate token)</span>
+cd ~/research/writing/tex
+git clone https://git@git.overleaf.com/&lt;project-id&gt; &lt;name&gt;
+<span class="c">#    password prompt = the TOKEN, not your SSO password. Once only.</span>
+
+<span class="c"># 3. the bibliography, from Zotero: right-click My Library → Export Library</span>
+<span class="c">#    → Better BibTeX → TICK "Keep updated" → save as papers/library/library.bib</span>
+cp ../../../papers/library/library.bib &lt;name&gt;/library.bib
+
+cd &lt;name&gt; &amp;&amp; claude</code></pre>
+
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:1.1rem 0">
+<p style="margin-top:0"><strong>The mistake everyone makes first.</strong> Run <code>git push</code> one folder too high and you get:</p>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.8rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">fatal: No configured push destination.</div>
+<p style="margin-bottom:0"><code>writing/tex/</code> belongs to <em>your research repo</em>, which has no remote. The Overleaf clone is the folder <em>inside</em> it. Two repos, nested, and git silently operates on whichever one encloses your current directory. <code>cd</code> into the clone. If you are ever unsure: <code>git remote -v</code> &mdash; Overleaf's URL means you are in the right place.</p>
+</div>
+
+<h3>Every session &mdash; the loop</h3>
+
+<pre><code>git pull          <span class="c"># FIRST. a co-author may have edited in the browser</span>
+claude            <span class="c"># from inside the clone</span>
+                  <span class="c"># ... work ...</span>
+git push          <span class="c"># silent; the keychain supplies the token</span></code></pre>
+
+<p>Pull first is not optional etiquette. Overleaf rejects a non-fast-forward push, and untangling that mid-session is the one part of this workflow that genuinely wastes time.</p>
+
+<h3>Writing</h3>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the drafter subagent: the Introduction's second paragraph, on whether
+  published dose-model accuracy describes patients who never stabilise.
+  Write into main.tex. LaTeX, \cite keys from library.bib.</div>
+
+<p>Name the <strong>section</strong>, not the topic. &ldquo;Write an introduction&rdquo; produces the generic one that a model can write without reading anything; &ldquo;the second paragraph, on whether X&rdquo; produces a paragraph that has to rest on something.</p>
+
+<p>What comes back carries a tier on every claim, and in LaTeX the ones that are not citations go in <code>%</code> comments so they never typeset:</p>
+
+<pre><code>... raised explained variance from 61.2\% to 69.1\%
+\citep{hornePharmacogeneticWarfarinDose2012}.
+% [GAP: error stratified by achieved INR band — no source opened reports it]</code></pre>
+
+<p><strong>Leave the gaps in.</strong> They are the paper telling you which search or experiment is still owed. Deleting them to make the draft read finished is the one move that converts an honest draft into a confident wrong one.</p>
+
+<h3>Citing</h3>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the cite skill: models trained on retrospective cohorts cannot
+  extrapolate beyond their training dose range.</div>
+
+<p>It searches your library and returns the key, or says it has nothing &mdash; which is the useful answer. It will <strong>not</strong> write a formatted reference, because formatting is BibTeX's job and a hand-typed one goes stale.</p>
+
+<p><strong>Pin the keys you cite.</strong> In Zotero: the item &rarr; <code>Extra</code> &rarr; <code>Citation Key: horne2012warfarin</code>. Better BibTeX <em>regenerates</em> unpinned keys when you fix metadata, and a regenerated key silently breaks every <code>\cite</code> already written.</p>
+
+<h3>Compiling &mdash; and the check that is the whole point</h3>
+
+<pre><code>tools/tex.sh writing/tex/&lt;name&gt;/main.tex --look</code></pre>
+
+<p>Measured on this exact project: a <strong>one-character typo</strong> in a cite key (<code>2012</code> &rarr; <code>2O12</code>) gave <code>latexmk</code> <strong>exit status 0</strong>, a PDF that built fine, a <code>?</code> where the citation should be, and that reference missing from the bibliography. Nothing failed.</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.8rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">  plain latexmk exit = 0   main.pdf built: YES
+
+  ok    compiled — main.pdf
+  <b>FAIL</b>  undefined citations. latexmk exited 0; this script does not.
+        hornePharmacogeneticWarfarinDose2O12</div>
+
+<p><strong>Overleaf's compiler will not fail on this either.</strong> That is why the local check is worth keeping even when Overleaf does your compiling.</p>
+
+<p><code>--look</code> writes one PNG per page. Then:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Read main-page-1.png and main-page-2.png. Does the Specific Aims section
+  still fit on one page, and did Table 2 keep its caption?</div>
+
+<p>This is the step people skip. A table running off the page, a figure separated from its caption, and a bibliography in the wrong style all compile perfectly.</p>
+
+<h3>Revising</h3>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Use the citecheck subagent on main.tex
+&gt; Use the prose subagent on main.tex</div>
+
+<p><code>citecheck</code> opens the actual PDFs in your Zotero storage and checks each claim against its source. <code>prose</code> reads only the draft. <strong>Neither has a <code>Write</code> tool</strong> &mdash; they report, you decide. A verifier that can edit is one that can make its own findings disappear.</p>
+
+<p>Expect several <em>cannot verify</em> verdicts and treat them as correct. Then edit directly &mdash; this is LaTeX, so there is no tracked-changes dance:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; citecheck says the 71.8% figure is not independently validated. Soften
+  that sentence to say so, keep the citation, recompile and show me the page.</div>
+
+<h3>Finishing</h3>
+
+<pre><code>git add -A &amp;&amp; git commit -m "Introduction: ..." &amp;&amp; git push</code></pre>
+
+<p><strong>Do not commit <code>main.pdf</code>.</strong> Overleaf compiles it, so a committed PDF is a stale binary that conflicts on every pull. The <code>.gitignore</code> in the package covers it along with <code>*.aux</code>, <code>*.bbl</code>, <code>*.log</code> and the page PNGs.</p>
+
+<p>Worth asking before you push, since <code>git diff</code> is the only review that matters:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">&gt; Show me git diff and summarise what changed in one line per paragraph.</div>
+
+<div class="note">
+<p><strong>Should Claude push on its own?</strong> The package allows <code>git push</code> and <strong>denies <code>--force</code></strong>. The reasoning: an ordinary push is recoverable &mdash; git keeps history and Overleaf keeps its own &mdash; while a force push is not. On a solo draft, let it push. On a manuscript with co-authors, consider removing <code>Bash(git push:*)</code> from the allow list so the last step is always yours; a push is visible to other people the moment it lands.</p>
+</div>
+
+<span id="toword"></span>
+<h2 id="stage7">Stage 7 &middot; Either source &rarr; Word, fields still live</h2>
+
+<p>You can go to Word from <strong>markdown or LaTeX</strong>, and the Word file that comes out has <strong>real Zotero field codes</strong> in both cases &mdash; the kind you can Refresh, restyle from APA to Vancouver, and hand to a co-author who has never heard of pandoc.</p>
+
+<p>This surprised me, so it is worth saying why it works. The <code>zotero.lua</code> filter acts on pandoc's <code>Cite</code> nodes and branches on the <strong>output</strong> format. The input format never enters into it, and pandoc's LaTeX reader produces exactly the same nodes as its markdown reader:</p>
+
+<pre><code>markdown  [@horne2012; @kimmel2013]     &rarr;  ids=[horne2012,kimmel2013]  mode=Normal
+latex     \citep{horne2012,kimmel2013}  &rarr;  ids=[horne2012,kimmel2013]  mode=Normal
+markdown  @horne2012                    &rarr;  mode=AuthorInText
+latex     \citet{horne2012}             &rarr;  mode=AuthorInText
+latex     \citep[p.~5]{horne2012}       &rarr;  suffix=[p. 5]</code></pre>
+
+<p><code>\autocite</code>, <code>\parencite</code>, <code>\textcite</code> and <code>\citeauthor</code> all work too, and <strong><code>\input{groups/bob}</code> is followed</strong> &mdash; so an assembled <code>main.tex</code> converts in one pass, co-authors' sections and all.</p>
+
+<h3>Test it yourself &mdash; ten minutes</h3>
+
+<p><strong>Zotero must be open</strong> with Better BibTeX installed, for the whole of this. The filter queries it live over <code>127.0.0.1:23119</code>; nothing is cached. If Zotero is shut, <code>render.sh</code> stops before pandoc runs and tells you which of the two is missing.</p>
+
+<p>Write the same four sentences twice, once each way, using <strong>cite keys that are really in your library</strong>.</p>
+
+<pre><code><span class="c"># writing/drafts/test.md</span>
+Accuracy improves with genotype [@yourkey2012].
+
+Both trials disagreed [@yourkey2012; @otherkey2013].
+
+@yourkey2012 argued the opposite.
+
+See the appendix [@yourkey2012, p. 5].</code></pre>
+
+<pre><code><span class="c"># writing/tex/test.tex</span>
+\documentclass{article}
+\usepackage{natbib}
+\begin{document}
+Accuracy improves with genotype \citep{yourkey2012}.
+
+Both trials disagreed \citep{yourkey2012,otherkey2013}.
+
+\citet{yourkey2012} argued the opposite.
+
+See the appendix \citep[p.~5]{yourkey2012}.
+\end{document}</code></pre>
+
+<pre><code>tools/render.sh live writing/drafts/test.md
+tools/render.sh live writing/tex/test.tex</code></pre>
+
+<p>Each should end on the same line, with the same number:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">  ok    Zotero is running (port 23119 answering)
+  ok    Better BibTeX is installed and responding
+  ok    test.docx written &mdash; <b>5 live Zotero field(s), one per citation in the source</b></div>
+
+<p>Now open each <code>.docx</code> and do the <strong>three Word steps, in this order</strong>:</p>
+
+<ol class="steps">
+<li><strong>Zotero tab &rarr; Document Preferences &rarr; OK.</strong> Pick your style here.</li>
+<li><strong>Put the cursor where the reference list belongs, then Zotero tab &rarr; Add/Edit Bibliography.</strong></li>
+<li><strong>Refresh.</strong></li>
+</ol>
+
+<p>Step 2 is not optional and nothing warns you about it. The filter writes <em>citation</em> fields only; the bibliography is a separate Zotero field that only the Word plugin can insert. Skip it and Refresh succeeds silently with no reference list, which looks like a failure and is not. Doing Preferences <em>after</em> Refresh gives you a confirmation popup for every single citation.</p>
+
+<p>The proof that the fields are real: change the style in Document Preferences and hit Refresh. Every citation and the whole reference list rewrite themselves. Static text cannot do that.</p>
+
+<h3>Three things to expect</h3>
+
+<p><strong>Before you Refresh, a LaTeX-sourced file shows empty placeholders.</strong> Markdown gives you <code>&lt;Do Zotero Refresh: [@horne2012]&gt;</code>; LaTeX gives you <code>&lt;Do Zotero Refresh: &gt;</code> with nothing inside. The field underneath is identical and Refresh fills both. It only means you cannot tell the citations apart by eye until you have refreshed once.</p>
+
+<p><strong><code>\ref</code> resolves; <code>\eqref</code> does not.</strong> <code>Section~\ref{sec:methods}</code> becomes &ldquo;Section 1&rdquo; and <code>Figure~\ref{fig:one}</code> becomes &ldquo;Figure 1&rdquo;, correctly numbered. <code>\eqref{eq:dose}</code> comes out as the literal <code>[eq:dose]</code>. Use plain <code>\ref</code> in anything headed for Word.</p>
+
+<p><strong>An in-text citation leaves the author name as plain text.</strong> <code>\citet{horne2012}</code> becomes <code>Horne et al.</code> followed by a suppress-author field. The field is live; the two words in front of it are not, so a later restyle in Zotero will not rewrite them. That is the price of having the citation at all &mdash; see below.</p>
+
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:1.1rem 0">
+<p><strong>The silent failure this replaced, in case you have older output lying around.</strong></p>
+<p>Until now <code>render.sh</code> called pandoc with no metadata, which left the filter's <code>author-in-text</code> setting off. With it off an in-text citation gets <strong>no field at all</strong>, and the two source formats fail differently:</p>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.8rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">source     <b>Inline: @horne2012 showed this.</b>
+
+markdown   Inline: @horne2012 showed this.     &larr; raw key, as literal text
+latex      Inline: showed this.                &larr; the citation is simply gone</div>
+<p>Nothing warned in either direction. The Word file opened, looked finished, and was wrong.</p>
+<p style="margin-bottom:0">Two fixes, both in the script now. The metadata is passed properly &mdash; and note that <code>-M zotero.author-in-text=true</code> does <em>not</em> work, because pandoc's <code>-M</code> cannot build a nested key and silently sets a flat one of that literal name. And <code>render.sh</code> now <strong>counts the citations going in and the fields coming out, fails if they differ, and deletes the bad <code>.docx</code></strong>. A half-cited file sitting next to a good one is a file somebody emails.</p>
+</div>
+
+<p>You can watch that check work by typo-ing one key on purpose:</p>
+
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.86rem;white-space:pre-wrap">@hornee2012: not found
+
+  <b>FAIL</b>  test.tex has 2 citation(s) but test.docx has 1 Zotero field(s).
+        These must match. A missing field is a citation the filter could not
+        resolve - scroll up, it printed the key.</div>
+
+<p>Figures, <code>tabular</code> environments and equations survive the LaTeX route as well: images carry over, tables become real Word tables, and <code>\begin{equation}</code> becomes a native Word equation rather than a picture of one.</p>
+
+<div class="note">
+<p><strong>This does not make the round trip work.</strong> Going <em>to</em> Word is fine from either source. Coming <em>back</em> &mdash; <code>.docx &rarr; .md &rarr; .docx</code> &mdash; still destroys every field code and every image, exactly as measured further up this page. Once you hand off to Word the <code>.docx</code> is the source of truth and Claude edits it through <code>tools/docx_suggest.py</code> as tracked changes. If you would rather keep editing the source, stay in <code>.tex</code> and re-render.</p>
+</div>
+
+<h2 id="wordback">Stage 8 &middot; Sending the Word file back</h2>
+
+<p>You will keep editing in Word and want Claude to carry on. That works &mdash; but <strong>not by sending the markdown round again</strong>. Measured on a document with two figures, one table and three Zotero fields:</p>
+
+<pre><code>                               citations   images   tables
+unzip &rarr; edit &rarr; zip                3 &rarr; 3     2 &rarr; 2    1 &rarr; 1
+pandoc &rarr; .md &rarr; .docx             3 &rarr; 0     2 &rarr; 0    1 &rarr; 1</code></pre>
+
+<p>Editing the archive is lossless. <strong>pandoc loses every citation and every image</strong> &mdash; markdown has no way to represent either, so the information has nowhere to go. The file still opens and still looks right, which is what makes it dangerous.</p>
+
+<p>So after the handoff the <code>.docx</code> is the source of truth. There is no attachment step in Claude Code; the file is already on disk:</p>
+
+<pre><code>Refine the second paragraph of writing/drafts/&lt;file&gt;.docx.
+Tighten the hedging but do not touch the citations.</code></pre>
+
+<p>Claude reads it with <code>tools/docx_text.py</code> &mdash; tables render as tables, figures as <code>&laquo;figure:N&raquo;</code>, citations as <code>&laquo;citation:N&raquo;</code> &mdash; and proposes changes through <code>tools/docx_suggest.py</code>, which writes a <strong>separate</strong> <code>-suggested.docx</code> of tracked changes. You accept or reject each one in Word's Review tab.</p>
+
+<p>To review a figure Claude has to look at it: <code>--media /tmp/figs</code> writes the images out. Reading the caption is not reviewing the figure; the axes are where claims go wrong.</p>
+
+<div class="note">
+<p><strong>If a Word file comes back from anywhere else</strong> &mdash; a co-author, Cowork, any tool that rewrote the XML &mdash; check it before building on it:</p>
+<pre><code>python3 tools/docx_text.py &lt;new&gt;.docx --against &lt;what-you-sent&gt;.docx</code></pre>
+<p>Citation counts can match while a field is quietly damaged inside a deletion. &ldquo;I opened it and Zotero still worked&rdquo; is not evidence that nothing broke. Thirty seconds.</p>
+</div>
+
+<h2>What it teaches</h2>
+
+<ul>
+<li><strong>Three layers, and they are not interchangeable.</strong> <code>CLAUDE.md</code> is a <em>request</em>, <code>.claude/settings.json</code> is a <em>refusal</em>, a subagent's missing tool is an <em>absence</em>. Put each rule in the lowest layer that can hold it. &ldquo;Do not edit the library&rdquo; is a request; the deny list makes it a refusal.</li>
+<li><strong>A verifier that can edit is a verifier you cannot trust.</strong> It can make its own findings disappear. <code>citecheck</code> and <code>prose</code> have no <code>Write</code>.</li>
+<li><strong><code>[GAP:]</code> is a result.</strong> Deleting the gaps so a draft reads finished is exactly how a confident, wrong paragraph gets written. The tier system exists so that you can see, per claim, whether anyone actually read anything.</li>
+<li><strong>One vendor file.</strong> <code>papers/library/MANIFEST.md</code> holds every Zotero-specific fact &mdash; which tool, which metadata file, which key column, how a key becomes a PDF path. Moving to Paperpile is that file plus a re-export. Nothing else changes.</li>
+<li><strong><code>doi:</code> outlives the tool; <code>item_key:</code> is the local join.</strong> Not the title, which gets retyped. Not a Better BibTeX cite key, which regenerates when you fix metadata.</li>
+<li><strong>The handoff to Word is one-way, so do it late.</strong> Markdown edits are cheap. Every edit after the handoff is careful. A paper's life is weeks in markdown and days in Word.</li>
+<li><strong>Cache derived data, never conclusions.</strong> Re-extracting a PDF is free and gives identical text, so cache it. A verdict is a judgement, and a cached judgement is where false confidence hides. <code>citecheck</code> re-verifies everything, every run, and keeps the ledger as a record rather than a skip list.</li>
+<li><strong>A DOI makes a paper citable, a PDF makes it checkable, a note makes it yours.</strong> Three different things, bought separately. Most confusion in this workflow is someone expecting one of them to have bought another.</li>
+<li><strong>Folders may encode lifecycle, never classification.</strong> <code>inbox/</code> is a folder because <em>unprocessed</em> is a state a paper is in exactly one of. Area is not &mdash; a paper is in several at once &mdash; so it is a field. The test before adding any subfolder: <em>can a paper be in two of these at the same time?</em></li>
+</ul>
+
+<h2>When it goes wrong</h2>
+
+<table>
+<tr><th style="width:42%">Symptom</th><th>Cause</th></tr>
+<tr><td><code>no pandoc with HTTP support</code></td><td>Homebrew's or conda's build. pandoc 3.9 added a flag letting it be built without networking and they turned it off; the filter talks to Zotero over <code>127.0.0.1</code>. Any pandoc 2.16.2&ndash;3.8 works. <code>doctor.sh</code> prints the fix.</td></tr>
+<tr><td>Refresh works, no reference list</td><td>Add/Edit Bibliography was skipped. Step 2 above.</td></tr>
+<tr><td><code>FAIL no citations found</code></td><td>The draft has <code>{Author, Year}</code> markers &mdash; those are the <code>rtf</code> route. Both <code>[@key]</code> and <code>\cite{key}</code> are accepted.</td></tr>
+<tr><td>One citation renders <code>(?)</code>, the rest are fine, <code>latexmk</code> exits <strong>0</strong></td><td>That key has no entry in the <code>.bib</code>. Localised and silent &mdash; the opposite failure to a duplicate, and the reason <code>tex.sh</code> fails where <code>latexmk</code> does not.</td></tr>
+<tr><td><code>has N citation(s) but M field(s)</code></td><td>A cite key is not in Zotero. The filter printed which one just above. The bad <code>.docx</code> has been deleted on purpose.</td></tr>
+<tr><td><code>0 of N items have a file</code></td><td>You re-exported before attaching the PDF, or you exported a collection. <a href="#reexport">Stage 1</a>.</td></tr>
+<tr><td>The library says there is a file; <code>citecheck</code> cannot open it</td><td>It was attached as a <strong>Linked File</strong>, so it lives outside <code>~/Zotero/storage</code> and outside <code>additionalDirectories</code>. Re-attach with <strong>File</strong>.</td></tr>
+<tr><td><code>Repeated entry</code>; every citation becomes <code>(?)</code> and the reference list is gone</td><td>The same cite key is defined twice &mdash; in one <code>.bib</code> or across two that reached one build. <code>bibtex</code> fails, <code>latexmk</code> exits 12, and the whole document loses its citations and its bibliography, not just that entry. <a href="#twobibs">Stage 3</a>.</td></tr>
+<tr><td><code>storage/</code> folder names match nothing in the CSV</td><td>Correct and expected &mdash; those are <em>attachment</em> keys. Join on the <code>File Attachments</code> column instead. <a href="#stage1">Stage 1</a>.</td></tr>
+<tr><td>Word says the file is corrupt</td><td>Re-run the identical command. Documented quirk, and that fixes it.</td></tr>
+<tr><td><code>citecheck</code> cannot open any PDF</td><td><code>additionalDirectories</code> in <code>.claude/settings.json</code> needs your absolute <code>~/Zotero/storage</code> path &mdash; no tilde.</td></tr>
+<tr><td>Library lookups fail for most papers</td><td>You exported a <em>collection</em>, not the library. The CSV has a handful of rows while <code>storage/</code> has hundreds of folders, and every lookup outside the collection fails silently.</td></tr>
+<tr><td>Everything is slow, or files look stale</td><td>Run Claude Code on your own machine rather than through a cloud session. Zotero listens on <code>127.0.0.1</code> and <code>~/Zotero/storage</code> is outside any shared folder &mdash; a bridged session can reach neither.</td></tr>
+</table>
+
+<p><code>tools/doctor.sh</code> covers most of the top half of that table, and prints the fix rather than describing it.</p>
+
+<h2>Making it yours</h2>
+
+<ul>
+<li><code>writing/STYLE.md</code> ships blank. Paste two paragraphs of your own writing in and <code>prose</code> stops flagging your habits as faults.</li>
+<li>The area table in <code>CLAUDE.md</code> is generic on purpose &mdash; <code>methods / application / evaluation / background</code>. Rewrite it for your field, with four areas that will still make sense in three years.</li>
+<li><code>QUESTIONS.md</code> is yours and the deny list enforces that. A question that states <em>what evidence would answer it</em> can be closed; a topic cannot.</li>
+<li>Nothing depends on the three demo papers. Put your own in and delete these.</li>
+</ul>
+
+<nav class="guidenav">
+  <a class="btn" href="../downloads/Demo10x_research_paper_with_zotero.zip">Download the package</a>
+  <a class="btn btn-ghost" href="../demos.html">All demos</a>
+  <a class="btn btn-ghost" href="demo9.html">&larr; Demo 9 &mdash; Lean proof agent</a>
+  <a class="btn btn-ghost" href="#cycle">The LaTeX cycle</a>
+  <a class="btn btn-ghost" href="#toword">Either source &rarr; Word</a>
+</nav>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">The three papers in this demo are <strong>real and open access under CC BY 4.0</strong>
+    &mdash; you may cite them. They are not included in the download; the package lists their
+    DOIs and you add them through Zotero, which is the first step of the workflow.
+    The scaffold is yours to adapt.</p>
+  </div>
+</footer>
+
+</body>
+</html>

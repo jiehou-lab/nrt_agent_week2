@@ -29,6 +29,7 @@ pre{background:#f6f8f7;border:1px solid var(--rule);border-radius:var(--radius);
 pre code{background:none;padding:0;font-size:inherit}
 .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;font-weight:650;color:var(--green-300);margin:0 0 .6rem}
 .lede{font-size:1.14rem;color:var(--ink-soft);max-width:64ch}
+.hero-sub{font-size:clamp(1.1rem,2.1vw,1.42rem);font-weight:600;line-height:1.32;letter-spacing:-.01em;color:var(--ink-soft);max-width:52ch;margin:-.2rem 0 1rem}
 .muted{color:var(--ink-soft);font-size:.95rem}
 .session-line{color:var(--ink);max-width:64ch;margin:.5rem 0 0;font-size:1rem;line-height:1.6}
 

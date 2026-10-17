@@ -18,3 +18,7 @@ downloads/*
 !downloads/*.pdf
 !downloads/*.pptx
 !downloads/*.docx
+
+# Working backups of pages — local history, not part of the published site
+backup/
+*.bak

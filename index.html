@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Models in Agentic AI — NRT Hot Topics · Week 2</title>
+<title>Agentic AI for Research — NRT Hot Topics</title>
 <meta name="description" content="How AI models work, where they fail, and how to connect them reliably to research workflows — with four hands-on demos that turn one analysis package into a safer agent-ready system.">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='52' font-family='Georgia,serif' fill='%23fff'>A</text></svg>">
@@ -16,16 +16,15 @@
     <a class="brand" href="index.html">
       <span class="brand-mark">NRT</span>
       <span class="brand-text">
-        <strong>Agentic AI · Week 2</strong>
+        <strong>Agentic AI</strong>
         <small>Michigan State University</small>
       </span>
     </a>
     <nav>
       <a href="#top">Home</a>
       <a href="#week2">Schedule</a>
-      <a href="#demos">Demos</a>
       <a href="#setup">Setup</a>
-      <a href="advanced.html">Advanced</a>
+      <a href="demos.html">Demos</a>
     </nav>
   </div>
 </header>
@@ -36,11 +35,10 @@
       <img src="assets/img/msu.png" alt="Michigan State University">
       <img src="assets/img/cmse.png" alt="MSU Department of Computational Mathematics, Science and Engineering">
     </div>
-    <p class="eyebrow">NRT Hot Topics: Agentic AI · Lectures 2 and 3</p>
-    <h1>AI Models in Agentic AI:<br>How They Learn, Fail, and Connect to Research Workflows</h1>
-    <p class="lede">How AI models work, where they fail, and how to connect them reliably to
-    research workflows — followed by four hands-on demos that progressively turn one analysis
-    package into a more structured and controlled agent-ready system.</p>
+    <p class="eyebrow">NRT Hot Topics: Agentic AI</p>
+    <h1>Agentic AI for Research</h1>
+    <p class="hero-sub">How models fail, how interfaces fix them, and how to design your own agent</p>
+    <p class="lede">Four Fridays, from the inside of a language model to a workflow you can hand to one. Why tool use breaks and what structured interfaces and MCP fix; the four ways to work with Claude &mdash; chat, Cowork, and Claude Code in a window or a terminal &mdash; and what each one can reach; then <strong>pattern design</strong>: who does each step, how much to build, and how you would know it went wrong. The practice packages are on the <a href="demos.html">Demos page</a>.</p>
 
     <p class="session-line" style="margin-top:1.2rem">
       <strong>Sep 25 &middot; Week 2.</strong> Why LLM tool use fails, structured interfaces and
@@ -51,10 +49,23 @@
       Markdown and terminal basics, the course project, the practice demos &mdash; then you
       design <strong>one research capability of your own</strong>.</p>
 
+    <p class="session-line">
+      <strong>Oct 9 &middot; Week 4.</strong> <strong>From chatbot to coworker</strong> &mdash;
+      the Claude landscape, and one physics problem solved four ways: chat, Cowork, Claude Code
+      in the desktop app, and Claude Code in the terminal. What each can reach, and what it
+      remembers. <em>Led by Prof. Michael Murillo.</em></p>
+
+    <p class="session-line">
+      <strong>Oct 16 &middot; Week 5.</strong> <strong>Pattern design.</strong> Four questions to ask
+      of any task: <em>who does each step</em> (you, a script, Claude, or a check), <em>how much to
+      build</em> (a prompt, a skill, or a subagent), <em>where it runs</em> &mdash; chat for one-off
+      thinking, Cowork for folders of documents, Claude Code for scripts and a shell &mdash; and
+      <em>how you would know it went wrong</em>. Then a live demo turning one real task into a skill
+      you can run again.</p>
+
     <div class="hero-facts">
-      <div><strong>Sep 25 &amp; Oct 2, 2026</strong><span>Fridays · 2:30 – 4:30 PM</span></div>
+      <div><strong>Sep 25 &ndash; Oct 16, 2026</strong><span>Fridays · 2:30 – 4:30 PM</span></div>
       <div><strong><a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a></strong><span>Michigan State University</span></div>
-      <div><strong>Four demos</strong><span>No coding required</span></div>
       <div><strong>Bring a laptop</strong><span>Terminal and Claude Code (<a href="#setup">setup</a>)</span></div>
     </div>
   </div>
@@ -266,177 +277,114 @@
   </details>
 </section>
 
-<section id="demos">
-  <h2>Four demos, one analysis</h2>
-  <p>Every demo runs the <strong>same tissue-damage analysis on the same slides with the same
-  trained model</strong>. Nothing about the science changes between them. What changes is how much
-  the agent has to infer, and how much it is allowed to do.</p>
+<section id="week4">
+  <h2>Oct 9 &middot; From chatbot to coworker</h2>
+  <p>An introduction to the Claude landscape and the four ways you can work with it &mdash;
+  <strong>chat</strong>, <strong>Cowork</strong>, <strong>Claude Code in the desktop app</strong>, and
+  <strong>Claude Code in the terminal</strong> &mdash; told through one physics problem solved four
+  times over. What each one can reach, what it remembers between sessions, and how to pick the right
+  one for the job in front of you.</p>
 
-  <div class="path">
-    <div><span>Level 1</span><strong>Repository as context</strong></div>
-    <div><span>Level 2</span><strong>MCP interface</strong></div>
-    <div><span>Level 3</span><strong>Permission-controlled access</strong></div>
-    <div><span>Level 4</span><strong>Scoped subagent delegation</strong></div>
-  </div>
+  <p class="muted">Led by <strong>Prof. Michael Murillo</strong>, Michigan State University.</p>
 
-  <p class="muted">First make the capability explicit, then control who can call it, then narrow
-  what each agent is allowed to do.</p>
-
-  <div class="note">
-    <p><strong>Set your machine up before you download a demo.</strong> All four need a terminal
-    (or the VS Code terminal), Python 3, and Claude Code signed in to the NRT organization.</p>
-    <p>If you have not done that yet, start with <a href="#setup">Before you arrive</a> below —
-    about ten minutes — and come back to this section afterwards.</p>
-  </div>
-
-  <!-- ─────────────────────────── LEVEL 1 ─────────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">1</div>
-      <div>
-        <h3>Original Tissue Analyzer — repository as context</h3>
-        <p>An ordinary research repository. The agent has to work everything out by reading it.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Run the analysis and the classifier yourself on four synthetic histology cases, then look at the fold-artifact case.</li>
-          <li>Open the same folder in Claude Code and ask it to work out the interface from the repository alone.</li>
-          <li>Probe two wordings: <code>20x</code> for magnification, and a <code>50%</code> threshold.</li>
-          <li>Ask it which files it used to decide — repository as context, made visible.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li>An agent can do a great deal with nothing but a well-organised repository.</li>
-          <li>Everything it knows, it inferred from docs, source and config — and a wrong inference looks exactly like a right one.</li>
-          <li>The fold case returns a perfectly ordinary label. Valid output is not the same as trustworthy output.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo1_tissue_analyzer.zip" target="_blank" rel="noopener">Download demo 1 &nbsp;↓</a>
-        <a class="btn btn-ghost" href="guides/demo1.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP · 360 KB · Python 3. Four synthetic histology cases with colour previews.</p>
-      </div>
-    </div>
+  <div class="files">
+    <a class="filecard" href="downloads/NRT_week4_claude_landscape_murillo.pdf" target="_blank" rel="noopener">
+      <span class="ft">Slides &middot; PDF</span>
+      <strong>The Claude landscape</strong>
+      <span class="fd">All 59 slides: the four interfaces side by side, the two dials &mdash; reach
+      and memory &mdash; and the four-setup experiment on one physics problem. Opens in the
+      browser.</span>
+    </a>
+    <a class="filecard" href="downloads/NRT_week4_claude_landscape_murillo.pptx" target="_blank" rel="noopener">
+      <span class="ft">PowerPoint &middot; 4.4 MB</span>
+      <strong>Slides (editable)</strong>
+      <span class="fd">The same deck as .pptx, with the speaker notes.</span>
+    </a>
   </div>
 
-  <!-- ─────────────────────────── LEVEL 2 ─────────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">2</div>
-      <div>
-        <h3>MCP Tissue Analyzer — explicit tool interface</h3>
-        <p>The same workflow, wrapped as MCP tools with a declared schema.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Run the MCP-adapted tools directly, then register and inspect the server with <code>claude mcp list</code> and <code>claude mcp get</code>.</li>
-          <li>Call <code>analyze_tissue</code> and <code>classify_tissue</code> from inside Claude Code and chain them across all four cases.</li>
-          <li>Send <code>damage_threshold_fraction = 50</code> and <code>magnification = 25</code> deliberately, and watch both be refused <em>before anything runs</em>.</li>
-          <li>Then ask in plain English for "20x magnification with a 50% threshold" and see it converted correctly.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li>Claude no longer reconstructs the interface from source; it is handed one.</li>
-          <li>A schema makes parameter meaning and valid ranges explicit — information Demo 1 leaves mostly in documentation.</li>
-          <li>The MCP lifecycle itself: configure, inspect, remove, restore, connect.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo2_MCP_Tissue_Analyzer.zip" target="_blank" rel="noopener">Download demo 2 &nbsp;↓</a>
-        <a class="btn btn-ghost" href="guides/demo2.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP · 376 KB · Python 3. Includes the MCP command reference.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────── LEVEL 3 ─────────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">3</div>
-      <div>
-        <h3>MCP + Permissions — restrict the direct paths</h3>
-        <p>The MCP server stays open; direct file and shell access is closed.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Start from a reasonable-looking policy that denies <code>Read</code> and <code>Edit</code> on <code>data/</code>, and watch it refuse.</li>
-          <li><strong>Then test a bypass path</strong> — ask for the same file through a shell command and see why the initial policy is incomplete.</li>
-          <li>Patch by naming bad commands, watch that fail too, then close it properly.</li>
-          <li>Practise the four operations: read the rules, add one, remove one, and switch a rule from <code>deny</code> to <code>ask</code>.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li>MCP and permissions are separate layers: MCP defines the tool interface, permissions decide which direct actions are available.</li>
-          <li>A deny list protects only what you explicitly block; reducing the available capability set is often more robust than enumerating every prohibited use.</li>
-          <li>These are guardrails on the agent, not an OS sandbox: the MCP server reads the file Claude cannot open.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo3_MCP_Permissions_Tissue_Analyzer.zip" target="_blank" rel="noopener">Download demo 3 &nbsp;↓</a>
-        <a class="btn btn-ghost" href="guides/demo3.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP · Python 3. Ships four permission policies to swap between.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────── LEVEL 4 ─────────────────────────── -->
-  <div class="level">
-    <div class="level-head">
-      <div class="level-num">4</div>
-      <div>
-        <h3>MCP + Scoped Subagent — delegate with a narrow tool set</h3>
-        <p>A <code>tissue-analyst</code> subagent that holds two tools and nothing else.</p>
-      </div>
-    </div>
-    <div class="level-body">
-      <div>
-        <h4>What you will do</h4>
-        <ul>
-          <li>Delegate to a subagent holding only the two MCP tools, then ask the main agent to show you exactly what crossed between them.</li>
-          <li>Prove the two contexts are separate — tell one a fact and ask the other to recall it.</li>
-          <li>Score its answers against the expected values, then probe four edge cases.</li>
-          <li><strong>Find the gap in its rules</strong> using the fold-artifact case, and fix the subagent yourself.</li>
-        </ul>
-        <h4>What it teaches</h4>
-        <ul>
-          <li>Two different control styles: Demo 3 blocks actions through project permissions; Demo 4 gives the subagent a narrower tool set from the start.</li>
-          <li>The report becomes the interface — information the subagent does not return is not passed back through that delegation step.</li>
-          <li>Scoping a subagent is not a security boundary: the MCP server still accesses files with the permissions of the process running it.</li>
-          <li>A rule that sounds correct is not the same as one that covers the case you care about.</li>
-        </ul>
-      </div>
-      <div class="demo-box">
-        <a class="btn" href="downloads/Demo4_subagent_tissue_analyzer.zip" target="_blank" rel="noopener">Download demo 4 &nbsp;↓</a>
-        <a class="btn btn-ghost" href="guides/demo4.html" target="_blank" rel="noopener">Open the guide</a>
-        <p class="muted">ZIP · Python 3. Ships two versions of the subagent to compare.</p>
-      </div>
-    </div>
-  </div>
-  <div class="note" style="margin-top:2rem">
-    <p><strong>Two more, for later.</strong> Demo 5 puts the same analysis behind a web interface,
-    reached both by a button and by a sentence. Demo 6 goes the other way: it hands you a research
-    project nobody prepared &mdash; one script, a README that is partly wrong &mdash; and four prompts
-    that turn it into an agent-callable capability, the way you will have to for your own code.
-    Both are optional and neither is part of either session.</p>
-    <p><a href="advanced.html">Advanced demos →</a></p>
-  </div>
-  <div class="note" style="margin-top:1.2rem">
-    <p><strong>&ldquo;It forgets everything when I quit.&rdquo;</strong> The most common question after
-    a first week with Claude Code. Three different things get called memory, and only one of them is
-    the one you want &mdash; a short reference on sessions, <code>--continue</code>,
-    <code>CLAUDE.md</code> and auto memory.</p>
-    <p><a href="guides/memory.html">Memory and sessions →</a></p>
-  </div>
+  <p class="muted"><strong>The idea to carry forward:</strong> the model stays fixed &mdash; what
+  changes is the scaffolding around it. <em>Reach</em> decides what an agent can do; <em>memory</em>
+  &mdash; files, rules, skills &mdash; decides whether it does it the way you need. That distinction
+  is what the Oct 16 session builds on.</p>
 </section>
+
+<section id="homework">
+  <h2>Oct 16 &middot; Pattern design intro</h2>
+  <p>Designing an agent for a task you already do. Four patterns to apply to any workflow &mdash;
+  <strong>who does each step</strong>, <strong>how much to build</strong>, <strong>where it runs</strong>,
+  and <strong>how you would know it went wrong</strong> &mdash; then a live demo that turns one real
+  task into a skill you can run again.</p>
+
+  <div class="callout">
+    <p><strong>Design the workflow first. The agent is only one of the boxes.</strong> Most steps in
+    a real task belong to you, to a script, or to a check. Friday is about deciding which box is
+    which &mdash; and <strong>&ldquo;this does not need an agent&rdquo; is a perfectly good
+    conclusion.</strong></p>
+    <p>Bring <strong>one small, ordinary task you already do</strong> and the five short answers
+    about it: what you do, how you do it now step by step, a sketch of that, what goes in and out of
+    each step &mdash; who does it, and whether it belongs in chat, Cowork or Claude Code &mdash; and
+    what could go wrong without you noticing. <strong>Half an hour is plenty</strong>, and
+    <strong>a photo of a hand-drawn workflow is a perfect answer.</strong></p>
+  </div>
+
+  <div class="files">
+    <a class="filecard" href="downloads/NRT_week5_agent_pattern_design.pdf" target="_blank" rel="noopener">
+      <span class="ft">Slides &middot; PDF</span>
+      <strong>Lecture slides</strong>
+      <span class="fd">Pattern design I &mdash; the four patterns, the worked example, and the
+      one-time setup for the demo. Opens in the browser.</span>
+    </a>
+    <a class="filecard" href="downloads/NRT_week5_agent_pattern_design.pptx" target="_blank" rel="noopener">
+      <span class="ft">PowerPoint &middot; 1.2 MB</span>
+      <strong>Slides (editable)</strong>
+      <span class="fd">The same deck as .pptx, if you would rather step through it in PowerPoint or
+      Keynote.</span>
+    </a>
+    <a class="filecard" href="downloads/NRT_week5_ADS_demo_skill_agent.docx" target="_blank" rel="noopener">
+      <span class="ft">Word &middot; 52 KB</span>
+      <strong>Solution demo &mdash; prompts to a skill to an agent</strong>
+      <span class="fd">The full worked demo on a real task: searching NASA ADS, downloading the
+      papers, summarizing them. Prompts you can paste, test cases, then packaging it as a skill, a
+      subagent, and finally into Cowork.</span>
+    </a>
+    <a class="filecard" href="guides/homework-agent-design.html" target="_blank" rel="noopener">
+      <span class="ft">Page</span>
+      <strong>The assignment</strong>
+      <span class="fd">The five questions, a short guide to which of chat, Cowork and Claude Code
+      fits each step, one worked example, and the prompts we use on the day.</span>
+    </a>
+    <a class="filecard" href="downloads/NRT_homework_agent_design.pdf" target="_blank" rel="noopener">
+      <span class="ft">PDF &middot; 163 KB</span>
+      <strong>Printable version</strong>
+      <span class="fd">Seven pages: the questions, space to write your answers, one worked example,
+      and the Friday prompts.</span>
+    </a>
+    <a class="filecard" href="downloads/NRT_homework_agent_design.docx" target="_blank" rel="noopener">
+      <span class="ft">Word &middot; 41 KB</span>
+      <strong>Editable version</strong>
+      <span class="fd">The form you fill in &mdash; type straight into it, or print it. Claude reads
+      a .docx directly on the day.</span>
+    </a>
+  </div>
+
+  <div class="callout">
+    <p style="margin-top:0"><strong>Submit your solution here:</strong>
+    <a href="https://forms.gle/EDDonqW83ZDZKEtz5" target="_blank" rel="noopener"><strong>forms.gle/EDDonqW83ZDZKEtz5</strong></a></p>
+    <p style="margin-bottom:0">Share what you built &mdash; your own task or the ADS demo. A link to
+    your folder, your <code>SKILL.md</code>, or a short note on what worked and what did not. An
+    answer that concludes <em>&ldquo;this did not need an agent&rdquo;</em>, with the reasoning, is
+    complete.</p>
+  </div>
+
+  <p class="muted"><strong>In a group project?</strong> The task you describe here is a good
+  candidate for the assignment of one problem solved four or five ways &mdash; and questions 1, 2
+  and 5 are most of what a <code>seed.md</code> needs. Bring both.</p>
+
+  <p class="muted"><strong>Also bring one real file</strong> that your task starts from &mdash; a real
+  spreadsheet, document or export, messy as it is, with names changed if it is sensitive. Made-up
+  files are tidy and real ones are not, and everything interesting lives in that difference.</p>
+</section>
+
 
 <section id="setup">
   <h2>Before you arrive</h2>
@@ -556,7 +504,7 @@ pip install -r requirements.txt</code></pre>
 
 <footer>
   <div class="wrap">
-    <p><strong>NRT Hot Topics: Agentic AI · Week 2</strong><br>
+    <p><strong>NRT Hot Topics: Agentic AI</strong><br>
     <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> · Michigan State University · Friday, September 25, 2026</p>
     <p class="muted">Demo packages are teaching artifacts. The tissue data is synthetic and the
     classifier is a stand-in; neither is suitable for any clinical or research use.</p>

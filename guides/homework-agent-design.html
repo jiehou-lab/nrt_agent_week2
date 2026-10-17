@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework · One task you already do — Agentic AI</title>
+<meta name="description" content="Homework for Friday 16 October: five questions about one small, ordinary task you already do — and the prompts we will use on Friday to turn it into a skill you can re-run.">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318453B'/><text y='72' x='50' text-anchor='middle' font-size='46' font-family='Georgia,serif' fill='%23fff'>HW</text></svg>">
+</head>
+<body class="guide">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">NRT</span>
+      <span class="brand-text">
+        <strong>Agentic AI</strong>
+        <small>Michigan State University</small>
+      </span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../index.html#week2">Schedule</a>
+      <a href="../index.html#setup">Setup</a>
+      <a href="../demos.html">Demos</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pagehead">
+  <div class="wrap">
+    <p class="eyebrow">HOMEWORK &middot; DUE FRIDAY 16 OCTOBER</p>
+    <h1>Bring one task you already do</h1>
+    <p class="lede">Choose one small, ordinary task that you already do, and describe how you do it today. Five short questions and a sketch. <strong>About 30 minutes is enough.</strong> On Friday we hand your answers to Claude and turn whatever is worth building into a <strong>skill you can run again</strong>.</p>
+    <p class="hero-cta" style="margin-top:1.3rem">
+      <a class="btn" href="../downloads/NRT_homework_agent_design.docx">Word &mdash; fill this in &nbsp;&darr;</a>
+      <a class="btn btn-ghost" href="../downloads/NRT_homework_agent_design.pdf">Printable PDF</a>
+      <a class="btn btn-ghost" href="../downloads/agent-design-brief.md">Markdown template</a>
+      <a class="btn btn-ghost" href="#which">Chat, Cowork or Code?</a>
+      <a class="btn btn-ghost" href="#friday">The Friday prompts</a>
+    </p>
+  </div>
+</div>
+
+<main class="wrap">
+
+<div class="callout">
+<p style="margin-top:0"><strong>Due Friday 16 October.</strong> For this homework, choose one small, ordinary task that you already do and describe how you do it today.</p>
+<p style="margin-bottom:0">The goal is not to invent an impressive AI project. The goal is to understand a real workflow well enough that, on Friday, we can decide together: which parts should stay with you, which parts could be automated, whether any part actually needs an agent, and how you would know if the result were wrong. <strong>&ldquo;This does not need an agent&rdquo; is a perfectly good conclusion.</strong></p>
+</div>
+
+<p class="hero-cta" style="margin:1.4rem 0">
+  <a class="btn" href="../downloads/NRT_homework_agent_design.docx">Word &mdash; fill this in &nbsp;&darr;</a>
+  <a class="btn btn-ghost" href="../downloads/NRT_homework_agent_design.pdf">Printable PDF</a>
+  <a class="btn btn-ghost" href="../downloads/agent-design-brief.md">Markdown template</a>
+  <a class="btn btn-ghost" href="#example">Worked example</a>
+  <a class="btn btn-ghost" href="#friday">The Friday prompts</a>
+</p>
+
+<h2 id="what">Pick a small task you already know well</h2>
+
+<p>Good examples are things like:</p>
+
+<ul>
+<li>tidying up documents someone sends you,</li>
+<li>finding a few useful papers or articles on a topic,</li>
+<li>summarizing the numbers from a spreadsheet each month,</li>
+<li>organizing files,</li>
+<li>checking a recurring report, or</li>
+<li>running a specific set of tools for some task.</li>
+</ul>
+
+<p>Pick something you already do and, ideally, something where you already use ChatGPT or Claude for at least part of the work. Small, repetitive tasks are often best because you know what can go wrong.</p>
+
+<p><strong>Small and slightly boring is better than ambitious.</strong> If you have done the task many times, you already know where it tends to go wrong and what a correct result looks like.</p>
+
+<h2 id="five">Answer five questions</h2>
+
+<table>
+<tr><th style="width:5%">&nbsp;</th><th style="width:38%">Question</th><th>What we want to learn</th></tr>
+<tr><td><strong>1</strong></td><td><strong>What do you do?</strong></td>
+<td>Describe the task, how often you do it, and how long it takes.</td></tr>
+<tr><td><strong>2</strong></td><td><strong>How do you do it now?</strong></td>
+<td>Write the real steps you currently follow.</td></tr>
+<tr><td><strong>3</strong></td><td><strong>Draw it</strong></td>
+<td>Show the steps and any loops or places where you have to go back. Boxes and arrows, one per step.</td></tr>
+<tr><td><strong>4</strong></td><td><strong>What goes in, what comes out, and who does each step?</strong></td>
+<td>Decide what you would keep for yourself and what an agent might do.</td></tr>
+<tr><td><strong>5</strong></td><td><strong>What could go wrong, and would you notice?</strong></td>
+<td>Identify a quiet failure and a quick way to detect it.</td></tr>
+</table>
+
+<div class="note">
+<p style="margin:0"><strong>Start question 4 with the human decisions.</strong> Which steps would you keep for yourself, and why? An agent checking its own work is not always an independent check.</p>
+</div>
+
+<h2 id="size">Keep it small</h2>
+
+<p>Your task is probably the right size if:</p>
+
+<ul>
+<li>it starts from one identifiable file, folder, input, or request;</li>
+<li>you could tell within about five minutes whether the result is right;</li>
+<li>the workflow has fewer than about ten steps.</li>
+</ul>
+
+<p><strong>If the whole task is really just one good prompt to ChatGPT, write that down.</strong> That is useful information too. A task becomes more interesting for agent design when it involves several steps, files moving between steps, repeated work, or something that needs to be checked.</p>
+
+<h2 id="which">Which one &mdash; chat, Cowork, or Claude Code?</h2>
+
+<p>Prof. Murillo's rule from last Friday: <strong>pick by what the agent has to touch.</strong></p>
+
+<table>
+<tr><th style="width:24%">&nbsp;</th><th style="width:40%">what it can work with</th><th>good fit</th></tr>
+<tr><td><strong>Chat</strong><br><span class="muted">browser / phone</span></td>
+<td>Content you paste or upload; a temporary sandbox.</td>
+<td>One-off questions, drafting, planning.</td></tr>
+<tr><td><strong>Cowork</strong><br><span class="muted">desktop</span></td>
+<td>Folders you grant access to, plus browser tasks.</td>
+<td>Multi-step file work without a terminal.</td></tr>
+<tr><td><strong>Claude Code</strong><br><span class="muted">Code tab / terminal</span></td>
+<td>Project files, scripts, tests, and a shell.</td>
+<td>Running code, or making repeatable workflows with explicit project instructions.</td></tr>
+</table>
+
+<h2 id="submit">What to submit</h2>
+
+<ul>
+<li>Complete questions 1&ndash;5 in the Word document (or the Markdown template). You can type directly into it or print it and write by hand.</li>
+<li><strong>A photo of a hand-drawn workflow for question 3 is completely fine.</strong></li>
+<li>About 30 minutes is enough. Half a page to one page of answers is usually plenty.</li>
+</ul>
+
+<p>Bring your completed homework <strong>and one real input file</strong> from the task on Friday. Remove sensitive details if necessary. On Friday, we will give your workflow to Claude Code or Cowork and use it to decide what &mdash; if anything &mdash; is worth building.</p>
+
+<h2 id="example">Worked example &mdash; formatting a colleague's document</h2>
+
+<p>This is deliberately ordinary and short. <strong>Your own answers can be this simple.</strong></p>
+
+<h3>1 &middot; What I do</h3>
+
+<p>Colleagues send sections of a shared report in different formats. I apply our template styles, adjust tables, and place figure captions correctly without changing the underlying wording.</p>
+
+<p class="muted">About twice a month &middot; 30&ndash;40 minutes each &middot; today: Word, by hand, plus Claude when the wording also needs a tidy.</p>
+
+<h3>2 &middot; How I do it now</h3>
+
+<ol class="steps">
+<li>Open their file next to our template.</li>
+<li>Apply our heading styles to their headings.</li>
+<li>Fix the tables &mdash; widths, header row, borders.</li>
+<li>Move figure captions below the figures and renumber them.</li>
+<li>Read it through to check that no wording changed.</li>
+<li>Save as <code>&lt;section&gt;_formatted.docx</code> and send it back.</li>
+</ol>
+
+<h3>3 &middot; Drawn</h3>
+
+<pre><code>[1 open theirs + template]          me
+           |
+           v
+[2 headings] [3 tables] [4 captions]    agent
+           |
+           v
+[5 check nothing was reworded] --changed!--> back to 4
+           |
+       unchanged
+           v
+[6 save and send]                   me</code></pre>
+
+<h3>4 &middot; In, out, who, where</h3>
+
+<table>
+<tr><th style="width:7%">Steps</th><th style="width:23%">Input</th><th style="width:22%">Output</th><th style="width:24%">Who</th><th>Where</th></tr>
+<tr><td>1</td><td>Colleague file + template</td><td>files ready</td><td>Me</td><td>Desktop</td></tr>
+<tr><td>2&ndash;4</td><td>Original + template</td><td>formatted copy</td><td>Agent</td><td>Cowork / Claude Code</td></tr>
+<tr><td>5</td><td>Original + formatted copy</td><td>change list</td><td>Agent drafts; I check</td><td>Cowork / Claude Code</td></tr>
+<tr><td>6</td><td>Approved file</td><td>email sent</td><td>Me</td><td>Email</td></tr>
+</table>
+
+<h3>5 &middot; What could go wrong</h3>
+
+<p>It &ldquo;tidies&rdquo; a sentence while restyling, and I send back something they did not write. I would not notice; it would read fine.</p>
+
+<p><strong>I'd spot it by</strong> having it list every wording change it made: the list should be empty, and an empty list takes two seconds to check.</p>
+
+<p><strong>Never touch:</strong> their original file. Always write a new one.</p>
+
+<p><strong>Where:</strong> Cowork. The files sit in a folder on my machine and there is no code to run. Chat would mean uploading and downloading every file by hand. <strong>Claude Code</strong> if it happens every week or month and I want it done identically every time &mdash; then the rules live in a <code>CLAUDE.md</code> the agent re-reads, or in a skill.</p>
+
+<div class="callout">
+<p style="margin:0"><strong>Why this example matters.</strong> The agent handles the repetitive middle; a person starts and approves the result. The check is an <strong>observable artifact</strong> &mdash; a change list &mdash; not a vague assurance that everything looks fine. And a short script may be preferable to an agent when the steps are fully deterministic.</p>
+</div>
+
+<h2 id="friday">On Friday &mdash; build something you can run again</h2>
+<p>You will not need a special folder, a setup file, or anything installed beyond Claude itself. Everything below is a prompt you paste, with your own answers pasted underneath. Work wherever you are &mdash; Cowork, the Code tab, or chat.</p>
+<div class="callout">
+<p style="margin:0">By the end you will have a skill: a short page of written instructions that Claude loads by itself whenever this task comes round again. Next time, the whole workflow is one sentence.</p>
+</div>
+<ol class="steps">
+
+<li><strong>Hand over your answers.</strong>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.84rem;white-space:pre-wrap">I want to design a small agent workflow for a task I already do.
+Here are my answers to five questions about it.
+
+1. WHAT I DO:
+   &lt;paste your answer to question 1&gt;
+
+2. HOW I DO IT NOW:
+   &lt;paste your numbered steps from question 2&gt;
+
+3. IN / OUT / WHO / WHERE, PER STEP:
+   &lt;paste your table from question 4&gt;
+
+4. WHAT COULD GO WRONG, AND HOW I'D SPOT IT:
+   &lt;paste your answer to question 5&gt;
+
+Read all of it. Before you propose anything, ask me the three
+questions whose answers would most change your design. Then wait.</div>
+<p>The waiting is the point. Nearly every brief is missing the same thing &mdash; a way it could go wrong that nobody would catch &mdash; and you want that found now, not after you have built something.</p></li>
+
+<li><strong>Ask whether it is worth building at all.</strong>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.84rem;white-space:pre-wrap">Now tell me honestly: is this worth building? Give me three
+options, smallest first &mdash;
+  (a) one good prompt I paste each time,
+  (b) a short script I run,
+  (c) a skill you load whenever this task comes up.
+For each: what would I have to do every time, and what could
+still go wrong? Recommend one, and say why not the smaller one.</div>
+<p>(a) and (b) are real answers. If all three sound equally good, ask which one it would drop first &mdash; that question gets a straighter answer than asking which is best.</p></li>
+
+<li><strong>Do one step, once, on a real file.</strong>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.84rem;white-space:pre-wrap">Before we write anything reusable, do step &lt;N&gt; once, right now,
+on this real file: &lt;drag the file in, or give me its path&gt;.
+Show me what comes out. If a few lines of code would do this
+more reliably than you reading the file yourself, write the code.</div>
+<p>A real file, not a made-up one. Made-up files are tidy and yours is not, and the difference is where the whole design lives.</p></li>
+
+<li><strong>Add your check &mdash; then break it on purpose.</strong>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.84rem;white-space:pre-wrap">Add the check I described in question 5 &mdash; the one that catches
+&lt;the quiet failure you named&gt;. It must report what it finds and
+must not fix anything.
+
+Then take a copy of my file, put that exact problem into it, and
+run the check again. I want to watch the check fail.</div>
+<p>A check you have never seen fail is not a check. Yours will probably pass the first time for the wrong reason &mdash; it read the wrong column, the file was empty, the text wrapped onto two lines. Ten minutes here saves you from trusting it for a year.</p></li>
+
+<li><strong>Turn it into a skill.</strong>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.84rem;white-space:pre-wrap">Now write this up so I can re-run it. Produce one file called
+SKILL.md, starting exactly like this:
+
+    ---
+    name: &lt;short-name-with-hyphens&gt;
+    description: &lt;one sentence: what it does and when to use
+      it &mdash; this is what makes you pick it up later&gt;
+    ---
+
+Then the steps, in order, written as instructions to you rather
+than to me. Include:
+  - what file or folder the task starts from,
+  - the checking step, and what it should print,
+  - what you must never do: &lt;your 'never touch' line from Q5&gt;,
+  - what to hand me at the end, and in what format.
+Keep it under a page. Show me the file.</div>
+<p>The description does more work than the steps. It is the only part Claude reads when deciding whether this skill applies, so it should name the things you will actually say: the file type, the folder, the words you use for the task.</p></li>
+
+<li><strong>Save it where Claude will find it.</strong>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.84rem;white-space:pre-wrap">Put that SKILL.md inside a folder named &lt;short-name-with-hyphens&gt;,
+zip the folder so the folder itself is the top level of the zip,
+and give me the zip.</div>
+<p>Then, in Claude: Settings &rarr; Capabilities, turn on Code execution and file creation if it is off. Then Customize &rarr; Skills &rarr; + &rarr; Create skill &rarr; Upload a skill, and upload the zip. A skill saved there is available in chat, in Cowork, and &mdash; signed in to the same account &mdash; in Claude Code. If you live in one project folder, you can instead save it as .claude/skills/&lt;short-name&gt;/SKILL.md and run /skills to check it is listed.</p></li>
+
+<li><strong>Test it cold.</strong>
+<div class="term" style="background:#1d1f1e;color:#e8e8e8;padding:.9rem 1rem;border-radius:6px;font-family:ui-monospace,monospace;font-size:.84rem;white-space:pre-wrap">&lt;Start a NEW conversation, and say the task the way you would
+ say it to a colleague:&gt;
+
+Can you tidy up this section for me? Here's the file.</div>
+<p>If Claude does not reach for your skill by itself, the description is what needs fixing, not the steps. That is the real test, and it is worth doing before you leave the room.</p></li>
+</ol>
+
+<div class="box danger" style="border:1px solid #b44;border-radius:8px;padding:1rem 1.1rem;margin:1.3rem 0">
+<p style="margin-top:0"><strong>&ldquo;This does not need an agent&rdquo; is a passing answer.</strong></p>
+<p style="margin-bottom:0">If prompt 2 lands on &ldquo;one good prompt&rdquo; or &ldquo;a short script you run once a month&rdquo;, that is a result and a good one. Write it down with the reasoning, and skip to prompt 5 &mdash; a skill that says &ldquo;paste this prompt, then check that&rdquo; is still worth saving.</p>
+</div>
+
+<div class="callout">
+<p style="margin-top:0"><strong>If you are in a group project.</strong> Last Friday's assignment &mdash; one problem solved four or five ways, fifteen minutes of slides &mdash; needs a problem and a <code>seed.md</code>. The task you describe here is a good candidate for both.</p>
+<p style="margin-bottom:0">Question 1 is the goal and who it is for, question 2 is the working guesses about how it gets done, and question 5 is how a result gets checked and what &ldquo;done&rdquo; means. Bring both and we will line them up.</p>
+</div>
+
+<h2 id="bring">What to bring</h2>
+
+<ul>
+<li>Your answers &mdash; typed into this document, or on paper. A photo of your question 3 sketch is fine.</li>
+<li>One real file your task starts from, messy as it is. Change names if it is sensitive; do not invent a clean one.</li>
+<li>Claude working on your laptop: the desktop app for Cowork, or Claude Code. Nothing else to install, and nothing to download beforehand.</li>
+</ul>
+
+<h2>What we are looking for</h2>
+
+<p>Whether it is <strong>honest and specific</strong> &mdash; not whether the idea is impressive.</p>
+
+<ul>
+<li>Question 2 describes what you actually do, awkward parts included.</li>
+<li>Question 4 names real files and real formats, and says &ldquo;not sure&rdquo; where you are not sure.</li>
+<li>Question 5 names something that could go wrong quietly, and a check you could actually run in a minute.</li>
+<li>An answer concluding &ldquo;this does not need an agent&rdquo;, with the reasoning, is complete.</li>
+</ul>
+
+<p class="muted">Half a page is a good length. If it is running to three, you have picked something too big &mdash; take one piece of it instead.</p>
+</main>
+<footer>
+  <div class="wrap">
+    <p><strong>NRT Hot Topics: Agentic AI</strong><br>
+    <a href="https://jiehou-lab.github.io/" target="_blank" rel="noopener">Jie Hou</a> &middot; Michigan State University</p>
+    <p class="muted">Bring a <strong>real file</strong> as well as your answers &mdash; a real spreadsheet, document or export, with names changed if it is sensitive. Made-up files are tidy and real ones are not, and everything interesting lives in that difference.</p>
+  </div>
+</footer>
+
+</body>
+</html>
